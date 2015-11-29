@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "ordrDB"
+  },
+  "AccessToken": {
+    "dataSource": "ordrDB",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "ordrDB",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "ordrDB",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "ordrDB",
+    "public": false
+  },
+  "Bathhouse": {
+    "dataSource": "ordrDB",
+    "public": true
+  },
+  "Room": {
+    "dataSource": "ordrDB",
+    "public": true
+  },
+  "City": {
+    "dataSource": "ordrDB",
+    "public": true
+  },
+  "Order": {
+    "dataSource": "ordrDB",
+    "public": true
+  },
+  "Review": {
+    "dataSource": "ordrDB",
+    "public": true
+  },
+  "Schedule": {
+    "dataSource": "ordrDB",
+    "public": true
+  }
+}

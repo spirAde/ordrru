@@ -1,0 +1,92 @@
+@import "../../../styles/variables.css";
+
+.ScheduleRow {
+
+	padding-bottom: 25px;
+	margin-bottom: 25px;
+	border-bottom: 1px solid rgba(255,255,255,.2);
+
+	&--last {
+		margin-bottom: 0;
+		padding-bottom: 0;
+		border: none;
+	}
+
+	&-info {
+		margin-bottom: 15px;
+	}
+
+	&-date {
+		float: left;
+		font-family: var(--font-family-bold);
+		position: relative;
+		top: 4px;
+		margin-right: 20px;
+	}
+
+	&-types {
+		float: left;
+		font-size: 12px;
+	}
+
+	&-type {
+		display: inline-block;
+		padding: 5px;
+
+		&--ordered {
+			border: 1px solid rgba(255,255,255,.2);
+			color: rgba(255,255,255,.3);
+		}
+
+		&--free {
+			border: 1px solid rgba(255,255,255,.2);
+			color: #fff;
+		}
+
+		&--selected {
+			border: 1px solid rgba(255,255,255,.2);
+			color: #fff;
+			background-color: #F4740C;
+		}
+
+		&--disabled {
+			border: 1px solid rgba(255,255,255,.2);
+			color: rgba(255,255,255,.3);
+			background-color: rgba(75, 95, 106, 0.85)
+		}
+	}
+
+	&-cells {
+
+	}
+
+	&-cell {
+		font-size: 12px;
+		width: 38px;
+		text-align: center;
+		display: block;
+		float: left;
+		border-right: 1px solid rgba(255,255,255,.1);
+		padding: 5px 0;
+		cursor: pointer;
+
+		&:hover {
+			background-color: #F4740C;
+		}
+
+		&--odd {
+			margin-left: -39px;
+			margin-top: 25px;
+			border-top: 1px solid rgba(255,255,255,.2);
+		}
+
+		&--disabled {
+			color: rgba(255,255,255,.3) !important;
+			background-color: transparent !important;
+		}
+	}
+
+	&-cell--upper {
+
+	}
+}

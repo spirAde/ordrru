@@ -1,0 +1,134 @@
+{
+  "name": "Bathhouse",
+  "plural": "bathhouses",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "address": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "contactData": {
+      "type": "object",
+      "default": {
+        "phone": [],
+        "email": [],
+        "site": ""
+      }
+    },
+    "tableTime": {
+      "type": "array",
+      "required": true,
+      "default": [
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        },
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        },
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        },
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        },
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        },
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        },
+        {
+          "startPeriodId": 0,
+          "endPeriodId": 144
+        }
+      ]
+    },
+    "cityId": {
+      "type": "string",
+      "required": true,
+      "index": true
+    },
+    "location": {
+      "type": "object",
+      "required": true,
+      "default": {
+        "lat": 0,
+        "lng": 0
+      }
+    },
+    "distance": {
+      "type": "number",
+      "required": true,
+      "default": 0,
+      "comments": "Distance between this point and center of city, will calculate before save model"
+    },
+    "isActive": {
+      "type": "boolean",
+      "required": true,
+      "index": true,
+      "default": false
+    },
+    "services": {
+      "type": "object",
+      "required": true,
+      "index": true,
+      "default": {
+        "massage": [],
+        "steaming": [],
+        "other": []
+      },
+      "comments": "Categories and services: ex. massage, etc."
+    },
+    "options": {
+      "type": "array",
+      "required": true,
+      "default": [],
+      "comments": "Additional options: ex. parking, internet, etc."
+    }
+  },
+  "validations": [],
+  "relations": {
+    "rooms": {
+      "type": "hasMany",
+      "model": "Room",
+      "foreignKey": "bathhouseId"
+    },
+    "city": {
+      "type": "belongsTo",
+      "model": "City",
+      "foreignKey": "cityId"
+    },
+    "orders": {
+      "type": "hasMany",
+      "model": "Order",
+      "foreignKey": "roomId",
+      "through": "Room"
+    },
+    "schedules": {
+      "type": "hasMany",
+      "model": "Schedule",
+      "foreignKey": "bathhouseId",
+      "through": "Room"
+    }
+  },
+  "acls": [
+
+  ],
+  "methods": {}
+}

@@ -1,0 +1,152 @@
+@import '../../../styles/variables.css';
+
+.FiltersList {
+	position: relative;
+	background-color: #fff;
+	transition: all 0.3s ease 0s;
+	z-index: 17;
+	width: 100%;
+	max-width: 1024px;
+	padding: 70px 0 0 0;
+
+	&--opened {
+	 	max-width: 1024px;
+	 	position: fixed;
+	 	left: 0;
+	 	top: 0;
+	 	box-sizing: border-box;
+	 	height: 100%;
+	 	padding-top: 70px;
+ 	}
+
+ 	&-wrapper {
+		overflow: hidden;
+		height: 100%;
+		position: relative;
+ 	}
+
+	&-top {
+		display: none;
+
+		&--opened {
+			padding: 20px;
+			display: block;
+		}
+	}
+
+	&-bottom {
+		padding: 0 20px 20px 20px;
+		display: none;
+		margin-top: -20px;
+
+		&--opened {
+		display: block;
+		}
+	}
+
+	&-options {
+		padding: 15px 20px;
+		border-top: 1px solid #DCE0E0;
+		border-bottom: 1px solid #DCE0E0;
+		z-index: 12;
+		background-color: #FFFFFF;
+		position: relative;
+	 	display: none;
+
+	 	&--opened {
+			display: block;
+	 	}
+
+		&--sticked {
+			width: 1024px;
+			position: fixed;
+			left: 0;
+			top: 70px;
+			box-sizing: border-box;
+			z-index: 17;
+	 	}
+	}
+
+	&-more {
+		float: left;
+	}
+
+	&-more-anchor {
+		display: inline-block;
+	 	border-radius: 3px;
+	 	background-color: #18B2AE;
+	 	color: #fff;
+	 	font-size: 12px;
+	 	font-family: var(--font-family-bold);
+		text-transform: uppercase;
+	 	padding: 10px 15px;
+	 	border: 1px solid #18B2AE;
+
+		&::hover {
+	 		background-color: #138A87;
+	 		border-color: #138A87;
+	 	}
+	}
+
+	&-tags {
+	 	float: left;
+	 	margin-left: 20px;
+	}
+
+ 	&-tags-anchor {
+		cursor: pointer;
+	 	position: relative;
+	 	display: inline-block;
+	 	border-radius: 3px;
+	 	background-color: #fff;
+	 	border: 1px solid #DFE0E4;
+	 	font-size: 12px;
+	 	margin-right: 3px;
+	 	text-transform: uppercase;
+	 	padding: 10px 35px 10px 15px;
+	 	color: #7E8492;
+ 	}
+
+	&-total-offers {
+	 	float: right;
+	 	padding-top: 8px;
+ 	}
+
+	&-total-offers-count {
+	 	font-family: var(--font-family-bold);
+	}
+
+	&-show-content {
+
+		 width: 100%;
+		 box-sizing: border-box;
+		 left: 0;
+		 bottom: 0;
+		 position: absolute;
+		 padding: 20px;
+		 display: none;
+		 background-color: #fff;
+
+		&--opened {
+		 display: block;
+		 border-top: 1px solid #dce0e0;
+	 	}
+	}
+
+ 	&-show-offers-element {
+	 	display: none
+	}
+
+	&-show-offers-anchor {
+	 	display: block;
+	 	text-align: center;
+	 	padding: 15px 0;
+		border-radius: 3px;
+		background-color: #18B2AE;
+		color: #fff;
+		font-size: 12px;
+		font-family: var(--font-family-bold);
+		text-transform: uppercase;
+		border: 1px solid #18B2AE;
+	}
+}

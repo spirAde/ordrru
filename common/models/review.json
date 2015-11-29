@@ -1,0 +1,30 @@
+{
+  "name": "Review",
+  "plural": "reviews",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": true,
+  "properties": {
+    "roomId": {
+      "type": "string",
+      "required": true,
+      "index": true
+    },
+    "text": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "evaluation": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

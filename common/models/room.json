@@ -1,0 +1,128 @@
+{
+  "name": "Room",
+  "plural": "rooms",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": true,
+  "properties": {
+    "bathhouseId": {
+      "type": "string",
+      "required": true,
+      "index": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "default": ""
+    },
+    "types": {
+      "type": "array",
+      "required": true,
+      "default": [],
+      "comments": "Types of bathhouses: ex. hammam, sauna, bathhouses"
+    },
+    "options": {
+      "type": "array",
+      "required": true,
+      "default": [],
+      "comments": "Additional options: ex. billiards, jacuzzi, etc."
+    },
+    "settings": {
+      "type": "object",
+      "required": true,
+      "default": {
+        "minDuration": 3,
+        "cleaningTime": 0,
+        "prepayment": false,
+        "holdTime": 0
+      },
+      "comments": "Set of settings: ex. minimal duration of time for order, duration for cleaning room, etc. "
+    },
+    "rating": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "popularity": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "orderedItems": {
+      "type": "object",
+      "required": true,
+      "default": {
+        "datetime": [
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          },
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          },
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          },
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          },
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          },
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          },
+          {
+            "startPeriodId": 0,
+            "endPeriodId": 144,
+            "price": 0
+          }
+        ],
+        "guest": {
+          "limit": 0,
+          "threshold": 0,
+          "price": 0
+        }
+      }
+    }
+  },
+  "validations": [],
+  "relations": {
+    "reviews": {
+      "type": "hasMany",
+      "model": "Review",
+      "foreignKey": "roomId"
+    },
+    "orders": {
+      "type": "hasMany",
+      "model": "Order",
+      "foreignKey": "roomId"
+    },
+    "schedule": {
+      "type": "hasMany",
+      "model": "Schedule",
+      "foreignKey": "roomId"
+    },
+    "bathhouses": {
+      "type": "belongsTo",
+      "model": "Bathhouse",
+      "foreignKey": "bathhouseId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

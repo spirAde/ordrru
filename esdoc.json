@@ -1,0 +1,9 @@
+{
+  "source": "./client/scripts",
+  "destination": "./build/esdoc",
+  "unexportIdentifier": true,
+  "includes": ["\\.(js|jsx|es6)$"],
+  "plugins": [
+    {"name": "esdoc-es7-plugin"}
+  ]
+}

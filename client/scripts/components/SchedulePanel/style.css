@@ -1,0 +1,23 @@
+@import "../../../styles/variables.css";
+
+.SchedulePanel {
+
+	position: relative;
+	display: none;
+
+	&--active {
+	 	display: block;
+	}
+
+	&-wrapper {
+		padding: 0 0 20px 0;
+		height: 250px;
+	}
+
+	&-scroll {
+		padding: 0px 20px;
+		overflow: hidden;
+		height: 100%;
+		position: relative;
+	}
+}

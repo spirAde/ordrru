@@ -1,0 +1,79 @@
+@import "../../../styles/variables.css";
+
+.FilterPrepayment {
+
+	&-wrapper {
+		padding:20px 0 0 220px;
+		position: relative;
+		margin-top: 20px;
+		border-top: 1px solid #dce0e0;
+	}
+
+	&-heading {
+		color: #7E8492;
+		position: absolute;
+		left: 0;
+		top: 20px;
+		text-transform: uppercase;
+		font-size: 12px;
+		font-family: var(--font-family-bold)
+	}
+
+ 	&-buttons {
+	 	list-style: none outside none;
+ 	}
+
+ 	&-button {
+		color: #7F8C9D;
+		display: inline;
+		position: relative;
+		float: left;
+		width: 160px;
+ 	}
+
+ 	&-button-input {
+		position: absolute;
+		top: -9999px;
+ 	}
+
+ 	&-button-label {
+		display: block;
+		position: relative;
+		padding-left: 30px;
+		margin-bottom: 20px;
+		z-index: 9;
+		background: rgba(255,255,255,0.15);
+		cursor: pointer;
+		-webkit-transition: all 0.45s linear;
+
+		&--checked {
+			color: #18B2AE;
+			font-family: var(--font-family-bold);
+ 		}
+	}
+
+	&-button-check {
+		display: block;
+		position: absolute;
+		border: 2px solid #BCC1C9;
+		border-radius: 100%;
+		height: 15px;
+		width: 15px;
+		top: 0;
+
+		&--checked {
+			border: 2px solid #18B2AE;
+	 	}
+ 	}
+
+	&-button-inside {
+		display: block;
+		position: relative;
+		background: #18B2AE;
+		border-radius: 100%;
+		height: 70%;
+		width: 70%;
+		top: 14%;
+		margin: auto;
+ 	}
+}

@@ -1,0 +1,65 @@
+@import '../../../styles/variables.css';
+
+#Map {
+
+	bottom: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.Map {
+
+	& .leaflet-popup-content-wrapper {
+		background: #fff;
+		border-radius: 3px;
+		box-shadow: 0 1px 2px;
+		pointer-events: all;
+		padding: 20px 0 0 0;
+		text-align: center;
+		font-size: 14px;
+		font-family: var(--font-family-base);
+	}
+
+	& .leaflet-popup-content {
+		height : 450px;
+		overflow : auto;
+		position: relative;
+	}
+
+	&-popup-bathhouse-name {
+		font-size: 18px;
+		font-family: var(--font-family-bold);
+	}
+
+	&-popup-room-name {
+		font-size: 14px;
+		font-family: var(--font-family-bold);
+	}
+
+	&-popup-rooms {
+		margin-top: 20px;
+	}
+
+	&-popup-room {
+		border-top: 1px solid #EBEBEB;
+		padding: 20px;
+	}
+
+	&-popup-room-info {
+		font-size: 12px;
+	}
+
+	&-popup-room-button {
+		display: inline-block;
+		color: #fff !important;
+		background-color: #18b2ae;
+		padding: 5px 10px;
+		margin-top: 10px;
+
+		&:hover {
+			background-color: #5ec9c6;
+		}
+	}
+}

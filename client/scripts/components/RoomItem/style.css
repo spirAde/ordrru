@@ -1,0 +1,295 @@
+@import "../../../styles/variables.css";
+
+.RoomItem {
+
+	border-bottom: 1px solid #dce0e0;
+
+	&--last {
+		border-bottom: none
+	}
+
+	&-inner {}
+
+	&-preview {
+		padding: 20px;
+		background-color: rgba(255,255,255,.9);
+	}
+
+	&-preview-top {
+		margin-bottom: 20px;
+	}
+
+	&-name {
+	 	font-family: var(--font-family-bold);
+	 	font-size: 28px;
+	 	float: left;
+	 	margin-right: 10px;
+	 	position: relative;
+	 	padding-left: 170px;
+
+		&:before {
+	 		display: inline-block;
+		 	background-color: #F4740C;
+	 		color: #fff;
+		 	text-align: center;
+		 	width: 145px;
+		 	padding: 5px 5px;
+		 	border-radius: 3px;
+		 	font-size: 14px;
+		 	position: absolute;
+		 	left: 0;
+		 	top:3px;
+	 	}
+ 	}
+
+ 	&-type {
+
+		&-bathhouse {
+			&:before {
+				content: "баня"
+	 		}
+	 	}
+
+		&-bathhouse-sauna {
+			&:before {
+				content: "баня | сауна"
+			}
+	 	}
+
+		&-bathhouse-hammam {
+			&:before {
+				content: "баня | хаммам"
+			}
+	 	}
+
+	 	&-bathhouse-hammam-sauna {
+			&:before {
+				content: "баня | сауна | хаммам"
+			}
+	 	}
+
+		&-sauna {
+	 		&:before {
+	 			content: "сауна"
+	 		}
+	 	}
+
+		&-hammam-sauna {
+	 		&:before {
+	 			content: "хаммам | сауна"
+	 		}
+	 	}
+
+		&-hammam {
+			&:before {
+				content: "хаммам"
+			}
+	 	}
+ 	}
+
+	&-stars {
+	 	float: left;
+		position: relative;
+	 	top:8px;
+ 	}
+
+	&-bathhouse-address {
+	 	float: right;
+	 	position: relative;
+	 	top:8px;
+
+		&-text {
+	 		color: #7f8c9d;
+	 		font-family: var(--font-family-bold);
+	 		text-decoration: underline;
+
+			&:hover {
+			 	color: #F4740C;
+		 	}
+	 	}
+ 	}
+
+	&-preview-bottom {}
+
+ 	&-photos {
+		float: left;
+		font-size: 0;
+		width: 750px;
+ 	}
+
+ 	&-photo {
+	 	display: inline-block;
+	 	margin-right: 16px;
+	 	width: 234px;
+	 	height: 140px;
+ 	}
+
+ 	&-more-info {
+	 	float: left;
+ 	}
+
+ 	&-details-button {
+		cursor: pointer;
+	 	display: block;
+	 	width: 234px;
+	 	height: 140px;
+	 	color: #fff;
+	 	text-align: center;
+	 	background-color: #F4740C;
+	 	font-family: var(--font-family-bold);
+
+		&:hover {
+		 	background-color: #4A5060;
+	 	}
+
+		&--active {
+	 		background-color: #C4C7CE;
+	 	}
+ 	}
+
+ 	&-details-price {
+	 	display: block;
+	 	font-size: 28px;
+	 	padding-top: 40px;
+ 	}
+
+ 	&-details-more {
+	 	display: block;
+	 	font-size: 18px;
+	 	text-decoration: underline;
+ 	}
+
+ 	&-info {
+
+	 	display: none;
+	 	position: relative;
+	 	transition: all 0.3s ease-in-out;
+
+		&--opened {
+		 	display: block;
+	 	}
+ 	}
+
+	&-descriptions-services {
+	 	padding: 0 20px 20px 20px;
+	 	background-color: rgba(255,255,255,.9);
+ 	}
+
+ 	&-description {
+		 width: 484px;
+		 float: left;
+ 	}
+
+	&-description-text {
+	 	line-height: 1.7;
+	}
+
+ 	&-services {
+		width: 500px;
+		float: left;
+ 	}
+
+ 	&-service-type {
+		margin: 0 0 10px 16px;
+		width: 177px;
+		float: left;
+		border: 1px solid rgba(177, 180, 188, .5);
+		padding: 10px 45px 10px 10px;
+		border-radius: 3px;
+		font-family: var(--font-family-bold);
+		position: relative;
+ 	}
+
+	&-booking {
+	 	background-color: rgba(75,95,106,.9);
+	 	color: #fff;
+	}
+
+ 	&-booking-inner {}
+
+ 	&-booking-step-1 {
+	 	padding: 20px 12px;
+ 	}
+
+ 	&-booking-left-fields {
+		width: 484px;
+		float: left;
+ 	}
+
+ 	&-field-date-time {
+
+	 	margin-bottom: 13px;
+	 	position: relative;
+ 	}
+
+	&-field-date-time-input {
+	 	box-sizing: border-box;
+	 	width: 100%;
+	 	padding: 10px;
+	 	color: #54595A;
+	 	font-family: var(--font-family-bold);
+	 	font-size: 16px;
+	 	border: 1px solid #D4D6D9;
+ 	}
+
+	&-field-select-services {
+		cursor: pointer;
+		width: 100%;
+		color: #54595a;
+ 	}
+
+	&-field-select-services-input {
+		padding: 10px;
+		background-color: #fff;
+		position: relative;
+		display: block;
+		font-family: var(--font-family-bold);
+	}
+
+	&-booking-right-fields {
+		width: 500px;
+		float: left;
+	 	padding-left: 16px;
+	}
+
+ 	&-select-guests {
+		width: 234px;
+		float: left;
+		background-color: #fff;
+		color: #54595A;
+		height: 95px;
+		text-align: center;
+		font-family: var(--font-family-bold);
+ 	}
+
+ 	&-select-guests-text {
+	 	padding: 12px 0 15px 0;
+ 	}
+
+ 	&-next-step {
+		width: 234px;
+		margin-left: 16px;
+		float: left;
+		text-align: center;
+ 	}
+
+ 	&-next-step-button {
+		color: #fff;
+		background-color: #F4740C;
+		display: block;
+		height: 95px;
+		font-family: var(--font-family-bold);
+		font-size: 28px;
+ 	}
+
+ 	&-total-cost {
+	 	padding-top: 20px;
+		display: block;
+ 	}
+
+ 	&-order-text {
+		font-size: 16px;
+		display: block;
+		font-family: var(--font-family-base);
+ 	}
+}

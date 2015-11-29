@@ -1,0 +1,36 @@
+@import './variables.css';
+@import './fonts.css';
+
+* {
+	margin: 0;
+	padding: 0;
+	outline: none;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #7F8C9D;
+	background-color: #fff;
+	font-size: 16px;
+	font-family: var(--font-family-base);
+	overflow-y: scroll;
+}
+
+img {
+	display: block;
+	border: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+ul {
+	list-style: none outside none;
+}
+
+h1, h2, h3, h4 {
+	color: #55595B;
+	font-weight: normal;
+}

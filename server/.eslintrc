@@ -1,0 +1,11 @@
+{
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "comma-dangle": [2, "never"],
+    "new-cap": 0
+  },
+  "extends": "strongloop",
+  "parser": "babel-eslint"
+}

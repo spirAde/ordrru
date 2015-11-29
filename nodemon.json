@@ -1,0 +1,12 @@
+{
+  "restartable": "rs",
+  "verbose": true,
+  "watch": [
+    "server/",
+    "common/models/"
+  ],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ext": "js json"
+}

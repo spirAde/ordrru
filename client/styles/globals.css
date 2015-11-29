@@ -1,0 +1,26 @@
+@import './variables.css';
+
+.g-clear::after {
+	clear: both;
+	content: "";
+	display: block;
+	height: 0;
+}
+
+.g-icons::before, .g-icons::after,
+.g-buttons a:before, .g-buttons a:after,
+.g-field-checkbox input + label:after, .g-field-checkbox label:before,
+.g-caret:after,
+.g-field-checkbox input + label:after, .g-field-checkbox label:before,
+.g-field-date:after,
+.g-field-select:after
+{
+	position: relative;
+	font-family: var(--font-family-icon);
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	font-size: 16px;
+}

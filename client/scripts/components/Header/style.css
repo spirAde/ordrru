@@ -1,0 +1,78 @@
+@import "../../../styles/variables.css";
+
+.Header {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	background-color: #4A5060;
+	z-index: 110;
+
+	&-wrapper {
+		position: relative;
+		padding: 15px 20px;
+		color: #fff;
+		font-size: 12px;
+		text-transform: uppercase;
+		font-family: var(--font-family-bold);
+	}
+
+	&-logo {
+		float: left;
+		width: 190px;
+	}
+
+	&-select-city {
+		float: left;
+		font-size: 16px;
+		margin-top: 10px;
+	}
+
+ 	&-current-city {
+		display: inline-block;
+		padding-right: 40px;
+ 	}
+
+ 	&-current-city-field {
+		cursor: pointer;
+		padding-right: 20px;
+ 	}
+
+	&-mode {
+		margin-top: 4px;
+		float: right;
+	}
+
+	&-anchor {
+		display: inline-block;
+		color: #fff;
+		background-color: rgba(255,255,255,.25);
+		padding: 10px 15px 10px 35px;
+		text-align: center;
+ 		position: relative;
+	 	line-height: 1;
+
+		&:before {
+		 	position: absolute;
+		 	left: 10px;
+		 	text-transform: lowercase;
+		 	top: 8px;
+	 	}
+
+	 	&:hover {
+		 	background-color: #18B2AE;
+	 	}
+	}
+
+	&-anchor--first {
+	 	border-radius: 3px 0 0 3px;
+ 	}
+
+ 	&-anchor--last {
+	 	border-radius: 0 3px 3px 0;
+ 	}
+
+	&-anchor--active {
+	 	background-color: #18B2AE;
+	}
+}

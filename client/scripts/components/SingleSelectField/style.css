@@ -1,0 +1,56 @@
+@import '../../../styles/variables.css';
+
+.SingleSelectField {
+
+	&-caption {
+		display: block;
+		padding: 10px 0;
+		font-family: var(--font-family-bold);
+	}
+
+ 	&-options-wrapper {
+
+	 	background-color: #fff;
+	 	position: absolute;
+	 	left: 0px;
+	 	top:42px;
+	 	display: none;
+	 	width: 100%;
+
+		&--opened {
+		 	display: block;
+		 	z-index: 1000;
+	 	}
+ 	}
+
+	&-option {
+	 	cursor: pointer;
+	 	padding: 10px 10px 10px 40px;
+	 	border-bottom: 1px solid rgba(112,117,129,.1);
+	 	font-family: var(--font-family-bold);
+	 	position: relative;
+
+	 	&--disabled {
+		 	font-family: var(--font-family-base);
+		 	padding: 10px;
+	 	}
+
+	 	&--selected {
+			 color: #fff;
+			 background-color: #76D1CE;
+	 	}
+
+	 	&--first {
+		 	border-radius: 4px 4px 0 0;
+	 	}
+
+		&--last {
+			border-bottom: none;
+		 	border-radius: 0 0 4px 4px;
+	 	}
+ 	}
+
+	&-option-name {
+	 	cursor: pointer;
+ 	}
+}

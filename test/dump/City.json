@@ -1,0 +1,5 @@
+[
+{"id": "219c9b88-d798-4691-8e07-b67404bd222f", "timezone": "Asia/Yekaterinburg", "slug": "ekat", "name": "Yekaterinburg", "center": {"lat": 56.82842, "lng": 60.628636}},
+{"id": "c88c30f7-8bde-4d8c-a435-f08ead52c7ef", "timezone": "Asia/Yekaterinburg", "slug": "mgn", "name": "Magnitogorsk", "center": {"lat": 58.98441315, "lng": 53.41167831}},
+{"id": "f4495973-c2d7-4212-9087-f2a8e32463bd", "timezone": "Asia/Yekaterinburg", "slug": "chel", "name": "Chelyabinsk", "center": {"lat": 55.163249, "lng": 61.435837}}
+]

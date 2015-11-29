@@ -1,0 +1,36 @@
+{
+  "name": "City",
+  "plural": "cities",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true
+    },
+    "center": {
+      "type": "object",
+      "required": true
+    },
+    "timezone": {
+      "type": "string",
+      "required": true,
+      "default": "Asia/Yekaterinburg"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "bathhouses": {
+      "type": "hasMany",
+      "model": "Bathhouse",
+      "foreignKey": "cityId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

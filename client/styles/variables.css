@@ -1,0 +1,39 @@
+:root {
+
+	/*
+	 * Colors
+	 * ======================================================================== */
+
+	--white-base:            hsl(255, 255, 255);
+
+	/*
+	 * Typography
+	 * ======================================================================== */
+
+	--font-family-base:      'proxima', Arial, sans-serif;
+	--font-family-bold:			 'proxima-bold', Arial, sans-serif;
+	--font-family-icon: 		 'ordr-icons';
+	--font-size-base:				 16px;
+
+	/*
+	 * Layout
+	 * ======================================================================== */
+
+	--max-content-width:     1024px;
+
+	/*
+	 * Media queries breakpoints
+	 * ======================================================================== */
+
+	--screen-xs-min:         480px;  /* Extra small screen / phone */
+	--screen-sm-min:         768px;  /* Small screen / tablet */
+	--screen-md-min:         1024px;  /* Medium screen / desktop */
+	--screen-lg-min:         1280px; /* Large screen / wide desktop */
+
+	/*
+	 * Animations
+	 * ======================================================================== */
+
+	--animation-swift-out:   .45s cubic-bezier(0.3, 1, 0.4, 1) 0s;
+
+}

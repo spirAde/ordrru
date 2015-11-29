@@ -1,0 +1,15 @@
+{
+  "globals": {
+    "__CLIENT__": true,
+    "__SERVER__": true,
+    "__DEVELOPMENT__": true,
+    "__DEVTOOLS__": true,
+    "__SSR__": true,
+    "__INITIAL_STATE__": true,
+    "__CONFIG__": true,
+    "isomorphicTools": true
+  },
+  "plugins": [
+    "react"
+  ]
+}
