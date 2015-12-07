@@ -1,9 +1,14 @@
+require('dotenv').config({path: '../../envs/.env.test'});
+
 var loopback = require('loopback');
 var _ = require('lodash');
 
 var generator = require('./generator');
 
 var server = require('../server.test');
+
+server.start();
+
 var dataSource = server.dataSources.ordrDB;
 
 var Bathhouse = server.models.Bathhouse;
@@ -41,6 +46,8 @@ dataSource.automigrate(function(error) {
 
       if (error) console.log(error);
 
+      console.log('created city record', cityRecord.name);
+      
       var bathhouses = _.times(5, _.partial(generator.bathhouse, cityRecord.center, cityRecord.id));
 
       _.forEach(bathhouses, function(bathhouse) {
@@ -48,6 +55,8 @@ dataSource.automigrate(function(error) {
         Bathhouse.create(bathhouse, {center: cityRecord.center}, function(error, bathhouseRecord) {
 
           if (error) console.log(error);
+
+          console.log('created bathhouse record');
 
           var rooms = _.times(10, _.partial(generator.room, bathhouseRecord.id));
 
@@ -58,6 +67,8 @@ dataSource.automigrate(function(error) {
               if (error) console.log(error);
             });
           });
+
+          console.log('created rooms for bathhouse');
         })
       });
     });

@@ -51,7 +51,7 @@ export default (app, callback) => {
     let commonData = {
       mapboxAccessToken: app.get('mapboxAccessToken'),
       periods: app.get('periods'),
-      invertPeriod: invert(app.get('periods')),
+      invertPeriods: invert(app.get('periods')),
       organizationType: app.get('organizationType'),
       bathhouseType: app.get('bathhouseType'),
       cities: cities
@@ -80,14 +80,12 @@ export default (app, callback) => {
           return bathhouse.rooms();
         }));
 
-        const orderComponents = pluck(bathhouseRooms, 'orderComponents');
-
-        const guestLimits = pluck(orderComponents, 'guest').map(guestData => {
+        const guestLimits = pluck(bathhouseRooms, 'guest').map(guestData => {
           return guestData.limit + guestData.threshold;
         });
 
-        const datetimePrices = pluck(flatten(orderComponents.map(orderComponent => {
-          return flatten(orderComponent.datetime);
+        const datetimePrices = pluck(flatten(pluck(bathhouseRooms, 'price').map(chunks => {
+          return flatten(chunks.chunks);
         })), 'price');
 
         const guest = {

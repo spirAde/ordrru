@@ -9,9 +9,8 @@ import thunkMiddleware from 'redux-thunk';
 import nock from 'nock';
 
 import { initialState as defaultInitialState, reducer } from '../../../common/reducers/bathhouse';
-import { findBathhousesAndRooms, findRoomSchedule, updateRooms, changeActiveRoom } from '../../../client/scripts/actions/bathhouse-actions';
+import { findBathhousesAndRooms, updateRooms, changeActiveRoom } from '../../../client/scripts/actions/bathhouse-actions';
 import { FIND_BATHHOUSES_FAILURE, FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS,
-  FIND_ROOM_SCHEDULE_REQUEST, FIND_ROOM_SCHEDULE_SUCCESS, FIND_ROOM_SCHEDULE_FAILURE,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS } from '../../../client/scripts/actions/bathhouse-actions';
 
 import { CHANGE_DATETIME_FILTER_VALUES, CHANGE_DISTANCE_FILTER_VALUE, CHANGE_GUEST_FILTER_VALUE,

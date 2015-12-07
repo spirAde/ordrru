@@ -2,8 +2,17 @@
   "restartable": "rs",
   "verbose": true,
   "watch": [
-    "server/",
-    "common/models/"
+    "server",
+    "common/models"
+  ],
+  "ignore": [
+    "trash",
+    "webpack",
+    "client",
+    "build",
+    "coverage",
+    "node_modules",
+    "rethinkdb_data"
   ],
   "env": {
     "NODE_ENV": "development"

@@ -41,7 +41,9 @@ export default function renderApplication(url, locale) {
         console.error('ROUTER ERROR:', pretty.render(error));
 
         status = 500;
-        content = '<!doctype html>\n' + ReactDOMServer.renderToString(<Root assets={isomorphicTools.assets()} store={store} locale={locale}/>);
+        content = '<!doctype html>\n' + ReactDOMServer.renderToString(
+            <Root assets={isomorphicTools.assets()} store={store} locale={locale}/>
+          );
 
         return resolve({status, content});
       }
@@ -50,14 +52,18 @@ export default function renderApplication(url, locale) {
       } else if (!routerState) {
 
         status = 500;
-        content = '<!doctype html>\n' + ReactDOMServer.renderToString(<Root assets={isomorphicTools.assets()} store={store} locale={locale}/>);
+        content = '<!doctype html>\n' + ReactDOMServer.renderToString(
+            <Root assets={isomorphicTools.assets()} store={store} locale={locale}/>
+          );
 
         return resolve({status, content});
       } else {
 
         if (!__SSR__) {
 
-          content = '<!doctype html>\n' + ReactDOMServer.renderToString(<Root assets={isomorphicTools.assets()} store={store} locale={locale}/>);
+          content = '<!doctype html>\n' + ReactDOMServer.renderToString(
+              <Root assets={isomorphicTools.assets()} store={store} locale={locale}/>
+            );
 
           return resolve({status, content});
         }
@@ -86,7 +92,9 @@ export default function renderApplication(url, locale) {
           console.error('DATA FETCHING ERROR:', pretty.render(error));
 
           status = 500;
-          content = '<!doctype html>\n' + ReactDOMServer.renderToString(<Root assets={isomorphicTools.assets()} store={store} locale={locale}/>);
+          content = '<!doctype html>\n' + ReactDOMServer.renderToString(
+              <Root assets={isomorphicTools.assets()} store={store} locale={locale}/>
+            );
 
           return resolve({status, content});
         });

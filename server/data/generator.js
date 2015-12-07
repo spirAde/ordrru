@@ -90,8 +90,8 @@ function generatePricesByDateTime() {
 
     pricesPoints.reduce(function(prev, curr) {
       pricesDatetime[dayIndex].push({
-        startPeriodId: prev,
-        endPeriodId: curr,
+        startPeriod: prev,
+        endPeriod: curr,
         price: dayIndex === 0 || dayIndex === 6 ? priceWeekend : price
       });
 
@@ -126,32 +126,32 @@ var generator = {
       },
       tableTime: [
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         },
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         },
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         },
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         },
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         },
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         },
         {
-          startPeriodId: 0,
-          endPeriodId: 144
+          startPeriod: 0,
+          endPeriod: 144
         }
       ],
       cityId: cityId,
@@ -179,13 +179,14 @@ var generator = {
         prepayment: Math.random() < 0.5,
         holdTime: 0
       },
-      orderComponents: {
-        datetime: generatePricesByDateTime(),
-        guest: {
-          limit: _.random(12, 18),
-          threshold: _.random(8, 10),
-          price: _.first(_.shuffle(_.range(100, 500, 50)))
-        }
+      guest: {
+        limit: _.random(12, 18),
+        threshold: _.random(8, 10),
+        price: _.first(_.shuffle(_.range(100, 500, 50)))
+      },
+      price: {
+        min: 0,
+        chunks: generatePricesByDateTime()
       },
       rating: _.random(1, 10),
       popularity: _.random(1, 10)

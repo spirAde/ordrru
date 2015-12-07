@@ -25,7 +25,10 @@ export const reducer = createReducer({
     return state
       .update('tags', tags => tags.delete(tags.findIndex(tag => tag === action.payload.tag)))
       //  if remove tag from list, need to reset filter type to start state
-      .updateIn(['filters', action.payload.tag], filter => filter.clear().merge(fromJS(configs.filters[action.payload.id][action.payload.tag])));
+      .updateIn(
+        ['filters', action.payload.tag],
+        filter => filter.clear().merge(fromJS(configs.filters[action.payload.id][action.payload.tag]))
+      );
   },
   [CHANGE_DATETIME_FILTER_VALUES](state) {
     return state;
@@ -58,8 +61,11 @@ export const reducer = createReducer({
     });
     return state.updateIn(['filters', 'prepayment'], list => list.clear().merge(changedValues));
   },
-  [CHANGE_PRICE_FILTER_VALUES](state) {
-    return state;
+  [CHANGE_PRICE_FILTER_VALUES](state, action) {
+    return state.setIn(['filters', 'price', 'current'], Map({
+      start: action.payload.values[0],
+      end: action.payload.values[1]
+    }));
   },
   [CHANGE_TYPES_FILTER_VALUE](state, action) {
     const types = state.getIn(['filters', 'types']);
@@ -72,13 +78,13 @@ export const reducer = createReducer({
       );
   },
   [CHANGE_SORTING_FILTER_VALUE](state, action) {
-    const types = state.getIn(['filters', 'sorting']);
-    return state
-      .setIn(
-        ['filters', 'sorting'],
-        types.update(
-          types.findIndex(type => type.get('name') === action.payload.value.get('name')),
-          type => action.payload.value)
-    );
+    const changedValues = state.getIn(['filters', 'sorting']).map(value => {
+      return Map({
+        name: value.get('name'),
+        isDesc: value.get('name') === action.payload.value.get('name') && value.get('checked') ? !value.get('isDesc') : true,
+        checked: value.get('name') === action.payload.value.get('name')
+      });
+    });
+    return state.updateIn(['filters', 'sorting'], list => list.clear().merge(changedValues));
   }
 }, initialState);

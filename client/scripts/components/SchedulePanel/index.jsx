@@ -3,6 +3,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import classNames from 'classnames';
 
+import moment from 'moment';
+
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import ScheduleRowComponent from '../ScheduleRow/index.jsx';
@@ -52,14 +54,17 @@ class SchedulePanelComponent extends Component {
   /**
    * render schedule rows for all retrieved dates
    * @param {Array.<Object>} schedules - schedules for room
+   * @param {Array.<Object>} prices - prices by chunks
    * @return {Array.<Element>} - schedule rows element
    * */
-  renderScheduleRows(schedule) {
+  renderScheduleRows(schedule, prices) {
     return schedule.map((day, index) => {
       return (
         <ScheduleRowComponent
           cells={day.get('periods')}
+          prices={prices.get(moment(day.get('date')).day())}
           date={day.get('date')}
+          isLast={index === schedule.size - 1}
           key={index}
           onSelectOrder={this.props.onSelectOrder}
         />
@@ -72,8 +77,8 @@ class SchedulePanelComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { schedule, isOpen } = this.props;
-    const rows = schedule ? this.renderScheduleRows(schedule) : null;
+    const { schedule, prices, isOpen } = this.props;
+    const rows = schedule ? this.renderScheduleRows(schedule, prices) : null;
 
     const classes = classNames({
       'SchedulePanel': true,
@@ -95,12 +100,16 @@ class SchedulePanelComponent extends Component {
 /**
  * propTypes
  * @property {Array.<Object>} schedules - room schedules
+ * @property {Array.<Object>} prices - prices for current day splitted by intervals
  * @property {boolean} isOpen - opened or not
+ * @property {string} notifier - notify text, if order was cancel or reserve
  * @property {Function} onSelectOrder - select date and period of order
  * */
 SchedulePanelComponent.propTypes = {
   schedule: ImmutablePropTypes.list,
+  prices: ImmutablePropTypes.list,
   isOpen: PropTypes.bool.isRequired,
+  notifier: PropTypes.string,
   onSelectOrder: PropTypes.func.isRequired
 };
 

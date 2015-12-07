@@ -4,6 +4,7 @@ import { redefineRoomSchedule } from './schedule-actions';
 
 export const CHANGE_ORGANIZATION_TYPE = 'CHANGE_ORGANIZATION_TYPE';
 export const CHANGE_CITY = 'CHANGE_CITY';
+
 export const UPDATE_ORDER_DATETIME_START = 'UPDATE_ORDER_DATETIME_START';
 export const UPDATE_ORDER_DATETIME_END = 'UPDATE_ORDER_DATETIME_END';
 
@@ -82,10 +83,10 @@ export function selectOrder(id, date, period) {
     const state = getState();
     const order = state.user.get('order');
 
-    !isNull(order.get('roomId')) ?
+    isNull(order.get('roomId')) ?
       dispatch(updateOrderDatetimeStart(id, date, period)) :
       dispatch(updateOrderDatetimeEnd(date, period));
 
-    dispatch(redefineRoomSchedule(id, date, period, !isNull(order.get('roomId'))));
+    dispatch(redefineRoomSchedule(id, date, period, isNull(order.get('roomId'))));
   };
 }

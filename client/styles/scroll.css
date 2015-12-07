@@ -1,0 +1,68 @@
+.ps-container .ps-scrollbar-x-rail {
+  bottom: 3px;
+  height: 8px;
+  opacity: 0;
+  position: absolute;
+  transition: background-color 0.2s linear 0s, opacity 0.2s linear 0s;
+}
+.ps-container:hover .ps-scrollbar-x-rail, .ps-container.hover .ps-scrollbar-x-rail {
+  opacity: 0.6;
+}
+.ps-container .ps-scrollbar-x-rail:hover, .ps-container .ps-scrollbar-x-rail.hover {
+  background-color: #eee;
+  opacity: 0.9;
+}
+.ps-container .ps-scrollbar-x-rail.in-scrolling {
+  background-color: #eee;
+  opacity: 0.9;
+}
+.ps-container .ps-scrollbar-y-rail {
+  opacity: 0;
+  position: absolute;
+  right: 10px;
+  transition: background-color 0.2s linear 0s, opacity 0.2s linear 0s;
+  width: 8px;
+}
+.ps-container:hover .ps-scrollbar-y-rail, .ps-container.hover .ps-scrollbar-y-rail {
+  opacity: 0.6;
+}
+.ps-container .ps-scrollbar-y-rail:hover, .ps-container .ps-scrollbar-y-rail.hover {
+  background-color: #eee;
+  opacity: 0.9;
+}
+.ps-container .ps-scrollbar-y-rail.in-scrolling {
+  background-color: #eee;
+  opacity: 0.9;
+}
+.ps-container .ps-scrollbar-x {
+  background-color: #aaa;
+  border-radius: 4px;
+  bottom: 0;
+  height: 8px;
+  position: absolute;
+  transition: background-color 0.2s linear 0s;
+}
+.ps-container.ie6 .ps-scrollbar-x {
+  font-size: 0;
+}
+.ps-container .ps-scrollbar-x-rail:hover .ps-scrollbar-x, .ps-container .ps-scrollbar-x-rail.hover .ps-scrollbar-x {
+  background-color: #999;
+}
+.ps-container .ps-scrollbar-y {
+  background-color: #aaa;
+  position: absolute;
+  transition: background-color 0.2s linear 0s;
+  width: 8px;
+}
+.ps-container.ie6 .ps-scrollbar-y {
+  font-size: 0;
+}
+.ps-container .ps-scrollbar-y-rail:hover .ps-scrollbar-y, .ps-container .ps-scrollbar-y-rail.hover .ps-scrollbar-y {
+  background-color: #999;
+}
+.ps-container.ie .ps-scrollbar-x, .ps-container.ie .ps-scrollbar-y {
+  visibility: hidden;
+}
+.ps-container.ie:hover .ps-scrollbar-x, .ps-container.ie:hover .ps-scrollbar-y, .ps-container.ie.hover .ps-scrollbar-x, .ps-container.ie.hover .ps-scrollbar-y {
+  visibility: visible;
+}

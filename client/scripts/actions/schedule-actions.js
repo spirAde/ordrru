@@ -1,10 +1,22 @@
+import moment from 'moment';
+import keys from 'lodash/object/keys';
+import last from 'lodash/array/last';
+
 import { Schedules } from '../API';
+
+import configs from '../../../common/data/configs.json';
 
 export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
 export const FIND_ROOM_SCHEDULE_FAILURE = 'FIND_ROOM_SCHEDULE_FAILURE';
 
 export const ADD_SCHEDULE_CHANGES = 'ADD_SCHEDULE_CHANGES';
+export const ADD_SCHEDULE_MIXED = 'ADD_SCHEDULE_MIXED';
+
+function combineOriginalAndChanges(original, changes) {
+
+  if (!changes) return original;
+}
 
 /**
  * Request fetching schedule
@@ -47,6 +59,16 @@ function fetchRoomScheduleFailure(error) {
   };
 }
 
+export function addMixSchedule(id, mixed) {
+  return {
+    type: ADD_SCHEDULE_MIXED,
+    payload: {
+      id,
+      mixed
+    }
+  };
+}
+
 /**
  * Fetch schedule for room if need
  * @param {string} roomId - room id
@@ -61,16 +83,15 @@ export function findRoomScheduleIfNeed(roomId) {
     }
 
     dispatch(fetchRoomScheduleRequest());
-    return Schedules.find({where: {roomId: roomId}, order: 'date ASC'})
+    return Schedules.find({ where: { roomId: roomId }, order: 'date ASC' })
       .then(response => response.json())
-      .then(schedule => dispatch(fetchRoomScheduleSuccess(roomId, schedule)))
+      .then(schedule => {
+        const mixed = combineOriginalAndChanges(schedule, state.schedule.getIn(['changes', roomId]));
+
+        dispatch(fetchRoomScheduleSuccess(roomId, schedule));
+        dispatch(addMixSchedule(roomId, mixed));
+      })
       .catch(error => dispatch(fetchRoomScheduleFailure(error)));
-  };
-}
-
-export function redefineRoomSchedule(id, date, period) {
-  return (dispatch, getState) => {
-
   };
 }
 
@@ -83,6 +104,29 @@ export function redefineRoomSchedule(id, date, period) {
  * @param {boolean} isStartOrder - start or end of order
  * @return {Function} thunk function
  * */
+export function redefineRoomSchedule(id, date, period, isStartOrder) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    const settings = state.bathhouse.get('rooms').find(room => room.get('id') === id).get('settings');
+    const minDuration = settings.get('minDuration');
+
+    const firstPeriod = 0;
+    const lastPeriod = parseInt(last(keys(configs.periods)), 10);
+
+    const dates = {
+      prev: moment.max(moment(date).subtract(1, 'days'), moment()),
+      curr: moment(date),
+      next: moment.min(moment(date).add(1, 'days'), moment().add(30, 'days'))
+    };
+
+    const interval = [
+      period - minDuration < 0 ? lastPeriod + period - minDuration : period - minDuration,
+      period + minDuration > lastPeriod ? period + minDuration - lastPeriod : period + minDuration
+    ];
+  };
+}
+
 export function addScheduleChanges() {
   return (dispatch, getState) => {
     const state = getState();

@@ -65,11 +65,15 @@ export default {
   "toOrder": "Заказать",
   "order": "Заказ",
 
+  "priceOfInterval": "с {start} до {end} цена {price} руб.",
   "priceFrom": "от {price} руб.",
   "guestCount": "Количество гостей",
   "additionalServices": "Дополнительные услуги",
   "additionalServicesIsEmpty": "Дополнительные услуги отсутствуют",
 
   "emptyResultShowText": "К сожалению, нам ничего не удалось найти по Вашему запросу. Рекомендуем немного изменить критерии поиска, или сбросить их полностью.",
-  "offersCount": "{offersCount, plural, =0 {Нет предложений} one {Всего {offersCount} предложение} few {Всего {offersCount} предложения} many {Всего {offersCount} предложений}}"
+  "offersCount": "{offersCount, plural, =0 {Нет предложений} one {Всего {offersCount} предложение} few {Всего {offersCount} предложения} many {Всего {offersCount} предложений}}",
+
+  "notifier.cancel": "К сожалению, Ваш заказ был отменен администратором бани",
+  "notifier.reserve": "К сожалению, Ваш заказ был отменен, т.к. только что был зарезервирован другим пользователем, либо администратором бани"
 }

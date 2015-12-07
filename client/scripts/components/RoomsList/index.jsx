@@ -1,3 +1,5 @@
+import { Map } from 'immutable';
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
@@ -35,8 +37,8 @@ class RoomsListComponent extends Component {
    * shouldComponentUpdate
    * @return {boolean}
    * */
-  shouldComponentUpdate(nextProps) {
-    return !shallowEqualImmutable(this.props, nextProps);
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -70,6 +72,7 @@ class RoomsListComponent extends Component {
    * */
   renderRooms(bathhouses, rooms, schedules) {
     const { activeRoomId } = this.props;
+
     return rooms.map((room, index) => {
       const bathhouse = bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId'));
       const schedule = schedules.get(room.get('id'));

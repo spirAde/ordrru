@@ -39,11 +39,14 @@ function sortingRoomsByType(bathhouses, rooms, type, isDesc) {
     );
   } else if (type === 'distance') {
     sorted = rooms.sortBy(
-      room => bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId')).distance,
+      room => bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId')).get('distance'),
       (prev, next) => isDesc ? next - prev : prev - next
     );
-  } else {
-    // TODO: add sorting, when prices will be working
+  } else if (type === 'price') {
+    sorted = rooms.sortBy(
+      room => room.getIn(['price', 'min']),
+      (prev, next) => isDesc ? next - prev : prev - next
+    );
   }
 
   return sorted;
@@ -402,7 +405,39 @@ export function updateRoomsByGuest(value) {
  * */
 export function updateRoomsByPrice(values) {
   return (dispatch, getState) => {
-    console.log(values);
+    const state = getState();
+    const allRoomIds = state.bathhouse.get('rooms').map(room => room.get('id'));
+
+    const newInvalid = state.bathhouse.get('invalid').withMutations(invalid => {
+      state.bathhouse.get('rooms').forEach(room => {
+        if (room.getIn(['price', 'min']) >= parseFloat(values[0]) &&
+            room.getIn(['price', 'min']) <= parseFloat(values[1])) {
+          invalid.update('price', distance => distance.push(room.get('id')));
+        }
+      });
+    });
+
+    const newValid = state.bathhouse.get('valid').withMutations(list => {
+      const allInvalidRoomIds = newInvalid.toList().flatten();
+      const allUniqueInvalidRoomIds = List.of(...new Set(allInvalidRoomIds.toJS()));
+      const valid = allRoomIds.filter(id => !allUniqueInvalidRoomIds.includes(id));
+      list.clear().merge(valid);
+    });
+
+    dispatch(changePriceFilterValues(values));
+
+    //  if active room is not valid after check, set activeRoomId to null
+    if (!newValid.includes(state.bathhouse.get('activeRoomId')) && state.bathhouse.get('activeRoomId')) {
+      dispatch(changeActiveRoom(state.bathhouse.get('activeRoomId')));
+    }
+
+    if (newInvalid.get('price').isEmpty() && state.filter.get('tags').includes('price')) {
+      dispatch(removeTag('price', state.city.get('activeCityId')));
+    } else if (!newInvalid.get('price').isEmpty() && !state.filter.get('tags').includes('price')) {
+      dispatch(addTag('price'));
+    }
+
+    dispatch(updateRooms(newValid, newInvalid));
   };
 }
 

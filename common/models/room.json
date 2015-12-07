@@ -51,11 +51,21 @@
       "required": true,
       "default": 0
     },
-    "orderedItems": {
+    "guest": {
       "type": "object",
       "required": true,
       "default": {
-        "datetime": [
+        "limit": 0,
+        "threshold": 0,
+        "price": 0
+      }
+    },
+    "price": {
+      "type": "object",
+      "required": true,
+      "default": {
+        "min": 0,
+        "chunks": [
           {
             "startPeriodId": 0,
             "endPeriodId": 144,
@@ -91,12 +101,7 @@
             "endPeriodId": 144,
             "price": 0
           }
-        ],
-        "guest": {
-          "limit": 0,
-          "threshold": 0,
-          "price": 0
-        }
+        ]
       }
     }
   },

@@ -19,199 +19,199 @@
       "required": true,
       "default": [
         {
-          "periodId": 0,
+          "period": 0,
           "enable": true
         },
         {
-          "periodId": 3,
+          "period": 3,
           "enable": true
         },
         {
-          "periodId": 6,
+          "period": 6,
           "enable": true
         },
         {
-          "periodId": 9,
+          "period": 9,
           "enable": true
         },
         {
-          "periodId": 12,
+          "period": 12,
           "enable": true
         },
         {
-          "periodId": 15,
+          "period": 15,
           "enable": true
         },
         {
-          "periodId": 18,
+          "period": 18,
           "enable": true
         },
         {
-          "periodId": 21,
+          "period": 21,
           "enable": true
         },
         {
-          "periodId": 24,
+          "period": 24,
           "enable": true
         },
         {
-          "periodId": 27,
+          "period": 27,
           "enable": true
         },
         {
-          "periodId": 30,
+          "period": 30,
           "enable": true
         },
         {
-          "periodId": 33,
+          "period": 33,
           "enable": true
         },
         {
-          "periodId": 36,
+          "period": 36,
           "enable": true
         },
         {
-          "periodId": 39,
+          "period": 39,
           "enable": true
         },
         {
-          "periodId": 42,
+          "period": 42,
           "enable": true
         },
         {
-          "periodId": 45,
+          "period": 45,
           "enable": true
         },
         {
-          "periodId": 48,
+          "period": 48,
           "enable": true
         },
         {
-          "periodId": 51,
+          "period": 51,
           "enable": true
         },
         {
-          "periodId": 54,
+          "period": 54,
           "enable": true
         },
         {
-          "periodId": 57,
+          "period": 57,
           "enable": true
         },
         {
-          "periodId": 60,
+          "period": 60,
           "enable": true
         },
         {
-          "periodId": 63,
+          "period": 63,
           "enable": true
         },
         {
-          "periodId": 66,
+          "period": 66,
           "enable": true
         },
         {
-          "periodId": 69,
+          "period": 69,
           "enable": true
         },
         {
-          "periodId": 72,
+          "period": 72,
           "enable": true
         },
         {
-          "periodId": 75,
+          "period": 75,
           "enable": true
         },
         {
-          "periodId": 78,
+          "period": 78,
           "enable": true
         },
         {
-          "periodId": 81,
+          "period": 81,
           "enable": true
         },
         {
-          "periodId": 84,
+          "period": 84,
           "enable": true
         },
         {
-          "periodId": 87,
+          "period": 87,
           "enable": true
         },
         {
-          "periodId": 90,
+          "period": 90,
           "enable": true
         },
         {
-          "periodId": 93,
+          "period": 93,
           "enable": true
         },
         {
-          "periodId": 96,
+          "period": 96,
           "enable": true
         },
         {
-          "periodId": 99,
+          "period": 99,
           "enable": true
         },
         {
-          "periodId": 102,
+          "period": 102,
           "enable": true
         },
         {
-          "periodId": 105,
+          "period": 105,
           "enable": true
         },
         {
-          "periodId": 108,
+          "period": 108,
           "enable": true
         },
         {
-          "periodId": 111,
+          "period": 111,
           "enable": true
         },
         {
-          "periodId": 114,
+          "period": 114,
           "enable": true
         },
         {
-          "periodId": 117,
+          "period": 117,
           "enable": true
         },
         {
-          "periodId": 120,
+          "period": 120,
           "enable": true
         },
         {
-          "periodId": 123,
+          "period": 123,
           "enable": true
         },
         {
-          "periodId": 126,
+          "period": 126,
           "enable": true
         },
         {
-          "periodId": 129,
+          "period": 129,
           "enable": true
         },
         {
-          "periodId": 132,
+          "period": 132,
           "enable": true
         },
         {
-          "periodId": 135,
+          "period": 135,
           "enable": true
         },
         {
-          "periodId": 138,
+          "period": 138,
           "enable": true
         },
         {
-          "periodId": 141,
+          "period": 141,
           "enable": true
         },
         {
-          "periodId": 144,
+          "period": 144,
           "enable": true
         }
       ]

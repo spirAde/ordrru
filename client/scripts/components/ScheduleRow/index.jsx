@@ -1,7 +1,14 @@
+import { Map } from 'immutable';
+
+import isNull from 'lodash/lang/isNull';
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage, FormattedDate } from 'react-intl';
+
 import classNames from 'classnames';
+
+import moment from 'moment';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -22,14 +29,23 @@ class ScheduleRowComponent extends Component {
    */
   constructor(props) {
     super(props);
+
+    /**
+     * @type {object}
+     * @property {Object} data
+     * @property {Object|null} data.shownInterval - shown price interval, when user mouse over cell
+     */
+    this.state = {
+      data: Map({ shownInterval: null })
+    };
   }
 
   /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
-  shouldComponentUpdate(nextProps) {
-    return !shallowEqualImmutable(this.props, nextProps);
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -40,6 +56,36 @@ class ScheduleRowComponent extends Component {
   handleClickCell(date, period, event) {
     event.preventDefault();
     this.props.onSelectOrder(date, period);
+  }
+
+  /**
+   * handle if user leave mouse cursor beyond, than set shownInterval to null
+   * @param {Object} event - SyntheticEvent
+   * */
+  handleMouseLeaveScheduleRow(event) {
+    event.preventDefault();
+    this.setState(({data}) => ({
+      data: data.set('shownInterval', null)
+    }));
+  }
+
+  /**
+   * handle if user mouse over cursor to cell, than set shownInterval current price interval
+   * @param {number} period - selected period
+   * @param {Object} event - SyntheticEvent
+   * */
+  handleMouseOverCell(period, event) {
+    event.preventDefault();
+    const { prices } = this.props;
+    const interval = prices.find(chunk => chunk.get('startPeriod') <= period && period <= chunk.get('endPeriod'));
+
+    this.setState(({data}) => ({
+      data: data.set('shownInterval', Map({
+        start: configs.periods[interval.get('startPeriod')],
+        end: configs.periods[interval.get('endPeriod')],
+        price: interval.get('price')
+      }))
+    }));
   }
 
   /**
@@ -55,10 +101,15 @@ class ScheduleRowComponent extends Component {
         'ScheduleRow-cell--odd': index % 2 === 1,
         'ScheduleRow-cell--disabled': !cell.get('enable')
       });
-      const cellTime = configs.periods[cell.get('periodId')];
+      const cellTime = configs.periods[cell.get('period')];
 
       return (
-        <div className={classes} key={index} onClick={this.handleClickCell.bind(this, date, cell.get('periodId'))}>
+        <div
+          className={classes}
+          key={index}
+          onClick={this.handleClickCell.bind(this, date, cell.get('period'))}
+          onMouseOver={this.handleMouseOverCell.bind(this, cell.get('period'))}
+        >
           {cellTime}
         </div>
       );
@@ -70,11 +121,17 @@ class ScheduleRowComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { cells, date } = this.props;
+    const { cells, date, isLast } = this.props;
+    const { data } = this.state;
     const renderCells = this.renderCells(date, cells);
 
+    const classes = classNames({
+      'ScheduleRow': true,
+      'ScheduleRow--last': isLast
+    });
+
     return (
-      <div className="ScheduleRow">
+      <div className={classes}>
         <div className="ScheduleRow-info g-clear">
           <div className="ScheduleRow-date">
             <FormattedDate
@@ -95,8 +152,21 @@ class ScheduleRowComponent extends Component {
               <FormattedMessage id="selected-time" />
             </div>
           </div>
+          <div className="ScheduleRow-price-interval">
+            {
+              !isNull(data.get('shownInterval')) ?
+              <FormattedMessage
+                id="priceOfInterval"
+                values={{
+                  start: data.getIn(['shownInterval', 'start']),
+                  end: data.getIn(['shownInterval', 'end']),
+                  price: data.getIn(['shownInterval', 'price'])
+                }}
+              /> : null
+            }
+          </div>
         </div>
-        <div className="ScheduleRow-cells g-clear">
+        <div className="ScheduleRow-cells g-clear" onMouseLeave={this.handleMouseLeaveScheduleRow.bind(this)}>
           {renderCells}
         </div>
       </div>
@@ -107,12 +177,16 @@ class ScheduleRowComponent extends Component {
 /**
  * propTypes
  * @property {Array.<Object>} cells - cells of schedule for dates
+ * @property {Array.<Object>} prices - prices for current day splitted by intervals
  * @property {string} date - date
+ * @property {boolean} isLast - last row or not
  * @property {Function} onSelectOrder - select date and period of order
  * */
 ScheduleRowComponent.propTypes = {
   cells: ImmutablePropTypes.list.isRequired,
+  prices: ImmutablePropTypes.list.isRequired,
   date: PropTypes.string.isRequired,
+  isLast: PropTypes.bool.isRequired,
   onSelectOrder: PropTypes.func.isRequired
 };
 

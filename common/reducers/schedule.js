@@ -3,7 +3,7 @@ import { fromJS } from 'immutable';
 import createReducer from '../utils/create-reducer';
 
 import { FIND_ROOM_SCHEDULE_REQUEST, FIND_ROOM_SCHEDULE_SUCCESS, FIND_ROOM_SCHEDULE_FAILURE,
-  ADD_SCHEDULE_CHANGES } from '../../client/scripts/actions/schedule-actions';
+  ADD_SCHEDULE_CHANGES, ADD_SCHEDULE_MIXED } from '../../client/scripts/actions/schedule-actions';
 
 export const initialState = fromJS({
   originals: {}, // unchangeable schedules of rooms
@@ -26,5 +26,9 @@ export const reducer = createReducer({
   },
   [ADD_SCHEDULE_CHANGES](state) {
     return state;
+  },
+  [ADD_SCHEDULE_MIXED](state, action) {
+    return state
+      .update('mixed', mixed => mixed.merge(fromJS({ [action.payload.id]: action.payload.mixed })))
   }
 }, initialState);

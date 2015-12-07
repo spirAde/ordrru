@@ -12,11 +12,11 @@ export default function getRoutes() {
       <Route path="/" component={HomePage} name="root" />
       <Route path="bathhouses" component={BathhouseListPage} name="bathhouses" />
       <Route path="bathhouses/:id" component={BathhouseItemPage} name="bathhouse" />
-      /*<Route path="manager" name="manager">
+      <Route path="manager" name="manager">
         <Route path="login" name="login" />
         <Route path="bathhouse" name="manager-bathhouse" />
         <Route path="carwash" name="manager-carwash" />
-      </Route>*/
+      </Route>
       <Route path="*" component={NotFoundPage} status={404} name="nothing" />
     </Route>
   );

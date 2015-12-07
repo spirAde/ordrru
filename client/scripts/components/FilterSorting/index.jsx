@@ -42,15 +42,13 @@ class FilterSortingComponent extends Component {
   handleClickSortingType(type, event) {
     event.preventDefault();
 
-    let value;
-    const currentType = this.props.values.find(type => type.get('name') === type.get('name'));
+    const currentSortingType = this.props.values.find(sortingType => sortingType.get('checked'));
 
-    if (currentType.get('checked')) {
-      value = type.set('isDesc', !type.get('isDesc'));
+    if (currentSortingType.get('name') === type.get('name')) {
+      this.props.onSelect(currentSortingType.set('isDesc', !currentSortingType.get('isDesc')));
     } else {
-      value = type.set('checked', !type.get('checked')).set('isDesc', true);
+      this.props.onSelect(type.set('checked', true));
     }
-    this.props.onSelect(value);
   }
 
   /**

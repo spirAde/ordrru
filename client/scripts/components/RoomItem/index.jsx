@@ -84,7 +84,7 @@ class RoomItemComponent extends Component {
   /**
    * render rating stars - full, half and empty stars
    * @param {number} rating - rating
-   * @return {Array.<Element>}
+   * @return {Array.<Element>}data
    * */
   renderStars(rating) {
     const fullStarsCount = floor(rating / 2);
@@ -147,7 +147,9 @@ class RoomItemComponent extends Component {
         <div className="RoomItem-inner">
           <div className="RoomItem-preview">
             <div className="RoomItem-preview-top g-clear">
-              <h2 className={`RoomItem-name RoomItem-type-${typesClasses}`}>{room.get('name')}</h2>
+              <h2 className={`RoomItem-name RoomItem-type-${typesClasses}`}>
+                {room.get('name')}
+              </h2>
               <div className="RoomItem-stars g-clear">
                 {stars}
               </div>
@@ -195,7 +197,7 @@ class RoomItemComponent extends Component {
                     <FormattedMessage
                       id="priceFrom"
                       values={{
-                        price: 1000
+                        price: room.getIn(['price', 'min'])
                       }}
                     />
                   </span>
@@ -259,6 +261,7 @@ class RoomItemComponent extends Component {
               </div>
               <SchedulePanelComponent
                 schedule={schedule}
+                prices={room.getIn(['price', 'chunks'])}
                 isOpen={data.get('scheduleIsOpen')}
                 onSelectOrder={this.handleSelectOrder}
               />

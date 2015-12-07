@@ -1,5 +1,6 @@
 @import './variables.css';
 @import './fonts.css';
+@import './scroll.css';
 
 * {
 	margin: 0;

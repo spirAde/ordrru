@@ -208,7 +208,7 @@
  	&-booking-inner {}
 
  	&-booking-step-1 {
-	 	padding: 20px 12px;
+	 	padding: 20px 0px 20px 20px;
  	}
 
  	&-booking-left-fields {
@@ -249,7 +249,7 @@
 	&-booking-right-fields {
 		width: 500px;
 		float: left;
-	 	padding-left: 16px;
+		margin-left: 17px;
 	}
 
  	&-select-guests {

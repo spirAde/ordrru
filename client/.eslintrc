@@ -1,5 +1,8 @@
 {
   "parser": "babel-eslint",
+  "ecmaFeatures": {
+    "modules": true
+  },
   "rules": {
     "strict": 0,
     "comma-dangle": [2, "never"],

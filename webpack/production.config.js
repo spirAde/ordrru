@@ -76,7 +76,7 @@ module.exports = {
   postcss: postcss,
 
   plugins: [
-    new CleanPlugin(['../build']),
+    new CleanPlugin('../build'),
     new ExtractTextPlugin('bundle.css', { allChunks: true }),
     new webpack.IgnorePlugin(/webpack-stats\.json$/),
     new webpack.NoErrorsPlugin(),

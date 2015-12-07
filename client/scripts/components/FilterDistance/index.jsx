@@ -40,9 +40,10 @@ class FilterDistanceComponent extends Component {
 
   /**
    * handleChangePosition - handle change position of slider, and pass params to parent component
+   * @param {Array} value - slider value
    * */
   handleChangePosition(value) {
-    this.props.onSelect(value);
+    this.props.onSelect(parseFloat(value[0]));
   }
 
   /**

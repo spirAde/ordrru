@@ -43,7 +43,7 @@ class FilterPriceComponent extends Component {
    * @return {void}
    * */
   handleChangePosition(values) {
-    this.props.onSelect(values);
+    this.props.onSelect([parseFloat(values[0]), parseFloat(values[1])]);
   }
 
   /**
@@ -63,8 +63,8 @@ class FilterPriceComponent extends Component {
             {
               __CLIENT__ ?
                 <Nouislider
-                  range={{min: values.get('min'), max: values.get('max')}}
-                  start={[values.getIn(['current', 'start']), values.getIn(['current', 'end'])]}
+                  range={{ min: values.get('min'), max: values.get('max') }}
+                  start={ [values.getIn(['current', 'start']), values.getIn(['current', 'end'])] }
                   step={100}
                   connect={true}
                   onChange={this.handleChangePosition}
