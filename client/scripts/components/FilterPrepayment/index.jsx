@@ -1,4 +1,4 @@
-import isNull from 'lodash/lang/isNull';
+import isNull from 'lodash/isNull';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -39,6 +39,9 @@ class FilterPrepaymentComponent extends Component {
    * */
   handleClick(type, event) {
     event.preventDefault();
+
+    if (type.get('checked')) return false;
+
     this.props.onSelect(type);
   }
 

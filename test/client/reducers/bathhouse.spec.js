@@ -12,7 +12,6 @@ import { initialState as defaultInitialState, reducer } from '../../../common/re
 import { Bathhouses } from '../../../client/scripts/API';
 
 import { FIND_BATHHOUSES_FAILURE, FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS,
-  FIND_ROOM_SCHEDULE_REQUEST, FIND_ROOM_SCHEDULE_SUCCESS, FIND_ROOM_SCHEDULE_FAILURE,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS } from '../../../client/scripts/actions/bathhouse-actions';
 
 import { getBathhouses } from '../../fixtures/bathhouse';

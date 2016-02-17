@@ -1,10 +1,10 @@
 import { List, fromJS } from 'immutable';
 
-import flatten from 'lodash/array/flatten';
-import isNull from 'lodash/lang/isNull';
-import trim from 'lodash/string/trim';
-import pluck from 'lodash/collection/pluck';
-import assign from 'lodash/object/assign';
+import flatten from 'lodash/flatten';
+import isNull from 'lodash/isNull';
+import trim from 'lodash/trim';
+import map from 'lodash/map';
+import assign from 'lodash/assign';
 
 import { Bathhouses } from '../API';
 import { removeTag, addTag, changeSearchNameFilterValue, changeOptionsFilterValue, changePrepaymentFilterValue,
@@ -103,13 +103,14 @@ export function findBathhousesAndRooms(cityId) {
     const state = getState();
 
     dispatch(fetchBathhousesRequest());
-    return Bathhouses.find({include: 'rooms', where: {cityId: cityId, isActive: true}})
+    return Bathhouses.find({ include: 'rooms', where: { cityId: cityId, isActive: true }})
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         //  mb use normalizr https://github.com/gaearon/normalizr
         const sorting = state.filter.getIn(['filters', 'sorting']).find(type => type.get('checked'));
-        const rooms = fromJS(flatten(pluck(data, 'rooms')));
-        const bathhouses = fromJS(data.map(bathhouse => assign({}, bathhouse, { rooms: pluck(bathhouse.rooms, 'id')})));
+        const rooms = fromJS(flatten(map(data, 'rooms')));
+        const bathhouses = fromJS(data.map(bathhouse => assign({}, bathhouse, { rooms: map(bathhouse.rooms, 'id') })));
         const sortedRooms = sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
 
         dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
@@ -331,7 +332,7 @@ export function updateRoomsByTypes(value) {
  * */
 export function updateRoomsByDateTime(values) {
   return (dispatch, getState) => {
-
+    //
   };
 }
 
@@ -394,7 +395,7 @@ export function updateRoomsByPrepayment(value) {
  * */
 export function updateRoomsByGuest(value) {
   return (dispatch, getState) => {
-
+    //
   };
 }
 
@@ -536,7 +537,7 @@ export function resetRoomsByTag(tag) {
 }
 
 /**
- * update schedule of room
+ * Update schedule of room
  * @param {string} id - room id
  * @param {Date} date - date in schedule
  * @param {Array.<number>} periods - list of periods

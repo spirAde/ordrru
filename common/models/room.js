@@ -1,12 +1,12 @@
-import pluck from 'lodash/collection/pluck';
-import flatten from 'lodash/array/flatten';
-import min from 'lodash/math/min';
+import map from 'lodash/map';
+import flatten from 'lodash/flatten';
+import min from 'lodash/min';
 
 export default (Room) => {
 
   Room.observe('before save', (ctx, next) => {
 
-    ctx.instance.price.min = min(pluck(flatten(ctx.instance.price.chunks), 'price'));
+    ctx.instance.price.min = min(map(flatten(ctx.instance.price.chunks), 'price'));
 
     next();
   });

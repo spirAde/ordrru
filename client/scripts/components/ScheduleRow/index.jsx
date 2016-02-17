@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 
-import isNull from 'lodash/lang/isNull';
+import isNull from 'lodash/isNull';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -49,12 +49,17 @@ class ScheduleRowComponent extends Component {
   }
 
   /**
-   * handle click on cell
+   * handle click on cell, if period is disable or has status lock, that skip clicking
    * @param {number} period - period id
    * @param {Object} event - SyntheticEvent
    * */
   handleClickCell(date, period, event) {
     event.preventDefault();
+
+    const data = this.props.cells.find(cell => cell.get('period') === period);
+
+    if (!data.get('enable') || data.get('status') === 'lock') return false;
+
     this.props.onSelectOrder(date, period);
   }
 
@@ -99,7 +104,9 @@ class ScheduleRowComponent extends Component {
       const classes = classNames({
         'ScheduleRow-cell': true,
         'ScheduleRow-cell--odd': index % 2 === 1,
-        'ScheduleRow-cell--disabled': !cell.get('enable')
+        'ScheduleRow-cell--free': cell.get('status') === 'free',
+        'ScheduleRow-cell--busy': cell.get('status') === 'busy',
+        'ScheduleRow-cell--lock': cell.get('status') === 'lock'
       });
       const cellTime = configs.periods[cell.get('period')];
 

@@ -1,6 +1,6 @@
 import moment from 'moment';
-import keys from 'lodash/object/keys';
-import last from 'lodash/array/last';
+import keys from 'lodash/keys';
+import last from 'lodash/last';
 
 import { Schedules } from '../API';
 
@@ -10,13 +10,16 @@ export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
 export const FIND_ROOM_SCHEDULE_FAILURE = 'FIND_ROOM_SCHEDULE_FAILURE';
 
+export const CHANGE_SCHEDULE = 'CHANGE_SCHEDULE';
+
 export const ADD_SCHEDULE_CHANGES = 'ADD_SCHEDULE_CHANGES';
-export const ADD_SCHEDULE_MIXED = 'ADD_SCHEDULE_MIXED';
+export const CLEAR_SCHEDULE_CHANGES = 'CLEAR_SCHEDULE_CHANGES';
 
-function combineOriginalAndChanges(original, changes) {
-
-  if (!changes) return original;
-}
+export const PERIOD_STATUSES = {
+  FREE: 'FREE',
+  BUSY: 'BUSY',
+  LOCK: 'LOCK'
+};
 
 /**
  * Request fetching schedule
@@ -59,15 +62,75 @@ function fetchRoomScheduleFailure(error) {
   };
 }
 
-export function addMixSchedule(id, mixed) {
+/**
+ * change schedule for room, as result as combination between original and changes
+ * @param {string} id - room id
+ * @param {Array<Object>} schedule - list of periods
+ * @return {{type: string, payload: {error: Object}}}
+ * */
+function changeSchedule(id, schedule) {
   return {
-    type: ADD_SCHEDULE_MIXED,
+    type: CHANGE_SCHEDULE,
     payload: {
       id,
-      mixed
+      schedule
     }
   };
 }
+
+/**
+ * clear all changes in schedule for room
+ * @param {string} id - room id
+ * @return {{type: string, payload: {error: Object}}}
+ * */
+function clearScheduleChanges(roomId) {
+  return {
+    type: CLEAR_SCHEDULE_CHANGES,
+    payload: {
+      id: roomId
+    }
+  };
+}
+
+/**
+ * create combination between originals and changes in schedule for room
+ * @param {string} roomId - room id
+ * @param {Array<Object>} original - original schedule for room
+ * @param {Array<Object>} changes - changes of schedule for room
+ * @param {number} minDuration - min duration for order for current room
+ * @return {Array<Object>} - combined schedule between original and changes
+ * */
+function combineOriginalAndChangesSchedule(roomId, original, changes, minDuration) {
+  return original;
+}
+
+export function addScheduleChanges(roomId, changes) {
+  return {
+    type: ADD_SCHEDULE_CHANGES,
+    payload: {
+      id: roomId,
+      changes
+    }
+  };
+}
+
+export function receiveScheduleChanges(roomId, changes) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (state.schedule.hasIn(['originals', roomId])) {
+      const original = state.schedule.getIn(['originals', roomId]);
+      const settings = state.bathhouse.get('rooms').find(room => room.get('id') === roomId).get('settings');
+      const minDuration = settings.get('minDuration');
+      const combinedSchedule = combineOriginalAndChangesSchedule(roomId, original, changes, minDuration);
+
+      dispatch(changeSchedule(roomId, combinedSchedule));
+    } else {
+      dispatch(addScheduleChanges(roomId, changes));
+    }
+  };
+}
+
 
 /**
  * Fetch schedule for room if need
@@ -77,19 +140,29 @@ export function addMixSchedule(id, mixed) {
 export function findRoomScheduleIfNeed(roomId) {
   return (dispatch, getState) => {
     const state = getState();
+    const currentDate = state.application.get('date');
 
-    if (state.schedule.get('originals').has(roomId) || state.schedule.get('isFetching')) {
+    if (state.schedule.get('schedules').has(roomId) || state.schedule.get('isFetching')) {
       return false;
     }
 
     dispatch(fetchRoomScheduleRequest());
-    return Schedules.find({ where: { roomId: roomId }, order: 'date ASC' })
+
+    return Schedules.find({ where: { roomId: roomId, date: { gte: currentDate } }, order: 'date ASC' })
       .then(response => response.json())
       .then(schedule => {
-        const mixed = combineOriginalAndChanges(schedule, state.schedule.getIn(['changes', roomId]));
-
         dispatch(fetchRoomScheduleSuccess(roomId, schedule));
-        dispatch(addMixSchedule(roomId, mixed));
+        if (state.schedule.hasIn(['changes', roomId])) {
+          const changes = state.schedule.getIn(['changes', roomId]);
+          const settings = state.bathhouse.get('rooms').find(room => room.get('id') === roomId).get('settings');
+          const minDuration = settings.get('minDuration');
+          const combinedSchedule = combineOriginalAndChangesSchedule(roomId, schedule, changes, minDuration);
+
+          dispatch(changeSchedule(roomId, combinedSchedule));
+          dispatch(clearScheduleChanges(roomId));
+        } else {
+          dispatch(changeSchedule(roomId, schedule));
+        }
       })
       .catch(error => dispatch(fetchRoomScheduleFailure(error)));
   };
@@ -124,12 +197,7 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
       period - minDuration < 0 ? lastPeriod + period - minDuration : period - minDuration,
       period + minDuration > lastPeriod ? period + minDuration - lastPeriod : period + minDuration
     ];
-  };
-}
 
-export function addScheduleChanges() {
-  return (dispatch, getState) => {
-    const state = getState();
-    const room = state.bathhouse.get('rooms').find(room => room.get('id') === id);
+    //
   };
 }

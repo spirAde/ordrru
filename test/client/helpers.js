@@ -2,6 +2,7 @@ require('babel/register')({
   stage: 0,
   optional: ['runtime']
 });
+require('css-modules-require-hook')();
 
 var jsdom = require('jsdom');
 var chai = require('chai');

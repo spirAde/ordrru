@@ -1,12 +1,17 @@
-import isNull from 'lodash/lang/isNull';
+import isNull from 'lodash/isNull';
 
 import { redefineRoomSchedule } from './schedule-actions';
 
 export const CHANGE_ORGANIZATION_TYPE = 'CHANGE_ORGANIZATION_TYPE';
 export const CHANGE_CITY = 'CHANGE_CITY';
 
+export const SET_USER_DEVICE = 'SET_USER_DEVICE';
+export const CHANGE_USER_VIEWPORT = 'CHANGE_USER_VIEWPORT';
+
 export const UPDATE_ORDER_DATETIME_START = 'UPDATE_ORDER_DATETIME_START';
 export const UPDATE_ORDER_DATETIME_END = 'UPDATE_ORDER_DATETIME_END';
+
+export const RESET_ORDER = 'RESET_ORDER';
 
 /**
  * update start datetime of order
@@ -70,6 +75,24 @@ export function changeOrganizationType(id) {
   };
 }
 
+export function setUserDevice(device) {
+  return {
+    type: SET_USER_DEVICE,
+    payload: {
+      device
+    }
+  };
+}
+
+export function changeUserViewport(viewport) {
+  return {
+    type: CHANGE_USER_VIEWPORT,
+    payload: {
+      viewport
+    }
+  };
+}
+
 /**
  * get selected date and period of order. Perform this action twice for start and end of order(startDate, endDate, startPeriod,
  * endPeriod) see user-state for details.
@@ -88,5 +111,11 @@ export function selectOrder(id, date, period) {
       dispatch(updateOrderDatetimeEnd(date, period));
 
     dispatch(redefineRoomSchedule(id, date, period, isNull(order.get('roomId'))));
+  };
+}
+
+export function resetOrder() {
+  return {
+    type: RESET_ORDER
   };
 }

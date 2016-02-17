@@ -1,5 +1,3 @@
-import { Map } from 'immutable';
-
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
@@ -9,7 +7,7 @@ import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import { changeActiveRoom } from '../../actions/bathhouse-actions';
 import { findRoomScheduleIfNeed } from '../../actions/schedule-actions';
-import { selectOrder } from '../../actions/user-actions';
+import { selectOrder, resetOrder } from '../../actions/user-actions';
 
 import RoomItemComponent from '../RoomItem/index.jsx';
 
@@ -47,6 +45,7 @@ class RoomsListComponent extends Component {
    * @return {void}
    */
   handleChangeActiveRoom(id) {
+    this.props.resetOrder();
     this.props.changeActiveRoom(id);
     this.props.findRoomScheduleIfNeed(id);
   }
@@ -71,7 +70,7 @@ class RoomsListComponent extends Component {
    * @return {Array.<Element>} RoomItems - room boxes
    * */
   renderRooms(bathhouses, rooms, schedules) {
-    const { activeRoomId } = this.props;
+    const { activeRoomId, order } = this.props;
 
     return rooms.map((room, index) => {
       const bathhouse = bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId'));
@@ -83,6 +82,7 @@ class RoomsListComponent extends Component {
           room={room}
           bathhouse={bathhouse}
           schedule={schedule}
+          order={order}
           onChangeActiveRoom={this.handleChangeActiveRoom}
           onSelectOrder={this.props.selectOrder}
           isClosable={false}
@@ -130,6 +130,8 @@ class RoomsListComponent extends Component {
  * @property {Array.<Object>} rooms - list of valid rooms
  * @property {Object.<string, Array>} schedules - original and changes of schedules
  * @property {boolean} isActive - room is open or close
+ * @property {Object} order - selected order by user
+ * @property {Function} resetOrder - reset selected user order
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  * @property {Function} findRoomScheduleIfNeed - find room schedule if need
  * @property {Function} selectOrder - select order from room item
@@ -140,6 +142,8 @@ RoomsListComponent.propTypes = {
   rooms: ImmutablePropTypes.list.isRequired,
   schedules: ImmutablePropTypes.map,
   isActive: PropTypes.bool.isRequired,
+  order: ImmutablePropTypes.map,
+  resetOrder: PropTypes.func.isRequired,
   changeActiveRoom: PropTypes.func.isRequired,
   findRoomScheduleIfNeed: PropTypes.func.isRequired,
   selectOrder: PropTypes.func.isRequired
@@ -155,8 +159,9 @@ function mapStateToProps(state) {
   return {
     bathhouses: state.bathhouse.get('bathhouses'),
     rooms: state.bathhouse.get('rooms').filter(room => validRooms.includes(room.get('id'))),
-    schedules: state.schedule.get('mixed'),
-    activeRoomId: state.bathhouse.get('activeRoomId')
+    schedules: state.schedule.get('schedules'),
+    activeRoomId: state.bathhouse.get('activeRoomId'),
+    order: state.user.get('order')
   };
 }
 
@@ -167,6 +172,7 @@ function mapStateToProps(state) {
  * */
 function mapDispatchToProps(dispatch) {
   return {
+    resetOrder: () => dispatch(resetOrder()),
     changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
     findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
     selectOrder: (id, date, period) => dispatch(selectOrder(id, date, period))

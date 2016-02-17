@@ -1,5 +1,3 @@
-import loopback from 'loopback';
-
 export default (Bathhouse) => {
 
   Bathhouse.observe('before save', (ctx, next) => {

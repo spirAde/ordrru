@@ -76,11 +76,11 @@ class FilterOptionsComponent extends Component {
     const { values } = this.props;
     const options = this.renderOptions(values);
     return (
-      <div className="FilterOptions">
-        <div className="FilterOptions-wrapper g-clear">
-          <h3 className="FilterOptions-heading">
-            <FormattedMessage id="filters.options" />
-          </h3>
+      <div className="FilterOptions-wrapper g-clear">
+        <h3 className="FilterOptions-heading">
+          <FormattedMessage id="filters.options" />
+        </h3>
+        <div className="FilterOptions-options">
           {options}
         </div>
       </div>

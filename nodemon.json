@@ -12,7 +12,8 @@
     "build",
     "coverage",
     "node_modules",
-    "rethinkdb_data"
+    "rethinkdb_data",
+    "test"
   ],
   "env": {
     "NODE_ENV": "development"

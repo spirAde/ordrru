@@ -17,7 +17,7 @@ export default function configureStore(reduxReactRouter, getRoutes, createHistor
 
     // Immutable to plain JS
     const logger = createLogger({
-      transformer: (state) => {
+      stateTransformer: (state) => {
         const newState = {};
         for (const key of Object.keys(state)) {
           if (Immutable.Iterable.isIterable(state[key])) {
@@ -39,6 +39,8 @@ export default function configureStore(reduxReactRouter, getRoutes, createHistor
     finalCreateStore = applyMiddleware(...middleware)(createStore);
   }
 
+  console.log(finalCreateStore);
+  console.log(reduxReactRouter);
   finalCreateStore = reduxReactRouter({ getRoutes, createHistory })(finalCreateStore);
 
   const reducer = require('./reducers/index');

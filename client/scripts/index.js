@@ -1,6 +1,8 @@
-import 'babel/polyfill';
+import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import moment from 'moment';
 
 import { IntlProvider } from 'react-intl';
 
@@ -34,6 +36,8 @@ const component = (
 );
 
 function runApp() {
+  moment.locale(locale);
+
   ReactDOM.render(component, reactRoot);
 
   if (__DEVELOPMENT__) {

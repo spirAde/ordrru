@@ -1,12 +1,17 @@
 import { Map } from 'immutable';
-import floor from 'lodash/math/floor';
-import fill from 'lodash/array/fill';
-import sortBy from 'lodash/collection/sortBy';
+
+import sample from 'lodash/sample';
+import range from 'lodash/range';
+import floor from 'lodash/floor';
+import fill from 'lodash/fill';
+import sortBy from 'lodash/sortBy';
+
+import moment from 'moment';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Link } from 'react-router';
-import { FormattedMessage } from 'react-intl';
+import { injectIntl, intlShape, FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -15,8 +20,14 @@ import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 import SchedulePanelComponent from '../SchedulePanel/index.jsx';
 import IconComponent from '../Icon/index.jsx';
 
+import configs from '../../../../common/data/configs.json';
+
 import './style.css';
 import bathhouseImg from '../../../images/bathhouse.jpg';
+import bathhouseImg1 from '../../../images/bathhouse1.jpg';
+import bathhouseImg2 from '../../../images/bathhouse2.jpg';
+import bathhouseImg3 from '../../../images/bathhouse3.jpg';
+import bathhouseImg4 from '../../../images/bathhouse4.jpg';
 
 /**
  * RoomItemComponent - dumb component, room box
@@ -38,10 +49,24 @@ class RoomItemComponent extends Component {
      * @property {boolean} data.scheduleIsOpen - opened or not schedule for room
      */
     this.state = {
-      data: Map({ scheduleIsOpen: false })
+      data: Map({
+        scheduleIsOpen: false
+      })
     };
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
+  }
+
+  /**
+   * componentWillReceiveProps - if activeRoomId was change, then close schedule for previous active room
+   * @return {void}
+   * */
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isOpen && !nextProps.isOpen) {
+      this.setState(({data}) => ({
+        data: data.set('scheduleIsOpen', false)
+      }));
+    }
   }
 
   /**
@@ -50,6 +75,31 @@ class RoomItemComponent extends Component {
    * */
   shouldComponentUpdate(nextProps, nextState) {
     return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
+  }
+
+  /**
+   * get humanize view of selected order datetime
+   * @param {string} id - room id
+   * @param {Object} order - selected user order
+   * @return {string} - humanize view of datetime
+   * */
+  getDatetimeValue(id, order) {
+    let value = '';
+
+    if (order.get('roomId') === id) {
+      if (order.getIn(['date', 'startDate'])) {
+        const startDate = order.getIn(['date', 'startDate']);
+        const startPeriod = order.getIn(['date', 'startPeriod']);
+        value += `${moment(startDate).format('Do MMMM')} ${configs.periods[startPeriod]} - `;
+      }
+      if (order.getIn(['date', 'endDate'])) {
+        const endDate = order.getIn(['date', 'endDate']);
+        const endPeriod = order.getIn(['date', 'endPeriod']);
+        value += `${moment(endDate).format('Do MMMM')} ${configs.periods[endPeriod]}`;
+      }
+    }
+
+    return value;
   }
 
   /**
@@ -129,7 +179,11 @@ class RoomItemComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { isOpen, room, bathhouse, schedule, isClosable } = this.props;
+    const { isOpen, room, bathhouse, schedule, isClosable, order } = this.props;
+    const { formatMessage } = this.props.intl;
+
+    const orderDatetimeValue = this.getDatetimeValue(room.get('id'), order);
+
     const { data } = this.state;
 
     const options = this.renderOptions(room.get('options').concat(bathhouse.get('options')));
@@ -182,13 +236,13 @@ class RoomItemComponent extends Component {
             <div className="RoomItem-preview-bottom g-clear">
               <div className="RoomItem-photos">
                 <a className="RoomItem-photo">
-                  <img src={bathhouseImg} />
+                  <img width="234" height="140" src={bathhouseImg} />
                 </a>
                 <a className="RoomItem-photo">
-                  <img src={bathhouseImg} />
+                  <img width="234" height="140" src={bathhouseImg1} />
                 </a>
                 <a className="RoomItem-photo">
-                  <img src={bathhouseImg} />
+                  <img width="234" height="140" src={bathhouseImg3} />
                 </a>
               </div>
               <div className="RoomItem-more-info">
@@ -228,8 +282,9 @@ class RoomItemComponent extends Component {
                     <div className="RoomItem-field-date-time g-field-date">
                       <input
                         className="RoomItem-field-date-time-input"
-                        placeholder="Выберите время"
+                        placeholder={formatMessage({ id: 'selectTime' })}
                         onClick={this.handleOpenSchedule.bind(this)}
+                        value={orderDatetimeValue}
                       />
                     </div>
                     <div className="RoomItem-field-select-services g-field-select">
@@ -279,7 +334,9 @@ class RoomItemComponent extends Component {
  * @property {Object} bathhouse - bathhouse data
  * @property {Object} room - room data
  * @property {Array} schedule - room schedule
+ * @property {Object} order - selected user order
  * @property {boolean} isClosable - if closable, then room box has close icon in right-top angle
+ * @property {Object} intl - intl shape
  * @property {Function} onChangeActiveRoom - change data about active room
  * @property {Function} onCloseRoom - close room by clicked on cancel icon
  * @property {Function} onSelectOrder - select date and period of order
@@ -289,7 +346,9 @@ RoomItemComponent.propTypes = {
   bathhouse: ImmutablePropTypes.map.isRequired,
   room: ImmutablePropTypes.map.isRequired,
   schedule: ImmutablePropTypes.list,
+  order: ImmutablePropTypes.map,
   isClosable: PropTypes.bool,
+  intl: intlShape.isRequired,
   onChangeActiveRoom: PropTypes.func.isRequired,
   onCloseRoom: PropTypes.func,
   onSelectOrder: PropTypes.func.isRequired
@@ -299,4 +358,4 @@ RoomItemComponent.defaultProps = {
   isClosable: false
 };
 
-export default RoomItemComponent;
+export default injectIntl(RoomItemComponent);

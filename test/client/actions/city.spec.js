@@ -1,9 +1,14 @@
-import { Map, fromJS } from 'immutable';
+import chai from 'chai'
+import chaiImmutable from 'chai-immutable';
 
-import { expect } from 'chai'
+import { List, Map, fromJS } from 'immutable';
 
 import { CHANGE_ACTIVE_CITY } from '../../../client/scripts/actions/city-actions';
 import { changeActiveCity, shouldChangeActiveCity, getCityBySlug } from '../../../client/scripts/actions/city-actions';
+
+const expect = chai.expect;
+
+chai.use(chaiImmutable);
 
 describe('city actions', () => {
 

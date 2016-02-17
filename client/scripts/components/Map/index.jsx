@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable';
 
-import compact from 'lodash/array/compact';
-import indexOf from 'lodash/array/indexOf';
+import compact from 'lodash/compact';
+import indexOf from 'lodash/indexOf';
 
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom/server';

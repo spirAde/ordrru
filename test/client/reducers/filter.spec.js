@@ -1,16 +1,25 @@
-import { List, Map, fromJS } from 'immutable';
-import { expect } from 'chai';
+import chai from 'chai'
+import chaiImmutable from 'chai-immutable';
 
+import { List, Map, fromJS } from 'immutable';
 import keys from 'lodash/object/keys';
 import assign from 'lodash/object/assign';
+import pluck from 'lodash/collection/pluck';
 
 import { initialState as defaultInitialState, reducer } from '../../../common/reducers/filter';
+
 import configs from '../../../common/data/configs.json';
 
 import { SET_FILTERS_DATA, ADD_TAG, REMOVE_TAG,
   CHANGE_DATETIME_FILTER_VALUES, CHANGE_DISTANCE_FILTER_VALUE, CHANGE_GUEST_FILTER_VALUE, CHANGE_SEARCH_NAME_FILTER_VALUE,
   CHANGE_OPTIONS_FILTER_VALUE, CHANGE_PRICE_FILTER_VALUES, CHANGE_TYPES_FILTER_VALUE,
   CHANGE_PREPAYMENT_FILTER_VALUE } from '../../../client/scripts/actions/filter-actions';
+
+const expect = chai.expect;
+
+chai.use(chaiImmutable);
+
+const defaultCityId = pluck(configs.cities, 'id')[0];
 
 describe('filter reducer', () => {
 
@@ -32,7 +41,6 @@ describe('filter reducer', () => {
   });
 
   it('handles SET_FILTERS_DATA', () => {
-    const activeCityId = '219c9b88-d798-4691-8e07-b67404bd222f';
     const initialState = fromJS({
       filters: {},
       tags: []
@@ -40,12 +48,12 @@ describe('filter reducer', () => {
     const action = {
       type: SET_FILTERS_DATA,
       payload: {
-        id: activeCityId
+        id: defaultCityId
       }
     };
     const nextState = reducer(initialState, action);
 
-    expect(nextState.get('filters').toJS()).to.have.all.keys(keys(configs.filters[activeCityId]));
+    expect(nextState.get('filters').toJS()).to.have.all.keys(keys(configs.filters[defaultCityId]));
     expect(nextState.get('tags')).to.equal(List());
   });
 
@@ -66,13 +74,7 @@ describe('filter reducer', () => {
   });
 
   it('handles REMOVE_TAG', () => {
-    const activeCityId = '219c9b88-d798-4691-8e07-b67404bd222f';
-    const defaultFilters = configs.filters[activeCityId];
-    const defaultDistance = {
-      min: 1,
-      max: 4.7,
-      current: 4.7
-    };
+    const defaultFilters = configs.filters[defaultCityId];
     const initialState = fromJS({
       filters: assign({}, defaultFilters, { distance: {
         "min": 1,
@@ -85,13 +87,13 @@ describe('filter reducer', () => {
       type: REMOVE_TAG,
       payload: {
         tag: 'distance',
-        id: activeCityId
+        id: defaultCityId
       }
     };
     const nextState = reducer(initialState, action);
 
     expect(nextState.get('tags')).to.equal(List.of('options', 'types'));
-    expect(nextState.getIn(['filters', 'distance'])).to.equal(fromJS(defaultDistance));
+    expect(nextState.getIn(['filters', 'distance'])).to.equal(fromJS(defaultFilters.distance));
   });
 
   it('handles CHANGE_DISTANCE_FILTER_VALUE', () => {

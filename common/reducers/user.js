@@ -3,6 +3,8 @@ import { fromJS } from 'immutable';
 import createReducer from '../utils/create-reducer';
 
 import { CHANGE_CITY, CHANGE_ORGANIZATION_TYPE,
+  SET_USER_DEVICE, CHANGE_USER_VIEWPORT,
+  RESET_ORDER,
   UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END } from '../../client/scripts/actions/user-actions';
 
 export const initialState = fromJS({
@@ -18,6 +20,13 @@ export const initialState = fromJS({
     },
     options: {},
     guests: null
+  },
+  device: {
+    isMobile: false,
+    viewport: {
+      height: null,
+      width: null
+    },
   }
 });
 
@@ -27,6 +36,16 @@ export const reducer = createReducer({
   },
   [CHANGE_ORGANIZATION_TYPE](state, action) {
     return state.set('organizationTypeId', action.payload.organizationTypeId);
+  },
+  [SET_USER_DEVICE](state, action) {
+    return state;
+  },
+  [CHANGE_USER_VIEWPORT](state, action) {
+    return state
+      .setIn(['device', 'viewport'], action.payload.viewport);
+  },
+  [RESET_ORDER](state) {
+    return state.set('order', initialState.get('order'));
   },
   [UPDATE_ORDER_DATETIME_START](state, action) {
     return state

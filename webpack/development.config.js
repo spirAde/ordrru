@@ -59,40 +59,33 @@ module.exports = {
         include: [path.join(__dirname, '..', 'client'), path.join(__dirname, '..', 'common')],
         exclude: path.join(__dirname, '..', 'client', 'models'),
         query: {
-          stage: 0,
-          optional: ['runtime'],
-          env: {
-            development: {
-              plugins: ['react-transform'],
-              extra: {
-                'react-transform': {
-                  transforms: [
-                    {
-                      transform: 'react-transform-hmr',
-                      imports: ['react'],
-                      locals: ['module']
-                    },
-                    {
-                      transform: 'react-transform-catch-errors',
-                      imports: ['react', 'redbox-react']
-                    }
-                  ]
-                }
-              }
+          'presets': ['es2015', 'react', 'stage-0'],
+          'env': {
+            'development': {
+              'plugins': [
+                /*'add-module-exports',
+                'transform-react-display-name',*/
+                ['react-transform', {
+                  'transforms': [{
+                    'transform': 'react-transform-hmr',
+                    'imports': ['react'],
+                    'locals': ['module']
+                  }, {
+                    'transform': 'react-transform-catch-errors',
+                    'imports': ['react', 'redbox-react']
+                  }]
+                }]
+              ]
             }
           }
         }
       },
-      {
-        test: /\.json/,
-        loader: 'json',
-        exclude: /node_modules/,
-      },
-      { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },
-      { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },
-      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" },
-      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file" },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml" },
+      { test: /\.json/, loader: 'json', exclude: /node_modules/ },
+      { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },
+      { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },
+      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream' },
+      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file' },
+      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml' },
       { test: isomorphicTools.regular_expression('images'), loader: 'url-loader?limit=10240' }
     ]
   },

@@ -1,4 +1,4 @@
-import debounce from 'lodash/function/debounce';
+import debounce from 'lodash/debounce';
 
 import React, { Component, PropTypes } from 'react';
 import { FormattedMessage } from 'react-intl';

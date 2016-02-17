@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import isEmpty from 'lodash/lang/isEmpty';
+import isEmpty from 'lodash/isEmpty';
 
 const baseUrl = 'http://localhost:3000/api';
 
