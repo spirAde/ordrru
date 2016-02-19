@@ -1,15 +1,16 @@
 import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Router, browserHistory } from 'react-router';
 
 import moment from 'moment';
 
 import { IntlProvider } from 'react-intl';
 
-import { ReduxRouter, reduxReactRouter } from 'redux-router';
+import { ReduxAsyncConnect } from 'redux-async-connect';
 import { Provider } from 'react-redux';
 
-import createHistory from 'history/lib/createBrowserHistory';
+import useScroll from 'scroll-behavior/lib/useStandardScroll';
 
 import messages from '../../common/data/messages/index';
 
@@ -21,7 +22,9 @@ import IntlUtils from './utils/IntlUtils';
 import '../styles/core.css';
 import '../styles/fonts.css';
 
-const store = configureStore(reduxReactRouter, getRoutes, createHistory, window.__INITIAL_STATE__);
+const history = useScroll(() => browserHistory)();
+
+const store = configureStore(history, window.__INITIAL_STATE__);
 const reactRoot = document.getElementById('root');
 
 const localization = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
@@ -29,9 +32,12 @@ const locale = localization.indexOf('-') ? localization.split('-')[0] : localiza
 
 const component = (
   <IntlProvider locale={locale} messages={messages[locale]}>
-    <Provider store={store} key="provider">
-      <ReduxRouter routes={getRoutes(store)} />
-    </Provider>
+    <Router
+      render={(props) =>
+        <ReduxAsyncConnect {...props} filter={item => !item.deferred} />
+      } history={history}>
+      {getRoutes(store)}
+    </Router>
   </IntlProvider>
 );
 

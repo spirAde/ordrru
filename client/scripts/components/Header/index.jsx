@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import { pushState } from 'redux-router';
 
 import classNames from 'classnames';
 
@@ -128,7 +127,7 @@ function mapStateToProps(state) {
  * */
 function mapDispatchToProps(dispatch) {
   return {
-    changeMode: (mode) => dispatch(pushState(null, `/bathhouses?city=mgn&mode=${mode}`))
+    //changeMode: (mode) => dispatch(pushState(null, `/bathhouses?city=mgn&mode=${mode}`))
   };
 }
 
