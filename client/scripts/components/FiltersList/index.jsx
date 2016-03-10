@@ -7,11 +7,13 @@ import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
+import { filtersListSelectors } from '../../selectors/FiltersListSelectors';
+
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
-import { resetRoomsByTag, updateRoomsByOptions, updateRoomsByDistance, updateRoomsByTypes, updateRoomsByPrepayment,
-  updateRoomsByGuest, updateRoomsByPrice, updateRoomsBySearchName, updateRoomsByDateTime,
-  updateRoomsBySorting } from '../../actions/bathhouse-actions';
+import { resetRoomsByTag, updateRoomsByOptions, updateRoomsByDistance, updateRoomsByTypes,
+  updateRoomsByPrepayment, updateRoomsByGuest, updateRoomsByPrice, updateRoomsBySearchName,
+  updateRoomsByDateTime, updateRoomsBySorting } from '../../actions/bathhouse-actions';
 
 import FilterDateTimeComponent from '../FilterDateTime/index.jsx';
 import FilterDistanceComponent from '../FilterDistance/index.jsx';
@@ -38,8 +40,10 @@ if (__CLIENT__) {
 /**
  * FiltersListComponent - dumb component, list of different filter components
  * Smart components - none
- * Dumb components - FilterDateTimeComponent, FilterDistanceComponent, FilterGuestsComponent, FilterOptionsComponent,
- *                   FilterPrepaymentComponent, FilterPriceComponent, FilterNameComponent, FilterTypesComponent
+ * Dumb components - FilterDateTimeComponent, FilterDistanceComponent,
+ *                   FilterGuestsComponent, FilterOptionsComponent,
+ *                   FilterPrepaymentComponent, FilterPriceComponent,
+ *                   FilterNameComponent, FilterTypesComponent
  * */
 class FiltersListComponent extends Component {
 
@@ -63,8 +67,8 @@ class FiltersListComponent extends Component {
       data: Map({
         isSticked: false,
         topIsOpen: true,
-        bottomIsOpen: false
-      })
+        bottomIsOpen: false,
+      }),
     };
 
     this.handleScroll = this.handleScroll.bind(this);
@@ -95,7 +99,8 @@ class FiltersListComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
+    return !shallowEqualImmutable(this.props, nextProps)
+      || !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -114,7 +119,7 @@ class FiltersListComponent extends Component {
     const isSticked = defaultBoxOffset < window.pageYOffset;
 
     this.setState(({ data }) => ({
-      data: data.set('isSticked', isSticked)
+      data: data.set('isSticked', isSticked),
     }));
   }
 
@@ -124,10 +129,10 @@ class FiltersListComponent extends Component {
    * */
   handleOpenFullFilters() {
     Ps.initialize(this.refs.scroll, {
-      suppressScrollX: true
+      suppressScrollX: true,
     });
     this.setState(({ data }) => ({
-      data: data.set('topIsOpen', true).set('bottomIsOpen', true)
+      data: data.set('topIsOpen', true).set('bottomIsOpen', true),
     }));
   }
 
@@ -138,7 +143,7 @@ class FiltersListComponent extends Component {
   handleShowOffers() {
     Ps.destroy(this.refs.scroll);
     this.setState(({ data }) => ({
-      data: data.set('bottomIsOpen', false)
+      data: data.set('bottomIsOpen', false),
     }));
   }
 
@@ -244,7 +249,11 @@ class FiltersListComponent extends Component {
       return (
         <a className="FiltersList-tags-anchor" key={index} onClick={this.handleClickResetTag.bind(this, tag)}>
           <FormattedMessage id={`tags.${tag}`} />
-          <IconComponent name="icon-cancel" rate={2} style={{ margin: '-5px -30px', float: 'right' }} />
+          <IconComponent
+            name="icon-cancel"
+            rate={2}
+            style={{ margin: '-5px -30px', float: 'right' }}
+          />
         </a>
       );
     });
@@ -255,36 +264,39 @@ class FiltersListComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { offersCount, tags, filters } = this.props;
+    const {
+      offersCount, tags, datetime, distance, guest,
+      prepayment, price, searchName, sorting, options, types } = this.props;
+
     const { data } = this.state;
 
     const tagsItems = this.renderTags(tags);
 
     const fullFiltersClasses = classNames({
-      'FiltersList': true,
-      'FiltersList--opened': data.get('topIsOpen') && data.get('bottomIsOpen')
+      FiltersList: true,
+      'FiltersList--opened': data.get('topIsOpen') && data.get('bottomIsOpen'),
     });
 
     const topFiltersClasses = classNames({
       'FiltersList-top': true,
-      'FiltersList-top--opened': data.get('topIsOpen')
+      'FiltersList-top--opened': data.get('topIsOpen'),
     });
 
     const bottomFiltersClasses = classNames({
       'FiltersList-bottom': true,
-      'FiltersList-bottom--opened': data.get('bottomIsOpen')
+      'FiltersList-bottom--opened': data.get('bottomIsOpen'),
     });
 
     const optionsClasses = classNames({
       'FiltersList-options': true,
       'FiltersList-options--opened': !data.get('bottomIsOpen'),
       'FiltersList-options--sticked': data.get('isSticked'),
-      'g-clear': true
+      'g-clear': true,
     });
 
     const showContentClasses = classNames({
       'FiltersList-show-content': true,
-      'FiltersList-show-content--opened': data.get('topIsOpen') && data.get('bottomIsOpen')
+      'FiltersList-show-content--opened': data.get('topIsOpen') && data.get('bottomIsOpen'),
     });
 
     return (
@@ -292,48 +304,48 @@ class FiltersListComponent extends Component {
         <div className="FiltersList-wrapper" ref="scroll">
           <div className={topFiltersClasses}>
             <FilterDateTimeComponent
-              values={filters.get('datetime')}
+              values={datetime}
               onSelect={this.handleDateTimeFilter}
             />
             <FilterOptionsComponent
-              values={filters.get('options')}
+              values={options}
               onSelect={this.handleOptionsFilter}
             />
             <FilterTypesComponent
-              values={filters.get('types')}
+              values={types}
               onSelect={this.handleTypesFilter}
             />
             <FilterPrepaymentComponent
-              values={filters.get('prepayment')}
+              values={prepayment}
               onSelect={this.handlePrepaymentFilter}
             />
             <FilterSortingComponent
-              values={filters.get('sorting')}
+              values={sorting}
               onSelect={this.handleSortingFilter}
             />
           </div>
           <div className={bottomFiltersClasses}>
             <FilterDistanceComponent
-              values={filters.get('distance')}
+              values={distance}
               onSelect={this.handleDistanceFilter}
             />
             <FilterPriceComponent
-              values={filters.get('price')}
+              values={price}
               onSelect={this.handlePriceFilter}
             />
             <FilterGuestsComponent
-              values={filters.get('guest')}
+              values={guest}
               onSelect={this.handleGuestsFilter}
             />
             <FilterSearchNameComponent
-              value={filters.get('searchName')}
+              value={searchName}
               onSelect={this.handleSearchNameFilter}
             />
           </div>
         </div>
         <div className={optionsClasses} ref="box">
           <div className="FiltersList-more">
-            <a className="FiltersList-more-anchor" onClick={this.handleOpenFullFilters.bind(this)}>
+            <a className="FiltersList-more-anchor" onClick={::this.handleOpenFullFilters}>
               {
                 data.get('isSticked') ?
                   <FormattedMessage id="showFilters" /> :
@@ -348,13 +360,13 @@ class FiltersListComponent extends Component {
             <FormattedMessage
               id="offersCount"
               values={{
-                offersCount: offersCount
+                offersCount,
               }}
             />
           </div>
         </div>
         <div className={showContentClasses}>
-          <a className="FiltersList-show-offers-anchor" onClick={this.handleShowOffers.bind(this)}>
+          <a className="FiltersList-show-offers-anchor" onClick={::this.handleShowOffers}>
             <FormattedMessage id="showOffers" />
           </a>
         </div>
@@ -382,15 +394,15 @@ class FiltersListComponent extends Component {
 FiltersListComponent.propTypes = {
   offersCount: PropTypes.number.isRequired,
   tags: ImmutablePropTypes.list.isRequired,
-  filters: ImmutablePropTypes.shape({
-    datetime: ImmutablePropTypes.map.isRequired,
-    distance: ImmutablePropTypes.map.isRequired,
-    guest: ImmutablePropTypes.map.isRequired,
-    options: ImmutablePropTypes.list.isRequired,
-    prepayment: ImmutablePropTypes.list.isRequired,
-    price: ImmutablePropTypes.map.isRequired,
-    types: ImmutablePropTypes.list.isRequired
-  }),
+  datetime: ImmutablePropTypes.map.isRequired,
+  distance: ImmutablePropTypes.map.isRequired,
+  guest: ImmutablePropTypes.map.isRequired,
+  options: ImmutablePropTypes.list.isRequired,
+  prepayment: ImmutablePropTypes.list.isRequired,
+  price: ImmutablePropTypes.map.isRequired,
+  types: ImmutablePropTypes.list.isRequired,
+  searchName: ImmutablePropTypes.map.isRequired,
+  sorting: ImmutablePropTypes.list.isRequired,
   updateRoomsByDateTime: PropTypes.func.isRequired,
   updateRoomsByDistance: PropTypes.func.isRequired,
   updateRoomsByGuest: PropTypes.func.isRequired,
@@ -400,21 +412,8 @@ FiltersListComponent.propTypes = {
   updateRoomsByPrepayment: PropTypes.func.isRequired,
   updateRoomsByPrice: PropTypes.func.isRequired,
   updateRoomsBySorting: PropTypes.func.isRequired,
-  resetRoomsByTag: PropTypes.func.isRequired
+  resetRoomsByTag: PropTypes.func.isRequired,
 };
-
-/**
- * pass state to props
- * @param {Object} state - current redux state
- * @return {Object.<string, string|number|Array|Object>} props - list of params
- * */
-function mapStateToProps(state) {
-  return {
-    tags: state.filter.get('tags'),
-    offersCount: state.bathhouse.get('valid').size,
-    filters: state.filter.get('filters')
-  };
-}
 
 /**
  * pass method to props
@@ -432,8 +431,8 @@ function mapDispatchToProps(dispatch) {
     updateRoomsByPrepayment: (value) => dispatch(updateRoomsByPrepayment(value)),
     updateRoomsByPrice: (values) => dispatch(updateRoomsByPrice(values)),
     updateRoomsBySorting: (value) => dispatch(updateRoomsBySorting(value)),
-    resetRoomsByTag: (tag) => dispatch(resetRoomsByTag(tag))
+    resetRoomsByTag: (tag) => dispatch(resetRoomsByTag(tag)),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FiltersListComponent);
+export default connect(filtersListSelectors, mapDispatchToProps)(FiltersListComponent);

@@ -7,6 +7,15 @@
     "__SSR__": true,
     "__INITIAL_STATE__": true,
     "__CONFIG__": true,
+    "__API_PROTOCOL__": true,
+    "__API_HOST__": true,
+    "__API_PORT__": true,
+    "__SOCKET_PROTOCOL__": true,
+    "__SOCKET_HOST__": true,
+    "__SOCKET_PORT__": true,
+    "__PROTOCOL": true,
+    "__HOST__": true,
+    "__PORT__": true,
     "isomorphicTools": true
   },
   "plugins": [

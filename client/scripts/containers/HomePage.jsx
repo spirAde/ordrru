@@ -16,7 +16,8 @@ import configs from '../../../common/data/configs.json';
 /**
  * HomePage - smart component, container, welcome page
  * Smart components - none
- * Dumb components - FaceComponent, HowUseItComponent, TestimonialsComponent, InterestingComponent, FooterComponent
+ * Dumb components - FaceComponent, HowUseItComponent, TestimonialsComponent,
+ *                   InterestingComponent, FooterComponent
  * */
 class HomePage extends Component {
 
@@ -73,12 +74,12 @@ class HomePage extends Component {
         <FaceComponent />
         <HowUseItComponent />
         <TestimonialsComponent />
-        /*<InterestingComponent
+        {/*<InterestingComponent
           onChangeCity={this.handleChangeCity}
           onChangeOrganizationType={this.handleChangeOrganizationType}
           cities={this.props.cities}
           types={this.props.types}
-        />*/
+        />*/}
         <FooterComponent />
       </div>
     );

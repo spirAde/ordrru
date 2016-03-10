@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link, browserHistory } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 
 import classNames from 'classnames';
+
+import { HeaderSelectors } from '../../selectors/HeaderSelectors';
 
 import IconComponent from '../Icon/index.jsx';
 
@@ -16,14 +18,6 @@ import logoImg from '../../../images/logo.png';
  * Dumb components - none
  * */
 class HeaderComponent extends Component {
-
-  /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
 
   /**
    * shouldComponentUpdate
@@ -45,7 +39,7 @@ class HeaderComponent extends Component {
       return false;
     }
 
-    this.props.changeMode(mode);
+    return browserHistory.push(`/bathhouses?city=mgn&mode=${mode}`);
   }
 
   /**
@@ -60,21 +54,21 @@ class HeaderComponent extends Component {
       'Header-anchor': true,
       'Header-anchor-mode-list': true,
       'Header-anchor--first': true,
-      'Header-anchor--active': isListMode
+      'Header-anchor--active': isListMode,
     });
 
     const mapButtonClasses = classNames({
       'Header-anchor': true,
       'Header-anchor-mode-map': true,
       'Header-anchor--last': true,
-      'Header-anchor--active': !isListMode
+      'Header-anchor--active': !isListMode,
     });
 
     return (
       <div className="Header">
         <div className="Header-wrapper g-clear">
           <div className="Header-logo">
-            <Link to="/">
+            <Link to={{ pathname: '/' }}>
               <img src={logoImg} alt="" width="130" height="40" />
             </Link>
           </div>
@@ -85,11 +79,19 @@ class HeaderComponent extends Component {
 
           <div className="Header-mode">
             <a className={listButtonClasses} onClick={this.handleChangeMode.bind(this, 'list')}>
-              <IconComponent name="icon-list" rate={1.5} style={{ margin: '0 10px -5px -15px' }} />
+              <IconComponent
+                name="icon-list"
+                rate={1.5}
+                style={{ margin: '0 10px -5px -15px' }}
+              />
               <FormattedMessage id="mode.list" />
             </a>
             <a className={mapButtonClasses} onClick={this.handleChangeMode.bind(this, 'map')}>
-              <IconComponent name="icon-location-point-mapbox" rate={1.5} style={{ margin: '0 10px -5px -15px' }} />
+              <IconComponent
+                name="icon-location-point-mapbox"
+                rate={1.5}
+                style={{ margin: '0 10px -5px -15px' }}
+              />
               <FormattedMessage id="mode.map" />
             </a>
           </div>
@@ -106,29 +108,6 @@ class HeaderComponent extends Component {
  */
 HeaderComponent.propTypes = {
   mode: PropTypes.oneOf(['list', 'map']),
-  changeMode: PropTypes.func.isRequired
 };
 
-/**
- * pass state to props
- * @param {Object} state - current redux state
- * @return {Object.<string, string|number|Array|Object>} props - list of params
- * */
-function mapStateToProps(state) {
-  return {
-    mode: state.router.location.query.mode
-  };
-}
-
-/**
- * pass method to props
- * @param {Function} dispatch
- * @return {Object} props - list of methods
- * */
-function mapDispatchToProps(dispatch) {
-  return {
-    //changeMode: (mode) => dispatch(pushState(null, `/bathhouses?city=mgn&mode=${mode}`))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);
+export default connect(HeaderSelectors)(HeaderComponent);

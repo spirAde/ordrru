@@ -4,7 +4,7 @@ import createReducer from '../utils/create-reducer';
 
 import { CHANGE_CITY, CHANGE_ORGANIZATION_TYPE,
   SET_USER_DEVICE, CHANGE_USER_VIEWPORT,
-  RESET_ORDER,
+  RESET_ORDER, SET_SOCKET_ID,
   UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END } from '../../client/scripts/actions/user-actions';
 
 export const initialState = fromJS({
@@ -27,7 +27,8 @@ export const initialState = fromJS({
       height: null,
       width: null
     },
-  }
+  },
+  socket: null,
 });
 
 export const reducer = createReducer({
@@ -57,5 +58,8 @@ export const reducer = createReducer({
     return state
       .setIn(['order', 'date', 'endDate'], action.payload.date)
       .setIn(['order', 'date', 'endPeriod'], action.payload.period);
-  }
+  },
+  [SET_SOCKET_ID](state, action) {
+    return state.set('socket', action.payload.id);
+  },
 }, initialState);

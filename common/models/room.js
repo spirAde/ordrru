@@ -1,6 +1,7 @@
-import map from 'lodash/map';
-import flatten from 'lodash/flatten';
-import min from 'lodash/min';
+import { map, min, flatten } from 'lodash';
+import moment from 'moment';
+
+import { datesRange, isSameDate } from '../utils/date-helper';
 
 export default (Room) => {
 
@@ -9,5 +10,32 @@ export default (Room) => {
     ctx.instance.price.min = min(map(flatten(ctx.instance.price.chunks), 'price'));
 
     next();
+  });
+
+  Room.observe('after save', (ctx, next) => {
+
+    if (!ctx.isNewInstance) next();
+
+    const id = ctx.instance.id;
+    const now = moment().toDate();
+    const end = moment(now).add(31, 'days').toDate();
+
+    const app = Room.app;
+    const Schedule = app.models.Schedule;
+
+    const dates = datesRange(now, end);
+
+    const promises = map(dates, date => {
+      return Schedule.create({
+        roomId: id,
+        date,
+      });
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        next();
+      })
+      .catch(error => next(error));
   });
 };

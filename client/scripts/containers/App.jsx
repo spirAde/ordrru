@@ -23,7 +23,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.initServiceWorker();
+    //this.initServiceWorker();
     this.initCurrentDateAndPeriod();
 
     this.props.changeUserViewport(this.getViewPort());
@@ -33,7 +33,7 @@ class App extends Component {
   getViewPort() {
     return {
       height: window.innerHeight,
-      width: window.innerWidth
+      width: window.innerWidth,
     };
   }
 
@@ -71,7 +71,7 @@ App.propTypes = {
   children: PropTypes.object.isRequired,
   setCurrentDate: PropTypes.func.isRequired,
   setCurrentPeriod: PropTypes.func.isRequired,
-  changeUserViewport: PropTypes.func.isRequired
+  changeUserViewport: PropTypes.func.isRequired,
 };
 
 /**
@@ -83,7 +83,7 @@ function mapDispatchToProps(dispatch) {
   return {
     setCurrentDate: (date) => dispatch(setCurrentDate(date)),
     setCurrentPeriod: (period) => dispatch(setCurrentPeriod(period)),
-    changeUserViewport: (viewport) => dispatch(changeUserViewport(viewport))
+    changeUserViewport: (viewport) => dispatch(changeUserViewport(viewport)),
   };
 }
 

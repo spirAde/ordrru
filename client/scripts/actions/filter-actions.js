@@ -22,8 +22,8 @@ export function setFiltersData(id) {
   return {
     type: SET_FILTERS_DATA,
     payload: {
-      id: id
-    }
+      id,
+    },
   };
 }
 
@@ -36,8 +36,8 @@ export function addTag(tag) {
   return {
     type: ADD_TAG,
     payload: {
-      tag
-    }
+      tag,
+    },
   };
 }
 
@@ -52,8 +52,8 @@ export function removeTag(tag, id) {
     type: REMOVE_TAG,
     payload: {
       tag,
-      id
-    }
+      id,
+    },
   };
 }
 
@@ -66,8 +66,8 @@ export function changeDateTimeFilterValues(values) {
   return {
     type: CHANGE_DATETIME_FILTER_VALUES,
     payload: {
-      values
-    }
+      values,
+    },
   };
 }
 
@@ -80,8 +80,8 @@ export function changeDistanceFilterValue(value) {
   return {
     type: CHANGE_DISTANCE_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 
@@ -94,8 +94,8 @@ export function changePrepaymentFilterValue(value) {
   return {
     type: CHANGE_PREPAYMENT_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 
@@ -108,8 +108,8 @@ export function changeOptionsFilterValue(value) {
   return {
     type: CHANGE_OPTIONS_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 
@@ -122,8 +122,8 @@ export function changeTypesFilterValue(value) {
   return {
     type: CHANGE_TYPES_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 
@@ -136,8 +136,8 @@ export function changeGuestFilterValue(value) {
   return {
     type: CHANGE_GUEST_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 
@@ -150,8 +150,8 @@ export function changePriceFilterValues(values) {
   return {
     type: CHANGE_PRICE_FILTER_VALUES,
     payload: {
-      values
-    }
+      values,
+    },
   };
 }
 
@@ -164,8 +164,8 @@ export function changeSearchNameFilterValue(value) {
   return {
     type: CHANGE_SEARCH_NAME_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 
@@ -176,8 +176,8 @@ export function changeSortingFilterValue(value) {
   return {
     type: CHANGE_SORTING_FILTER_VALUE,
     payload: {
-      value
-    }
+      value,
+    },
   };
 }
 

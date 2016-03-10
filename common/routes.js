@@ -7,7 +7,17 @@ import BathhouseListPage from '../client/scripts/containers/BathhousesListPage.j
 import BathhouseItemPage from '../client/scripts/containers/BathhouseItemPage.jsx';
 import NotFoundPage from '../client/scripts/containers/NotFoundPage.jsx';
 
-export default function getRoutes() {
+export default function getRoutes(store) {
+  const requireLogin = (nextState, replace, cb) => {
+    function checkAuth() {
+      const { auth: { user }} = store.getState();
+      if (!user) {
+        replace('/');
+      }
+      cb();
+    }
+  };
+
   return (
     <Route>
       <Route path="/" component={App}>

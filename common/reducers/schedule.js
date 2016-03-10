@@ -9,7 +9,7 @@ export const initialState = fromJS({
   originals: {}, // loaded schedule for room
   changes: {}, // changes from real time server
   schedules: {}, // combination between originals and changes
-  isFetching: false
+  isFetching: false,
 });
 
 export const reducer = createReducer({

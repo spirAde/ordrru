@@ -1,10 +1,13 @@
-'use strict';
-
 var environment = process.env.NODE_ENV || 'development';
 
 require('dotenv').config({path: 'envs/.env.' + environment});
 require('babel-core/register')({
-  plugins: ['transform-runtime'],
+  plugins: [
+    'transform-runtime',
+    'add-module-exports',
+    'transform-decorators-legacy',
+    'transform-react-display-name'
+  ],
   presets: ['es2015', 'stage-0', 'react']
 });
 require('css-modules-require-hook')();
@@ -15,28 +18,27 @@ global.__DEVTOOLS__ = process.env.DEVTOOLS;
 global.__DEVELOPMENT__ = process.env.DEVELOPMENT;
 global.__SSR__ = process.env.SSR;
 
-var path = require('path');
-var WebpackIsomorphicTools = require('webpack-isomorphic-tools');
-var isomorphicTools = new WebpackIsomorphicTools(require('../webpack/isomorphic-tools'));
-/*
-var areIntlLocalesSupported = require('intl-locales-supported');
+global.__PROTOCOL__ = process.env.PROTOCOL;
+global.__HOST__ = process.env.HOST;
+global.__PORT__ = process.env.PORT;
 
-var localesMyAppSupports = ['ru'];
+global.__API_PROTOCOL__ = process.env.API_PROTOCOL;
+global.__API_HOST__ = process.env.API_HOST;
+global.__API_PORT__ = process.env.API_PORT;
 
-if (global.Intl) {
-  if (!areIntlLocalesSupported(localesMyAppSupports)) {
-    require('intl');
-    Intl.NumberFormat = IntlPolyfill.NumberFormat;
-    Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
-  }
-} else {
-  global.Intl = require('intl');
-}
-*/
+global.__SOCKET_PROTOCOL__ = process.env.SOCKET_PROTOCOL;
+global.__SOCKET_HOST__ = process.env.SOCKET_HOST;
+global.__SOCKET_PORT__ = process.env.SOCKET_PORT;
+
+const path = require('path');
+const WebpackIsomorphicTools = require('webpack-isomorphic-tools');
+const isomorphicTools = new WebpackIsomorphicTools(
+  require('../webpack/isomorphic-tools')
+);
 
 global.isomorphicTools = isomorphicTools
   .development(__DEVELOPMENT__)
-  .server(path.resolve(__dirname, '..'), function() {
-    var server = require('../server/server.' + environment + '.js');
-    //server.start();
+  .server(path.resolve(__dirname, '..'), () => {
+    const server = require('../server/server.' + environment + '.js');
+    server.start();
   });

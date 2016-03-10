@@ -3,9 +3,14 @@ var boot = require('loopback-boot');
 
 var app = loopback();
 
+const bootOptions = {
+  appRootDir: __dirname,
+  bootScripts: ['./boot/authentication.js'],
+};
+
 app.start = function() {
 
-  boot(app, __dirname);
+  boot(app, bootOptions);
   app.use('/api', loopback.rest());
   app.listen();
 };

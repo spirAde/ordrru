@@ -13,6 +13,8 @@ export const UPDATE_ORDER_DATETIME_END = 'UPDATE_ORDER_DATETIME_END';
 
 export const RESET_ORDER = 'RESET_ORDER';
 
+export const SET_SOCKET_ID = 'SET_SOCKET_ID';
+
 /**
  * update start datetime of order
  * @param {string} id - room id
@@ -26,8 +28,8 @@ function updateOrderDatetimeStart(id, date, period) {
     payload: {
       id,
       date,
-      period
-    }
+      period,
+    },
   };
 }
 
@@ -42,8 +44,8 @@ function updateOrderDatetimeEnd(date, period) {
     type: UPDATE_ORDER_DATETIME_END,
     payload: {
       date,
-      period
-    }
+      period,
+    },
   };
 }
 
@@ -56,8 +58,8 @@ export function changeCity(id) {
   return {
     type: CHANGE_CITY,
     payload: {
-      id
-    }
+      id,
+    },
   };
 }
 
@@ -70,8 +72,8 @@ export function changeOrganizationType(id) {
   return {
     type: CHANGE_ORGANIZATION_TYPE,
     payload: {
-      id
-    }
+      id,
+    },
   };
 }
 
@@ -79,8 +81,8 @@ export function setUserDevice(device) {
   return {
     type: SET_USER_DEVICE,
     payload: {
-      device
-    }
+      device,
+    },
   };
 }
 
@@ -88,8 +90,8 @@ export function changeUserViewport(viewport) {
   return {
     type: CHANGE_USER_VIEWPORT,
     payload: {
-      viewport
-    }
+      viewport,
+    },
   };
 }
 
@@ -116,6 +118,19 @@ export function selectOrder(id, date, period) {
 
 export function resetOrder() {
   return {
-    type: RESET_ORDER
+    type: RESET_ORDER,
+  };
+}
+
+
+export function setSocketId(id) {
+  return {
+    type: SET_SOCKET_ID,
+    payload: {
+      id,
+    },
+    meta: {
+      remote: true,
+    },
   };
 }

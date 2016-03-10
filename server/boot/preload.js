@@ -1,10 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import moment from 'moment';
-import { flatten } from 'lodash/array';
-import { pluck } from 'lodash/collection';
-import { assign, invert } from 'lodash/object';
-import { floor, ceil, min, max } from 'lodash/math';
+import { flatten, assign, invert, map, floor, ceil, min, max } from 'lodash';
 
 export default (app, callback) => {
 
@@ -32,14 +29,14 @@ export default (app, callback) => {
     ]
   };
 
-  commonFilters.options = pluck(app.get('bathhouseOptions').concat(app.get('roomOptions')), 'option').map(option => {
+  commonFilters.options = map(app.get('bathhouseOptions').concat(app.get('roomOptions')), 'option').map(option => {
     return {
       name: option,
       checked: false
     };
   });
 
-  commonFilters.types = pluck(app.get('bathhouseType'), 'type').map(type => {
+  commonFilters.types = map(app.get('bathhouseType'), 'type').map(type => {
     return {
       name: type,
       checked: false
@@ -68,7 +65,7 @@ export default (app, callback) => {
       cities.forEach((city, index) => {
 
         const cityBathhouses = bathhouses[index];
-        const distancePack = pluck(cityBathhouses, 'distance');
+        const distancePack = map(cityBathhouses, 'distance');
 
         const cityDistance = {
           min: floor(min(distancePack), 1),
@@ -80,11 +77,11 @@ export default (app, callback) => {
           return bathhouse.rooms();
         }));
 
-        const guestLimits = pluck(bathhouseRooms, 'guest').map(guestData => {
+        const guestLimits = map(bathhouseRooms, 'guest').map(guestData => {
           return guestData.limit + guestData.threshold;
         });
 
-        const datetimePrices = pluck(flatten(pluck(bathhouseRooms, 'price').map(chunks => {
+        const datetimePrices = map(flatten(map(bathhouseRooms, 'price').map(chunks => {
           return flatten(chunks.chunks);
         })), 'price');
 

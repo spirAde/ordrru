@@ -1,4 +1,4 @@
-var environment = process.env.NODE_ENV || 'development';
+var environment = process.env.NODE_ENV || 'local';
 
 require('dotenv').config({path: 'envs/.env.' + environment});
 
@@ -13,7 +13,7 @@ import webpackConfig from '../webpack/development.config';
 const compiler = webpack(webpackConfig);
 
 const host = process.env.HOST || 'localhost';
-const port = parseInt(process.env.PORT) + 1 || 3001;
+const port = parseInt(process.env.PORT, 10) + 1 || 3001;
 
 const serverOptions = {
   contentBase: 'http://localhost:3001',

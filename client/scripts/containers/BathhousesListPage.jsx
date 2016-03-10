@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-
+import { asyncConnect } from 'redux-async-connect';
 import qs from 'query-string';
+
+import { BathhousesListSelectors } from '../selectors/BathhousesListSelectors';
 
 import shallowEqualImmutable from '../utils/shallowEqualImmutable';
 
@@ -19,35 +21,11 @@ import MapComponent from '../components/Map/index.jsx';
  * Smart components - none
  * Dumb components - HeaderComponent, FiltersListComponent, RoomsListComponent, MapComponent
  * */
-class BathhouseListPage extends Component {
-
-  /**
-   * constructor
-   * @param {Object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
-   * shouldComponentUpdate
-   * @return {boolean}
-   * */
-  shouldComponentUpdate(nextProps) {
-    return !shallowEqualImmutable(this.props, nextProps);
-  }
-
-  /**
-   * SSR method, preload state with data fetched inside this method
-   * @param {Function} dispatch
-   * @param {Function} getState
-   * @param {Object} location
-   * @return {Promise} - promise contains api methods for fetching data
-   * */
-  static fetchData(dispatch, getState, location) {
+@asyncConnect([{
+  promise: ({ store: { dispatch, getState } }) => {
     const promises = [];
-    const params = qs.parse(location.search);
     const state = getState();
+    const params = qs.parse(state.routing.location.search);
     const city = getCityBySlug(state, params.city);
 
     if (shouldChangeActiveCity(state, city.get('id'))) {
@@ -63,6 +41,16 @@ class BathhouseListPage extends Component {
     }
 
     return Promise.all(promises);
+  },
+}])
+class BathhouseListPage extends Component {
+
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps) {
+    return !shallowEqualImmutable(this.props, nextProps);
   }
 
   /**
@@ -78,7 +66,7 @@ class BathhouseListPage extends Component {
       <div>
         <HeaderComponent mode={mode} />
         <FiltersListComponent />
-        <RoomsListComponent isActive={isListMode}/>
+        <RoomsListComponent isActive={isListMode} />
         <MapComponent isActive={!isListMode} />
       </div>
     );
@@ -90,18 +78,7 @@ class BathhouseListPage extends Component {
  * @property {string} mode - current mode of page(list or map)
  */
 BathhouseListPage.propTypes = {
-  mode: PropTypes.oneOf(['list', 'map'])
+  mode: PropTypes.oneOf(['list', 'map']),
 };
 
-/**
- * pass state to props
- * @param {Object} state - current redux state
- * @return {Object.<string, string|number|Array|Object>} props - list of params
- * */
-function mapStateToProps(state) {
-  return {
-    mode: state.router.location.query.mode
-  };
-}
-
-export default connect(mapStateToProps)(BathhouseListPage);
+export default connect(BathhousesListSelectors)(BathhouseListPage);

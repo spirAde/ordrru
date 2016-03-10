@@ -1,10 +1,6 @@
 import { Map } from 'immutable';
 
-import sample from 'lodash/sample';
-import range from 'lodash/range';
-import floor from 'lodash/floor';
-import fill from 'lodash/fill';
-import sortBy from 'lodash/sortBy';
+import { floor, fill, sortBy } from 'lodash';
 
 import moment from 'moment';
 
@@ -50,21 +46,22 @@ class RoomItemComponent extends Component {
      */
     this.state = {
       data: Map({
-        scheduleIsOpen: false
-      })
+        scheduleIsOpen: false,
+      }),
     };
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
   }
 
   /**
-   * componentWillReceiveProps - if activeRoomId was change, then close schedule for previous active room
+   * componentWillReceiveProps - if activeRoomId was change,
+   * then close schedule for previous active room
    * @return {void}
    * */
   componentWillReceiveProps(nextProps) {
     if (this.props.isOpen && !nextProps.isOpen) {
-      this.setState(({data}) => ({
-        data: data.set('scheduleIsOpen', false)
+      this.setState(({ data }) => ({
+        data: data.set('scheduleIsOpen', false),
       }));
     }
   }
@@ -74,7 +71,8 @@ class RoomItemComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -115,8 +113,8 @@ class RoomItemComponent extends Component {
    * handle open|close schedule for room
    * */
   handleOpenSchedule() {
-    this.setState(({data}) => ({
-      data: data.set('scheduleIsOpen', !data.get('scheduleIsOpen'))
+    this.setState(({ data }) => ({
+      data: data.set('scheduleIsOpen', !data.get('scheduleIsOpen')),
     }));
   }
 
@@ -163,11 +161,16 @@ class RoomItemComponent extends Component {
       const classes = classNames({
         'RoomItem-service-type': true,
         'g-icons': true,
-        [optionClass]: true
+        [optionClass]: true,
       });
+
       return (
         <div className={classes} key={index}>
-          <IconComponent name={`icon-${option}`} rate={1.5} style={{ marginRight: '10px', marginBottom: '-5px' }} />
+          <IconComponent
+            name={`icon-${option}`}
+            rate={1.5}
+            style={{ marginRight: '10px', marginBottom: '-5px' }}
+          />
           <FormattedMessage id={`options.${option}`} />
         </div>
       );
@@ -191,7 +194,7 @@ class RoomItemComponent extends Component {
 
     const infoClasses = classNames({
       'RoomItem-info': true,
-      'RoomItem-info--opened': isOpen
+      'RoomItem-info--opened': isOpen,
     });
 
     const typesClasses = sortBy(room.get('types').toJS()).join('-');
@@ -216,7 +219,7 @@ class RoomItemComponent extends Component {
                       style={{
                         margin: '-7px',
                         fillOpacity: '.5',
-                        float: 'right'
+                        float: 'right',
                       }}
                     /> :
                     null
@@ -228,7 +231,10 @@ class RoomItemComponent extends Component {
                   color="#F4740C"
                   style={{ marginBottom: '-2px', marginRight: '5px' }}
                 />
-                <Link to={`/bathhouse/${bathhouse.get('id')}`} className="RoomItem-bathhouse-address-text">
+                <Link
+                  to={{ pathname: `/bathhouse/${bathhouse.get('id')}` }}
+                  className="RoomItem-bathhouse-address-text"
+                >
                   {bathhouse.get('name')}
                 </Link> {bathhouse.get('address')}
               </p>
@@ -246,12 +252,12 @@ class RoomItemComponent extends Component {
                 </a>
               </div>
               <div className="RoomItem-more-info">
-                <a className="RoomItem-details-button" onClick={this.handleOpenDescription.bind(this)}>
+                <a className="RoomItem-details-button" onClick={::this.handleOpenDescription}>
                   <span className="RoomItem-details-price">
                     <FormattedMessage
                       id="priceFrom"
                       values={{
-                        price: room.getIn(['price', 'min'])
+                        price: room.getIn(['price', 'min']),
                       }}
                     />
                   </span>
@@ -283,7 +289,7 @@ class RoomItemComponent extends Component {
                       <input
                         className="RoomItem-field-date-time-input"
                         placeholder={formatMessage({ id: 'selectTime' })}
-                        onClick={this.handleOpenSchedule.bind(this)}
+                        onClick={::this.handleOpenSchedule}
                         value={orderDatetimeValue}
                       />
                     </div>
@@ -351,11 +357,11 @@ RoomItemComponent.propTypes = {
   intl: intlShape.isRequired,
   onChangeActiveRoom: PropTypes.func.isRequired,
   onCloseRoom: PropTypes.func,
-  onSelectOrder: PropTypes.func.isRequired
+  onSelectOrder: PropTypes.func.isRequired,
 };
 
 RoomItemComponent.defaultProps = {
-  isClosable: false
+  isClosable: false,
 };
 
 export default injectIntl(RoomItemComponent);

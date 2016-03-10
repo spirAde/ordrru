@@ -1,17 +1,14 @@
 import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, browserHistory } from 'react-router';
-
-import moment from 'moment';
-
-import { IntlProvider } from 'react-intl';
-
-import { ReduxAsyncConnect } from 'redux-async-connect';
 import { Provider } from 'react-redux';
+import { Router, browserHistory } from 'react-router';
+import { ReduxAsyncConnect } from 'redux-async-connect';
+import { IntlProvider } from 'react-intl';
 
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
 
+import moment from 'moment';
 import messages from '../../common/data/messages/index';
 
 import configureStore from '../../common/configure-store';
@@ -27,24 +24,30 @@ const history = useScroll(() => browserHistory)();
 const store = configureStore(history, window.__INITIAL_STATE__);
 const reactRoot = document.getElementById('root');
 
-const localization = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+const localization = navigator.languages ?
+  navigator.languages[0] : (navigator.language || navigator.userLanguage);
 const locale = localization.indexOf('-') ? localization.split('-')[0] : localization;
 
+const filter = (item) => !item.deferred;
+const renderAsync = (props) => <ReduxAsyncConnect {...props} filter={filter} />;
+
 const component = (
-  <IntlProvider locale={locale} messages={messages[locale]}>
-    <Router
-      render={(props) =>
-        <ReduxAsyncConnect {...props} filter={item => !item.deferred} />
-      } history={history}>
-      {getRoutes(store)}
-    </Router>
-  </IntlProvider>
+  <Router render={renderAsync} history={history}>
+    {getRoutes(store)}
+  </Router>
 );
 
 function runApp() {
   moment.locale(locale);
 
-  ReactDOM.render(component, reactRoot);
+  ReactDOM.render(
+    <IntlProvider locale={locale} messages={messages[locale]}>
+      <Provider store={store} key="provider">
+        {component}
+      </Provider>
+    </IntlProvider>,
+    reactRoot
+  );
 
   if (__DEVELOPMENT__) {
     const Perf = require('react-addons-perf');
@@ -52,9 +55,11 @@ function runApp() {
     window.React = React; // enable debugger
     window.Perf = Perf; // performance tool
 
-    if (!reactRoot || !reactRoot.firstChild || !reactRoot.firstChild.attributes || !reactRoot.firstChild.attributes['data-react-checksum']) {
+    if (!reactRoot || !reactRoot.firstChild || !reactRoot.firstChild.attributes
+      || !reactRoot.firstChild.attributes['data-react-checksum']) {
       console.error(// eslint-disable-line no-console
-        'Server-side React render was discarded. Make sure that your initial render does not contain any client-side code.'
+        `Server-side React render was discarded. Make sure that your
+        initial render does not contain any client-side code.`
       );
     }
   }
@@ -77,7 +82,4 @@ function runApp() {
 
 IntlUtils.loadPolyfill(locale)
   .then(IntlUtils.loadLocaleData.bind(this, locale))
-  .then(runApp)
-  .catch(err => console.error(
-    err// eslint-disable-line no-console
-  ));
+  .then(runApp);

@@ -1,197 +1,320 @@
-'use strict';
+import casual from 'casual';
+import { head, shuffle, random, map, sampleSize, includes, take, range, flatten, sample, compact } from 'lodash';
+import async from 'async';
+import moment from 'moment';
 
-var util = require('util');
+import config from './config.json';
+import * as utils from './utils';
 
-var casual = require('casual');
-var _ = require('lodash');
-
-var bathhouseOptions = ['internet', 'bar', 'billiards', 'icehole', 'kitchen'];
-var services = {
-  massage: ['russian', 'georgian', 'siberian', 'ukrainian', 'belarusian', 'babayski', 'bashkir', 'american'],
-  steaming: ['classic', 'sport', 'relax', 'hardcore', 'middle', 'easy', 'nightmare', 'smth'],
-  other: ['hookah', 'karaoke', 'barbecue set', 'cards', 'domino', 'backgammon', 'projector', 'whores']
+const generators = {
+	bathhouse: (city) => {
+		return {
+			name: casual.company_name,
+			address: casual.address2,
+			description: casual.description,
+			contactData: {
+				phone: [casual.phone],
+				email: [casual.email],
+				site: [casual.url]
+			},
+			tableTime: [
+				{ startPeriod: 0, endPeriod: 144 },
+				{ startPeriod: 0, endPeriod: 144 },
+				{ startPeriod: 0, endPeriod: 144 },
+				{ startPeriod: 0, endPeriod: 144 },
+				{ startPeriod: 0, endPeriod: 144 },
+				{ startPeriod: 0, endPeriod: 144 },
+				{ startPeriod: 0, endPeriod: 144 }
+			],
+			cityId: city.id,
+			location: utils.generateRandomPoint(city.center, 5000),
+			distance: 0,
+			isActive: true,
+			options: sampleSize(config.options.bathhouse, random(1, config.options.bathhouse)),
+			services: {
+				massage: utils.generateServices(config.services.massage),
+				steaming: utils.generateServices(config.services.steaming),
+				other: utils.generateServices(config.services.other)
+			}
+		}
+	},
+	room: function(bathhouse) {
+		return {
+			bathhouseId: bathhouse.id,
+			name: casual.title,
+			description: casual.description,
+			types: sampleSize(config.types, random(1, config.types.length)),
+			options: sampleSize(config.options.room, random(1, config.options.room)),
+			settings: {
+				minDuration: head(shuffle(config.duration)),
+				cleaningTime: 0,
+				prepayment: Math.random() < 0.5,
+				holdTime: 0
+			},
+			guest: {
+				limit: random(12, 18),
+				threshold: random(8, 10),
+				price: head(shuffle(range(100, 500, 50)))
+			},
+			price: {
+				min: 0,
+				chunks: utils.generatePricesByDateTime(config.thresholds),
+			},
+			rating: random(1, 10),
+			popularity: random(1, 10)
+		}
+	},
+	order: function(room, order) {
+		return {
+			roomId: room.id,
+			startDate: order.startDate,
+			endDate: order.endDate,
+			startPeriod: order.startPeriod,
+			endPeriod: order.endPeriod,
+			services: [],
+			guests: 10,
+			sums: {
+				datetime: 1000,
+				guests: 1000,
+				services: 1000
+			},
+			createdByUser: Math.random() < 0.5
+		}
+	},
+	review: function(room) {
+		return {
+			roomId: room.id,
+			date: utils.generateReviewDate(),
+			text: casual.sentences(random(5)),
+			evaluation: random(10, true),
+		}
+	}
 };
 
-var roomOptions = ['jacuzzi', 'billiards', 'pool', 'smoking'];
-var types = ['hammam', 'sauna', 'bathhouse'];
-var minDuration = [3, 6, 9];
+export default (models) => {
 
-var pricesThresholds = [
-  [
-    [30, 36, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78],
-    [99, 102, 105, 108, 111, 114]
-  ],
-  [
-    [27, 30, 33, 36, 39, 42],
-    [63, 66, 69, 72, 75, 78],
-    [105, 108, 111, 114, 117]
-  ],
-  [
-    [21, 24, 27, 30, 33],
-    [60, 63, 66, 69, 72],
-    [96, 99, 102],
-    [123, 126]
-  ]
-];
+	const run = require('./server');
 
-function clog(data) {
-  console.log(util.inspect(data, false, null));
+	run((error, app) => {
+		if (error) throw error;
+
+		const dataSources = app.dataSources.ordrDB;
+
+		function createCity(data, callback) {
+			return app.models.City.create(data, (error, record) => {
+				callback(null, record);
+			});
+		}
+
+		function getCities(callback) {
+			return app.models.City.find({}, (error, cities) => {
+				callback(null, cities);
+			});
+		}
+
+		function createBathhouse(city, callback) {
+			const data = generators.bathhouse(city);
+			return app.models.Bathhouse.create(data, { center: city.center }, (error, record) => {
+				return callback(null, record);
+			});
+		}
+
+		function getBathhouses(callback) {
+			return app.models.Bathhouse.find({}, (error, bathhouses) => {
+				callback(null, bathhouses);
+			});
+		}
+
+		function createRoom(bathhouse, callback) {
+			const data = generators.room(bathhouse);
+			return app.models.Room.create(data, (error, record) => {
+				return callback(null, record);
+			});
+		}
+
+		function getRooms(callback) {
+			return app.models.Room.find({}, (error, rooms) => {
+				callback(null, rooms);
+			});
+		}
+
+		function createOrder(room, order, callback) {
+			const data = generators.order(room, order);
+			return app.models.Order.create(data, (error, record) => {
+				return callback(null, record);
+			});
+		}
+
+		function createReview(room, callback) {
+			const data = generators.review(room);
+			return app.models.Review.create(data, (error, record) => {
+				return callback(null, record);
+			});
+		}
+
+		const queue = [];
+
+		const funcs = {
+			city: [],
+			bathhouse: [],
+			room: [],
+			order: [],
+			schedule: [],
+			review: [],
+		};
+
+		const statuses = {
+			city: includes(models, 'city') || includes(models, 'all'),
+			bathhouse: includes(models, 'bathhouse') || includes(models, 'all'),
+			room: includes(models, 'room') || includes(models, 'all'),
+			order: includes(models, 'order') || includes(models, 'all'),
+			schedule: includes(models, 'schedule') || includes(models, 'all'),
+			review: includes(models, 'review') || includes(models, 'all'),
+		};
+
+		const counts = {
+			city: 1,
+			bathhouse: 3,
+			room: 5,
+			order: 10,
+			review: 10,
+		};
+
+		if (error) throw error;
+
+		if (statuses.city) {
+
+			funcs.city = function (callback) {
+				const funcs = map(take(config.cities, counts.city), city => {
+					return async.apply(createCity, city);
+				});
+
+				return async.parallel(flatten(funcs), (error, cities) => {
+					console.log('cities', 'x', cities.length);
+					callback(null, cities);
+				});
+			}
+
+			queue.push(funcs.city);
+		}
+		if (statuses.bathhouse) {
+
+			if (!statuses.city) {
+				funcs.city = function(callback) {
+					getCities((error, cities) => {
+						callback(null, cities);
+					});
+				};
+
+				queue.push(funcs.city);
+			}
+
+			funcs.bathhouse = function (cities, callback) {
+				const funcs = map(cities, city => {
+					return map(range(0, counts.bathhouse), index => {
+						return async.apply(createBathhouse, city);
+					});
+				});
+
+				return async.parallel(flatten(funcs), (error, bathhouses) => {
+					console.log('bathhouses', 'x', compact(map(bathhouses, 'id')).length);
+					callback(null, bathhouses);
+				});
+			}
+
+			queue.push(funcs.bathhouse);
+		}
+		if (statuses.room) {
+
+			if (!statuses.bathhouse) {
+				funcs.bathhouse = function(callback) {
+					getBathhouses((error, bathhouses) => {
+						callback(null, bathhouses);
+					});
+				}
+
+				queue.push(funcs.bathhouse);
+			}
+
+			funcs.room = function (bathhouses, callback) {
+				const funcs = map(bathhouses, bathhouse => {
+					return map(range(0, counts.room, 1), index => {
+						return async.apply(createRoom, bathhouse);
+					});
+				});
+
+				return async.parallel(flatten(funcs), (error, rooms) => {
+					console.log('rooms', 'x', compact(map(rooms, 'id')).length);
+					callback(null, rooms);
+				});
+			}
+
+			queue.push(funcs.room);
+		}
+		/*if (statuses.review) {
+
+			if (!statuses.room) {
+				funcs.room = function(callback) {
+					getRooms((error, bathhouses) => {
+						callback(null, bathhouses);
+					});
+				}
+
+				queue.push(funcs.room);
+			}
+
+			funcs.review = function (rooms, callback) {
+				const funcs = map(rooms, room => {
+					return map(range(0, counts.review, 1), index => {
+						return async.apply(createReview, room);
+					});
+				});
+
+				return async.parallel(flatten(funcs), (error, reviews) => {
+					console.log('reviews', 'x', compact(map(reviews, 'id')).length);
+					callback(null, reviews);
+				});
+			}
+
+			queue.push(funcs.review);
+		}*/
+		if (statuses.order) {
+
+			if (!statuses.room) {
+				funcs.room = function(callback) {
+					getRooms((error, bathhouses) => {
+						callback(null, bathhouses);
+					});
+				}
+
+				queue.push(funcs.room);
+			}
+
+			funcs.order = function (rooms, callback) {
+				const now = moment().toDate();
+				const end = moment(now).add(31, 'days').toDate();
+
+				const funcs = map(rooms, room => {
+					const orders = utils.generateOrders(now, end, counts.order);
+					return map(orders, order => {
+						return async.apply(createOrder, room, order);
+					});
+				});
+
+				return async.parallel(flatten(funcs), (error, orders) => {
+					console.log('orders', 'x', compact(map(orders, 'id')).length);
+					callback(null, rooms);
+				});
+			}
+
+			queue.push(funcs.order);
+		}
+
+		async.waterfall(queue, (error, data) => {
+
+			if (error) throw error;
+
+			process.exit();
+		});
+	});
 }
-
-function generateRandomPoint(center, radius) {
-  var x0 = center.lng;
-  var y0 = center.lat;
-  // Convert Radius from meters to degrees.
-  var rd = radius / 111300;
-
-  var u = Math.random();
-  var v = Math.random();
-
-  var w = rd * Math.sqrt(u);
-  var t = 2 * Math.PI * v;
-  var x = w * Math.cos(t);
-  var y = w * Math.sin(t);
-
-  var xp = x / Math.cos(y0);
-
-  // Resulting point.
-  return {lat: y + y0, lng: xp + x0};
-}
-
-function distance(lat1, lon1, lat2, lon2, unit) {
-  var radlat1 = Math.PI * lat1 / 180;
-  var radlat2 = Math.PI * lat2 / 180;
-  var radlon1 = Math.PI * lon1 / 180;
-  var radlon2 = Math.PI * lon2 / 180;
-  var theta = lon1-lon2;
-  var radtheta = Math.PI * theta/180;
-  var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-  dist = Math.acos(dist);
-  dist = dist * 180 / Math.PI;
-  dist = dist * 60 * 1.1515;
-  if (unit === 'K') { dist = dist * 1.609344 }
-  if (unit === 'N') { dist = dist * 0.8684 }
-  return dist
-}
-
-function generatePricesByDateTime() {
-  var pricesDatetime = [];
-  var price = _.first(_.shuffle(_.range(700, 2450, 50)));
-  var priceWeekend = price + Math.ceil(Math.random() * 500);
-  var pricesSchema = pricesThresholds[_.random(0, 2)];
-
-  var pricesPoints = _.map(pricesSchema, function(line) {
-    return _.first(_.shuffle(line));
-  }).concat(144);
-
-  _.range(0, 7).forEach(function(dayIndex) {
-
-    pricesDatetime[dayIndex] = [];
-
-    pricesPoints.reduce(function(prev, curr) {
-      pricesDatetime[dayIndex].push({
-        startPeriod: prev,
-        endPeriod: curr,
-        price: dayIndex === 0 || dayIndex === 6 ? priceWeekend : price
-      });
-
-      return curr;
-    }, 0);
-  });
-
-  return pricesDatetime;
-}
-
-function generateServices(type) {
-  var items = _.sample(services[type], _.random(1, services[type].length));
-
-  return _.map(items, function(item) {
-    return {
-      name: item,
-      price: _.sample(_.range(1000, 2000, 100), 1)[0]
-    }
-  });
-}
-
-var generator = {
-  bathhouse: function(center, cityId) {
-    return {
-      name: casual.company_name,
-      address: casual.address2,
-      description: casual.description,
-      contactData: {
-        phone: [casual.phone],
-        email: [casual.email],
-        site: [casual.url]
-      },
-      tableTime: [
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        },
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        },
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        },
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        },
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        },
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        },
-        {
-          startPeriod: 0,
-          endPeriod: 144
-        }
-      ],
-      cityId: cityId,
-      location: generateRandomPoint(center, 5000),
-      distance: 0,
-      isActive: true,
-      options: _.sample(bathhouseOptions, _.random(1, bathhouseOptions.length)),
-      services: {
-        massage: generateServices('massage'),
-        steaming: generateServices('steaming'),
-        other: generateServices('other')
-      }
-    }
-  },
-  room: function(bathhouseId) {
-    return {
-      bathhouseId: bathhouseId,
-      name: casual.title,
-      description: casual.description,
-      types: _.sample(types, _.random(1, types.length)),
-      options: _.sample(roomOptions, _.random(1, roomOptions.length)),
-      settings: {
-        minDuration: _.first(_.shuffle(minDuration)),
-        cleaningTime: 0,
-        prepayment: Math.random() < 0.5,
-        holdTime: 0
-      },
-      guest: {
-        limit: _.random(12, 18),
-        threshold: _.random(8, 10),
-        price: _.first(_.shuffle(_.range(100, 500, 50)))
-      },
-      price: {
-        min: 0,
-        chunks: generatePricesByDateTime()
-      },
-      rating: _.random(1, 10),
-      popularity: _.random(1, 10)
-    }
-  }
-};
-
-module.exports = generator;

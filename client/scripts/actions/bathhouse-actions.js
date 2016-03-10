@@ -1,15 +1,13 @@
 import { List, fromJS } from 'immutable';
 
-import flatten from 'lodash/flatten';
-import isNull from 'lodash/isNull';
-import trim from 'lodash/trim';
-import map from 'lodash/map';
-import assign from 'lodash/assign';
+import { flatten, isNull, trim, map, assign } from 'lodash';
 
-import { Bathhouses } from '../API';
-import { removeTag, addTag, changeSearchNameFilterValue, changeOptionsFilterValue, changePrepaymentFilterValue,
-  changeDateTimeFilterValues, changeDistanceFilterValue, changeGuestFilterValue, changeTypesFilterValue,
-  changePriceFilterValues, changeSortingFilterValue } from './filter-actions';
+import { Bathhouse } from '../API';
+
+import { removeTag, addTag, changeSearchNameFilterValue, changeOptionsFilterValue,
+  changePrepaymentFilterValue, changeDateTimeFilterValues, changeDistanceFilterValue,
+  changeGuestFilterValue, changeTypesFilterValue, changePriceFilterValues,
+  changeSortingFilterValue } from './filter-actions';
 
 export const FIND_BATHHOUSES_REQUEST = 'FIND_BATHHOUSES_REQUEST';
 export const FIND_BATHHOUSES_SUCCESS = 'FIND_BATHHOUSES_SUCCESS';
@@ -39,7 +37,9 @@ function sortingRoomsByType(bathhouses, rooms, type, isDesc) {
     );
   } else if (type === 'distance') {
     sorted = rooms.sortBy(
-      room => bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId')).get('distance'),
+      room => bathhouses.find(
+        bathhouse => bathhouse.get('id') === room.get('bathhouseId')
+      ).get('distance'),
       (prev, next) => isDesc ? next - prev : prev - next
     );
   } else if (type === 'price') {
@@ -59,7 +59,7 @@ function sortingRoomsByType(bathhouses, rooms, type, isDesc) {
 function fetchBathhousesRequest() {
   return {
     type: FIND_BATHHOUSES_REQUEST,
-    payload: {}
+    payload: {},
   };
 }
 
@@ -74,8 +74,8 @@ function fetchBathhousesSuccess(bathhouses, rooms) {
     type: FIND_BATHHOUSES_SUCCESS,
     payload: {
       bathhouses,
-      rooms
-    }
+      rooms,
+    },
   };
 }
 
@@ -88,8 +88,8 @@ function fetchBathhousesFailure(error) {
   return {
     type: FIND_BATHHOUSES_FAILURE,
     payload: {
-      error
-    }
+      error,
+    },
   };
 }
 
@@ -103,10 +103,9 @@ export function findBathhousesAndRooms(cityId) {
     const state = getState();
 
     dispatch(fetchBathhousesRequest());
-    return Bathhouses.find({ include: 'rooms', where: { cityId: cityId, isActive: true }})
-      .then(response => response.json())
+
+    return Bathhouse.find({ include: 'rooms', where: { cityId, isActive: true } })
       .then(data => {
-        console.log(data);
         //  mb use normalizr https://github.com/gaearon/normalizr
         const sorting = state.filter.getIn(['filters', 'sorting']).find(type => type.get('checked'));
         const rooms = fromJS(flatten(map(data, 'rooms')));
@@ -144,8 +143,8 @@ export function updateRooms(valid, invalid) {
     type: UPDATE_ROOMS,
     payload: {
       valid,
-      invalid
-    }
+      invalid,
+    },
   };
 }
 
@@ -158,8 +157,8 @@ export function sortRooms(rooms) {
   return {
     type: SORT_ROOMS,
     payload: {
-      rooms
-    }
+      rooms,
+    },
   };
 }
 
@@ -172,8 +171,8 @@ export function changeActiveRoom(id) {
   return {
     type: CHANGE_ACTIVE_ROOM,
     payload: {
-      id
-    }
+      id,
+    },
   };
 }
 
@@ -508,7 +507,10 @@ export function updateRoomsBySorting(value) {
     const rooms = state.bathhouse.get('rooms');
 
     dispatch(changeSortingFilterValue(value));
-    dispatch(sortRooms(sortingRoomsByType(bathhouses, rooms, value.get('name'), value.get('isDesc'))));
+    dispatch(sortRooms(
+      sortingRoomsByType(bathhouses, rooms, value.get('name'),
+      value.get('isDesc')
+    )));
   };
 }
 
@@ -524,6 +526,8 @@ export function resetRoomsByTag(tag) {
 
     const newInvalid = state.bathhouse.get('invalid').update(tag, list => list.clear());
 
+    // TODO: ugly hack, find all new invalid room id, remove all duplicates, and check availability
+    // TODO: in all rooms. Need solution use clear Immutable
     const newValid = state.bathhouse.get('valid').withMutations(list => {
       const allInvalidRoomIds = newInvalid.toList().flatten();
       const allUniqueInvalidRoomIds = List.of(...new Set(allInvalidRoomIds.toJS()));
@@ -549,7 +553,7 @@ export function updateRoomSchedule(id, date, periods) {
     payload: {
       id,
       date,
-      periods
-    }
+      periods,
+    },
   };
 }

@@ -6,7 +6,8 @@ import { SET_CURRENT_DATE, SET_CURRENT_PERIOD } from '../../client/scripts/actio
 
 export const initialState = fromJS({
   date: null,
-  period: null
+  period: null,
+  socket: null,
 });
 
 export const reducer = createReducer({

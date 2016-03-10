@@ -4,7 +4,12 @@
   },
   "rules": {
     "comma-dangle": [2, "never"],
-    "new-cap": 0
+    "indent": 0,
+    "new-cap": 0,
+    "max-len": [2, 100, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": false
+    }]
   },
   "extends": "strongloop",
   "parser": "babel-eslint"

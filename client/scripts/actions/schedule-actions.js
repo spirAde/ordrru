@@ -2,7 +2,7 @@ import moment from 'moment';
 import keys from 'lodash/keys';
 import last from 'lodash/last';
 
-import { Schedules } from '../API';
+import { Schedule } from '../API';
 
 import configs from '../../../common/data/configs.json';
 
@@ -18,7 +18,7 @@ export const CLEAR_SCHEDULE_CHANGES = 'CLEAR_SCHEDULE_CHANGES';
 export const PERIOD_STATUSES = {
   FREE: 'FREE',
   BUSY: 'BUSY',
-  LOCK: 'LOCK'
+  LOCK: 'LOCK',
 };
 
 /**
@@ -28,7 +28,7 @@ export const PERIOD_STATUSES = {
 function fetchRoomScheduleRequest() {
   return {
     type: FIND_ROOM_SCHEDULE_REQUEST,
-    payload: {}
+    payload: {},
   };
 }
 
@@ -43,8 +43,8 @@ function fetchRoomScheduleSuccess(id, schedule) {
     type: FIND_ROOM_SCHEDULE_SUCCESS,
     payload: {
       id,
-      schedule
-    }
+      schedule,
+    },
   };
 }
 
@@ -57,8 +57,9 @@ function fetchRoomScheduleFailure(error) {
   return {
     type: FIND_ROOM_SCHEDULE_FAILURE,
     payload: {
-      error
-    }
+      message: error.message,
+    },
+    error,
   };
 }
 
@@ -73,8 +74,8 @@ function changeSchedule(id, schedule) {
     type: CHANGE_SCHEDULE,
     payload: {
       id,
-      schedule
-    }
+      schedule,
+    },
   };
 }
 
@@ -87,8 +88,8 @@ function clearScheduleChanges(roomId) {
   return {
     type: CLEAR_SCHEDULE_CHANGES,
     payload: {
-      id: roomId
-    }
+      id: roomId,
+    },
   };
 }
 
@@ -109,8 +110,8 @@ export function addScheduleChanges(roomId, changes) {
     type: ADD_SCHEDULE_CHANGES,
     payload: {
       id: roomId,
-      changes
-    }
+      changes,
+    },
   };
 }
 
@@ -148,8 +149,7 @@ export function findRoomScheduleIfNeed(roomId) {
 
     dispatch(fetchRoomScheduleRequest());
 
-    return Schedules.find({ where: { roomId: roomId, date: { gte: currentDate } }, order: 'date ASC' })
-      .then(response => response.json())
+    return Schedule.find({ where: { roomId: roomId, date: { gte: currentDate } }, order: 'date ASC' })
       .then(schedule => {
         dispatch(fetchRoomScheduleSuccess(roomId, schedule));
         if (state.schedule.hasIn(['changes', roomId])) {

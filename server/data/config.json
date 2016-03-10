@@ -1,0 +1,62 @@
+{
+  "cities": [
+    {
+      "name": "Magnitogorsk",
+      "slug": "mgn",
+      "center": { "lat": 58.98441315, "lng": 53.41167831 },
+      "timezone": "Asia/Yekaterinburg"
+    },
+    {
+      "name": "Chelyabinsk",
+      "slug": "chel",
+      "center": { "lat": 55.163249, "lng": 61.435837 },
+      "timezone": "Asia/Yekaterinburg"
+    },
+    {
+      "name": "Yekaterinburg",
+      "slug": "ekat",
+      "center": { "lat": 56.828420, "lng": 60.628636 },
+      "timezone": "Asia/Yekaterinburg"
+    },
+    {
+      "name": "Moscow",
+      "slug": "msk",
+      "center": { "lat": 55.751244, "lng": 37.618423 },
+      "timezone": "Europe/Moscow"
+    },
+    {
+      "name": "Saint Petersburg",
+      "slug": "spb",
+      "center": { "lat": 59.9342802, "lng": 30.3350986 },
+      "timezone": "Europe/Moscow"
+    }
+  ],
+  "options": {
+    "room": ["jacuzzi", "billiards", "pool", "smoking"],
+    "bathhouse": ["internet", "bar", "billiards", "icehole", "kitchen"]
+  },
+  "services": {
+    "massage": ["russian", "georgian", "siberian", "ukrainian", "belarusian", "babayski", "bashkir", "american"],
+    "steaming": ["classic", "sport", "relax", "hardcore", "middle", "easy", "nightmare"],
+    "other": ["hookah", "karaoke", "barbecue set", "cards", "domino", "backgammon", "projector", "whores"]
+  },
+  "types": ["hammam", "sauna", "bathhouse"],
+  "duration": [3, 6, 9],
+  "thresholds": [
+    [
+      [30, 36, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78],
+      [99, 102, 105, 108, 111, 114]
+    ],
+    [
+      [27, 30, 33, 36, 39, 42],
+      [63, 66, 69, 72, 75, 78],
+      [105, 108, 111, 114, 117]
+    ],
+    [
+      [21, 24, 27, 30, 33],
+      [60, 63, 66, 69, 72],
+      [96, 99, 102],
+      [123, 126]
+    ]
+  ]
+}

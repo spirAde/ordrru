@@ -40,7 +40,7 @@ class FaceComponent extends Component {
           <div className="Face-info">
             <h1 className="Face-text-heading">Банный отдых</h1>
             <p className="Face-text-branding">Планируйте свое время правильно! Бронируйте бани,<br />автомойки и другие уникальные услуги. </p>
-            <Link className="Face-next-page-button g-icons" to="/bathhouses" query={{city: 'mgn', mode: 'list'}}>
+            <Link className="Face-next-page-button g-icons" to={{ pathname: '/bathhouses', query: { city: 'mgn', mode: 'list' } }}>
               <span>Подобрать</span>
               <IconComponent name="icon-chevron-right" style={{ margin: '0 -14px -4px 5px' }}/>
             </Link>

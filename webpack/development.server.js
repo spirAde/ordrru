@@ -1,5 +1,3 @@
-'use strict';
-
 require('dotenv').config({path: 'envs/.env.development'});
 
 import loopback from 'loopback';

@@ -1,3 +1,5 @@
+import loopback from 'loopback';
+
 export default (Bathhouse) => {
 
   Bathhouse.observe('before save', (ctx, next) => {
@@ -10,7 +12,8 @@ export default (Bathhouse) => {
     const cityCenterLocation = new loopback.GeoPoint(ctx.options.center);
 
     ctx.instance.distance = loopback.GeoPoint.distanceBetween(
-      bathhouseLocation, cityCenterLocation, {type: 'kilometers'});
+      bathhouseLocation, cityCenterLocation, { type: 'kilometers' }
+    );
 
     next();
   });

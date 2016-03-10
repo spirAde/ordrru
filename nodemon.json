@@ -15,8 +15,5 @@
     "rethinkdb_data",
     "test"
   ],
-  "env": {
-    "NODE_ENV": "development"
-  },
   "ext": "js json"
 }

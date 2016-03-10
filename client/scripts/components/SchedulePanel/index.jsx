@@ -25,21 +25,13 @@ if (__CLIENT__) {
 class SchedulePanelComponent extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * Initialize scrollbar for panel
    * @return {void}
    * */
   componentDidMount() {
     Ps.initialize(this.refs.scroll, {
       wheelPropagation: true,
-      suppressScrollX: true
+      suppressScrollX: true,
     });
   }
 
@@ -78,11 +70,12 @@ class SchedulePanelComponent extends Component {
    * */
   render() {
     const { schedule, prices, isOpen } = this.props;
+
     const rows = schedule ? this.renderScheduleRows(schedule, prices) : null;
 
     const classes = classNames({
-      'SchedulePanel': true,
-      'SchedulePanel--active': isOpen
+      SchedulePanel: true,
+      'SchedulePanel--active': isOpen,
     });
 
     return (
@@ -110,7 +103,7 @@ SchedulePanelComponent.propTypes = {
   prices: ImmutablePropTypes.list,
   isOpen: PropTypes.bool.isRequired,
   notifier: PropTypes.string,
-  onSelectOrder: PropTypes.func.isRequired
+  onSelectOrder: PropTypes.func.isRequired,
 };
 
 export default SchedulePanelComponent;

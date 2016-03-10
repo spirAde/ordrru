@@ -19,8 +19,8 @@ export function changeActiveCity(id) {
   return {
     type: CHANGE_ACTIVE_CITY,
     payload: {
-      id
-    }
+      id,
+    },
   };
 }
 

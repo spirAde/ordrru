@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 
-import isNull from 'lodash/isNull';
+import { isNull } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -36,7 +36,7 @@ class ScheduleRowComponent extends Component {
      * @property {Object|null} data.shownInterval - shown price interval, when user mouse over cell
      */
     this.state = {
-      data: Map({ shownInterval: null })
+      data: Map({ shownInterval: null }),
     };
   }
 
@@ -45,7 +45,8 @@ class ScheduleRowComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -60,7 +61,7 @@ class ScheduleRowComponent extends Component {
 
     if (!data.get('enable') || data.get('status') === 'lock') return false;
 
-    this.props.onSelectOrder(date, period);
+    return this.props.onSelectOrder(date, period);
   }
 
   /**
@@ -69,8 +70,8 @@ class ScheduleRowComponent extends Component {
    * */
   handleMouseLeaveScheduleRow(event) {
     event.preventDefault();
-    this.setState(({data}) => ({
-      data: data.set('shownInterval', null)
+    this.setState(({ data }) => ({
+      data: data.set('shownInterval', null),
     }));
   }
 
@@ -81,15 +82,18 @@ class ScheduleRowComponent extends Component {
    * */
   handleMouseOverCell(period, event) {
     event.preventDefault();
-    const { prices } = this.props;
-    const interval = prices.find(chunk => chunk.get('startPeriod') <= period && period <= chunk.get('endPeriod'));
 
-    this.setState(({data}) => ({
+    const { prices } = this.props;
+    const interval = prices.find(
+      chunk => chunk.get('startPeriod') <= period && period <= chunk.get('endPeriod')
+    );
+
+    this.setState(({ data }) => ({
       data: data.set('shownInterval', Map({
         start: configs.periods[interval.get('startPeriod')],
         end: configs.periods[interval.get('endPeriod')],
-        price: interval.get('price')
-      }))
+        price: interval.get('price'),
+      })),
     }));
   }
 
@@ -104,9 +108,9 @@ class ScheduleRowComponent extends Component {
       const classes = classNames({
         'ScheduleRow-cell': true,
         'ScheduleRow-cell--odd': index % 2 === 1,
-        'ScheduleRow-cell--free': cell.get('status') === 'free',
-        'ScheduleRow-cell--busy': cell.get('status') === 'busy',
-        'ScheduleRow-cell--lock': cell.get('status') === 'lock'
+        'ScheduleRow-cell--free': cell.get('enable'),
+        'ScheduleRow-cell--busy': !cell.get('enable'),
+        'ScheduleRow-cell--lock': !cell.get('enable') && cell.get('temp'),
       });
       const cellTime = configs.periods[cell.get('period')];
 
@@ -129,12 +133,13 @@ class ScheduleRowComponent extends Component {
    * */
   render() {
     const { cells, date, isLast } = this.props;
+
     const { data } = this.state;
     const renderCells = this.renderCells(date, cells);
 
     const classes = classNames({
-      'ScheduleRow': true,
-      'ScheduleRow--last': isLast
+      ScheduleRow: true,
+      'ScheduleRow--last': isLast,
     });
 
     return (
@@ -167,13 +172,16 @@ class ScheduleRowComponent extends Component {
                 values={{
                   start: data.getIn(['shownInterval', 'start']),
                   end: data.getIn(['shownInterval', 'end']),
-                  price: data.getIn(['shownInterval', 'price'])
+                  price: data.getIn(['shownInterval', 'price']),
                 }}
               /> : null
             }
           </div>
         </div>
-        <div className="ScheduleRow-cells g-clear" onMouseLeave={this.handleMouseLeaveScheduleRow.bind(this)}>
+        <div
+          className="ScheduleRow-cells g-clear"
+          onMouseLeave={::this.handleMouseLeaveScheduleRow}
+        >
           {renderCells}
         </div>
       </div>
@@ -194,7 +202,7 @@ ScheduleRowComponent.propTypes = {
   prices: ImmutablePropTypes.list.isRequired,
   date: PropTypes.string.isRequired,
   isLast: PropTypes.bool.isRequired,
-  onSelectOrder: PropTypes.func.isRequired
+  onSelectOrder: PropTypes.func.isRequired,
 };
 
 export default ScheduleRowComponent;

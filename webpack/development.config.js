@@ -1,5 +1,3 @@
-'use strict';
-
 require('dotenv').config({path: 'envs/.env.development'});
 
 var fs = require('fs');
@@ -74,16 +72,24 @@ module.exports = {
   plugins: [
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.IgnorePlugin(/webpack-stats\.json$/),
+    new webpack.IgnorePlugin(/webpack-assets\.json$/),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: process.env.DEVELOPMENT,
       __DEVTOOLS__: process.env.DEVTOOLS,
-      __SSR__: process.env.SSR
+      __SSR__: process.env.SSR,
+      __PROTOCOL__: JSON.stringify(process.env.PROTOCOL),
+      __HOST__: JSON.stringify(process.env.HOST),
+      __PORT__: process.env.PORT,
+      __API_PROTOCOL__: JSON.stringify(process.env.API_PROTOCOL),
+      __API_HOST__: JSON.stringify(process.env.API_HOST),
+      __API_PORT__: process.env.API_PORT,
+      __SOCKET_PROTOCOL__: JSON.stringify(process.env.SOCKET_PROTOCOL),
+      __SOCKET_HOST__: JSON.stringify(process.env.SOCKET_HOST),
+      __SOCKET_PORT__: process.env.SOCKET_PORT,
     }),
-    //new ExtractTextPlugin('bundle.css', { allChunks: true }),
     isomorphicTools.development()
   ]
 };

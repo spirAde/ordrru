@@ -9,7 +9,7 @@ import keys from 'lodash/object/keys';
 
 import { initialState as defaultInitialState, reducer } from '../../../common/reducers/bathhouse';
 
-import { Bathhouses } from '../../../client/scripts/API';
+import { Bathhouses } from '../../../client/scripts/API1';
 
 import { FIND_BATHHOUSES_FAILURE, FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS } from '../../../client/scripts/actions/bathhouse-actions';

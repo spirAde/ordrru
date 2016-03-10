@@ -3,6 +3,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 
+import { RoomsListSelectors } from '../../selectors/RoomsListSelectors';
+
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import { changeActiveRoom } from '../../actions/bathhouse-actions';
@@ -146,24 +148,8 @@ RoomsListComponent.propTypes = {
   resetOrder: PropTypes.func.isRequired,
   changeActiveRoom: PropTypes.func.isRequired,
   findRoomScheduleIfNeed: PropTypes.func.isRequired,
-  selectOrder: PropTypes.func.isRequired
+  selectOrder: PropTypes.func.isRequired,
 };
-
-/**
- * pass state to props
- * @param {Object} state - current redux state
- * @return {Object.<string, string|number|Array|Object>} props - list of params
- * */
-function mapStateToProps(state) {
-  const validRooms = state.bathhouse.get('valid');
-  return {
-    bathhouses: state.bathhouse.get('bathhouses'),
-    rooms: state.bathhouse.get('rooms').filter(room => validRooms.includes(room.get('id'))),
-    schedules: state.schedule.get('schedules'),
-    activeRoomId: state.bathhouse.get('activeRoomId'),
-    order: state.user.get('order')
-  };
-}
 
 /**
  * pass method to props
@@ -179,4 +165,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RoomsListComponent);
+export default connect(RoomsListSelectors, mapDispatchToProps)(RoomsListComponent);
