@@ -2,8 +2,8 @@ import moment from 'moment';
 import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
-  recalculateSchedule, fixNeighboringSchedules, mergeSchedules,
-  clog, calculateDatetimeOrderSum } from '../utils/schedule-helper';
+  recalculateSchedule, fixNeighboringSchedules,
+  clog, calculateDatetimeOrderSum, mergeSchedules } from '../utils/schedule-helper';
 import { datesRange, isSameDate } from '../utils/date-helper';
 
 export default (Order) => {
@@ -99,7 +99,7 @@ export default (Order) => {
       // get recalculated schedule for each chunk of splitted order
       const newSchedules = map(splittedOrder, chunkOrder => {
         const schedule = find(schedules, schedule => isSameDate(schedule.date, chunkOrder.date));
-        return recalculateSchedule(schedule.periods, chunkOrder.periods, minDuration, step);
+        return recalculateSchedule(schedule.periods, chunkOrder.periods, minDuration);
       });
 
       const prevSchedule = isSameDate(schedules[0].date, prevDate) ? head(schedules) : null;

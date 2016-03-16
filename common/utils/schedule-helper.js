@@ -2,7 +2,7 @@ import util from 'util';
 import moment from 'moment';
 
 import { range, filter, map, has, difference, head, last, takeWhile, takeRightWhile,
-	assign, slice, indexOf, min, max, includes, reduce, intersection } from 'lodash';
+	assign, slice, indexOf, findIndex, min, max, includes, reduce, merge, intersection, isEmpty } from 'lodash';
 import { datesRange, isSameDate } from './date-helper';
 
 const FIRST_PERIOD = 0;
@@ -65,7 +65,7 @@ export function checkSchedulesIntersection(schedule, order) {
  * @param {Array.<Number>} order - order periods
  * @param {Number} minDuration - minimal order duration
  * */
-export function recalculateSchedule(schedule, order, minDuration, step) {
+export function recalculateSchedule(schedule, order, minDuration) {
 
 	const allSchedulePeriods = map(schedule, period => parseInt(period.period, 10));
 
@@ -117,13 +117,17 @@ export function recalculateSchedule(schedule, order, minDuration, step) {
  * @param {Number} minDuration - minimal order duration
  * @return {Array.<Object>}
  * */
-export function fixNeighboringSchedules(prev, next, minDuration, step) {
-	const lastEnablePeriods = prev ? takeRightWhile(prev, { enable: false }) : [];
-	const firstEnablePeriods = next ? takeWhile(next, { enable: false }) : [];
+export function fixNeighboringSchedules(prev, next, minDuration) {
+
+	if (isEmpty(prev)) throw new Error('previous schedule is empty');
+	if (isEmpty(next)) throw new Error('next schedule is empty');
+
+	const lastEnablePeriods = takeRightWhile(prev, { enable: true });
+	const firstEnablePeriods = takeWhile(next, { enable: true });
 
 	const between = [...lastEnablePeriods, ...firstEnablePeriods];
 
-	if (between.length > minDuration * step) return { prev, next };
+	if (!between.length || between.length > minDuration - 1) return { prev, next };
 
 	const fixedPrev = map(lastEnablePeriods, period => {
 		return {
@@ -140,42 +144,34 @@ export function fixNeighboringSchedules(prev, next, minDuration, step) {
 	});
 
 	return {
-		prev: prev ? mergeSchedules(prev, fixedPrev) : [],
-		next: next ? mergeSchedules(next, fixedNext) : [],
+		prev: mergeSchedules(prev, fixedPrev),
+		next: mergeSchedules(next, fixedNext),
 	}
 }
 
 /**
- * Merge schedules, second may be part of schedule. Second schedule rewrite first.
- * @param {Array.<Object>} first - first schedule
+ * Merge schedules(see lodash/merge). Second schedule overwrite first.
+ * Second schedule maybe a part.
+ * @param {Array.<Object>} first - first schedule will be overwriting
  * @param {Array.<Object>} second - second schedule
- * @param {Boolean} afterCreating - after creating or after deleting order
+ * @returns {Array.<Object>} merged schedule
  * */
-export function mergeSchedules(first, second, afterCreating = true) {
+export function mergeSchedules(first, second) {
+	if (isEmpty(first)) throw new Error('first schedule is empty');
+	if (isEmpty(second)) return first;
 
-	if (!first.length) {
-		throw new Error('don\'t merge schedules, because first is empty');
-	} else if (!second.length) {
-		return first;
-	}
+	if (first.length === second.length) return merge(first, second);
 
-	return first.map((period, index) => {
-		let enable = false;
+	const startIndex = findIndex(first, period => period.period === head(second).period);
+	const endIndex = findIndex(first, period => period.period === last(second).period);
 
-		if (includes(second, period.period)) {
-			if (afterCreating) {
-				enable = period.enable && !second[index].enable ? false : period.enable;
-			} else {
-				enable = !period.enable && second[index].enable ? true : period.enable;
-			}
-			return {
-				enable,
-				period: period.period,
-			}
-		}
+	const changedSecond = [
+		...slice(first, 0, startIndex),
+		...second,
+		...slice(first, endIndex + 1)
+	];
 
-		return period;
-	});
+	return merge(first, changedSecond);
 }
 
 /**
