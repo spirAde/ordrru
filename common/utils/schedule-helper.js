@@ -1,7 +1,8 @@
 import util from 'util';
+import moment from 'moment';
 
-import { range, filter, map, difference, last, takeWhile, takeRightWhile,
-	assign, slice, indexOf, min, max, includes } from 'lodash';
+import { range, filter, map, has, difference, head, last, takeWhile, takeRightWhile,
+	assign, slice, indexOf, min, max, includes, reduce, intersection } from 'lodash';
 import { datesRange, isSameDate } from './date-helper';
 
 const FIRST_PERIOD = 0;
@@ -22,6 +23,10 @@ const LAST_PERIOD = 144;
  * @return {Array.<Object>}
  * */
 export function splitOrderByDatesAndPeriods(order, step) {
+	if (!has(order, 'startDate') || !has(order, 'endDate') || !has(order, 'startPeriod') || !has(order, 'endPeriod')) {
+		throw new Error('incorrect data of order');
+	}
+
 	const dates = datesRange(order.startDate, order.endDate);
 
 	return map(dates, date => {
@@ -64,12 +69,12 @@ export function recalculateSchedule(schedule, order, minDuration, step) {
 
 	const allSchedulePeriods = map(schedule, period => parseInt(period.period, 10));
 
-	const freeSchedulePeriods = map(
-		filter(schedule, period => period.enable),
+	const busyPeriods = map(
+		filter(schedule, { enable: false }),
 		period => parseInt(period.period, 10)
 	);
 
-	const start = order[0];
+	const start = head(order);
 	const end = last(order);
 
 	const startIndex = indexOf(allSchedulePeriods, start);
@@ -78,23 +83,26 @@ export function recalculateSchedule(schedule, order, minDuration, step) {
 	const leftChunkSchedule = slice(schedule, 0, startIndex);
 	const rightChunkSchedule = slice(schedule, endIndex + 1);
 
-	const closestLeftPeriods = takeRightWhile(leftChunkSchedule, 'enable');
-	const closestRightPeriods = takeWhile(rightChunkSchedule, 'enable');
+	const closestLeftPeriods = map(takeRightWhile(leftChunkSchedule, 'enable'), 'period');
+	const closestRightPeriods = map(takeWhile(rightChunkSchedule, 'enable'), 'period');
 
-	let fixedSchedule = order;
+	const needLeftFix = closestLeftPeriods.length && closestLeftPeriods.length < minDuration - 1 &&
+		head(closestLeftPeriods) !== FIRST_PERIOD;
+	const needRightFix = closestRightPeriods.length && closestRightPeriods.length < minDuration - 1 &&
+		last(closestRightPeriods) !== LAST_PERIOD;
 
-	if (closestLeftPeriods.length && closestLeftPeriods.length <= minDuration) {
-		const fixOrderLeft = range(max(FIRST_PERIOD, start - minDuration * step), start, step);
-		fixedSchedule = [...fixOrderLeft, ...order];
-	}
-	if (closestRightPeriods.length && closestRightPeriods.length <= minDuration) {
-		const fixOrderRight = range(end, min(end + (minDuration + 1) * step, LAST_PERIOD), step);
-		fixedSchedule = [...order, ...fixOrderRight];
-	}
+	const leftFix = needLeftFix ? closestLeftPeriods : [];
+	const rightFix = needRightFix ? closestRightPeriods : [];
 
-	return allSchedulePeriods.map(period => {
+	const fixedSchedule = [
+		...leftFix,
+		...order,
+		...rightFix,
+	];
+
+	return map(allSchedulePeriods, period => {
 		return {
-			enable: !includes(fixedSchedule, period),
+			enable: !includes(fixedSchedule, period) && !includes(busyPeriods, period),
 			period: period,
 		}
 	});
@@ -170,6 +178,37 @@ export function mergeSchedules(first, second, afterCreating = true) {
 	});
 }
 
+/**
+ * calculate sum of datetime order, i.e. sum of every hour of order
+ * @param {Object} order
+ * @param {String} order.startDate - start date of order
+ * @param {Number} order.startPeriod - start period of order
+ * @param {String} order.endDate - end date of order
+ * @param {Number} order.endPeriod - end period of order
+ * @param {Array.<Array>} prices - prices splitted by day(index of week, 0 - Sunday),
+ * 	and nested arrays split by period interval with price
+ * @returns {Number} sum - sum of order
+ * */
+export function calculateDatetimeOrderSum(order, prices) {
+	const splittedOrder = splitOrderByDatesAndPeriods(order, 3);
+
+	return reduce(splittedOrder, (sum, chunk) => {
+		const dayIndex = moment(chunk.date).day();
+		const dayPrices = prices[dayIndex];
+
+		return sum + reduce(dayPrices, (sum, curr) => {
+				const currPeriods = range(curr.startPeriod, curr.endPeriod + 3, 3);
+				const intersect = intersection(currPeriods, chunk.periods);
+				return intersect.length ? sum + ((intersect.length - 1) * curr.price) / 2 : sum;
+			}, 0);
+	}, 0);
+}
+
+/**
+ * deep console.log for schedule, look period level
+ * @param {Any} data
+ * @returns void
+ * */
 export function clog(data) {
 	console.log(util.inspect(data, false, null));
 }

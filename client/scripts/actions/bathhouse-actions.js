@@ -90,6 +90,7 @@ function fetchBathhousesFailure(error) {
     payload: {
       error,
     },
+    error,
   };
 }
 
@@ -107,10 +108,18 @@ export function findBathhousesAndRooms(cityId) {
     return Bathhouse.find({ include: 'rooms', where: { cityId, isActive: true } })
       .then(data => {
         //  mb use normalizr https://github.com/gaearon/normalizr
-        const sorting = state.filter.getIn(['filters', 'sorting']).find(type => type.get('checked'));
+        const sorting = state.filter
+          .getIn(['filters', 'sorting'])
+          .find(type => type.get('checked'));
+
         const rooms = fromJS(flatten(map(data, 'rooms')));
-        const bathhouses = fromJS(data.map(bathhouse => assign({}, bathhouse, { rooms: map(bathhouse.rooms, 'id') })));
-        const sortedRooms = sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
+
+        const bathhouses = fromJS(data.map(
+          bathhouse => assign({}, bathhouse, { rooms: map(bathhouse.rooms, 'id') })
+        ));
+
+        const sortedRooms =
+          sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
 
         dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
       })

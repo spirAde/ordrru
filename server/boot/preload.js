@@ -17,7 +17,11 @@ export default (app, callback) => {
     },
     distance: { min: 0, max: 0, current: 0},
     guest: { min: 0, max: 0, current: 0},
-    prepayment: [{isRequired: null, checked: true}, {isRequired: true, checked: false}, {isRequired: false, checked: false}],
+    prepayment: [
+      { isRequired: null, checked: true },
+      { isRequired: true, checked: false },
+      { isRequired: false, checked: false }
+    ],
     price: { min: 0, max: 0, current: { start: 0, end: 0 } },
     searchName: {
       text: ''
@@ -100,7 +104,7 @@ export default (app, callback) => {
           }
         };
 
-        outData.filters[city.id] = assign({}, commonFilters, {distance: cityDistance, guest: guest, price: prices});
+        outData.filters[city.id] = assign({}, commonFilters, { distance: cityDistance, guest: guest, price: prices });
       });
 
       fs.writeFile(configFile, JSON.stringify(outData, null, 2), function(error) {

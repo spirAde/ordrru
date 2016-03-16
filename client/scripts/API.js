@@ -1,33 +1,36 @@
 
 import fetch from 'isomorphic-fetch';
-import { isEmpty } from 'lodash';
+import { isEmpty, assign, has } from 'lodash';
 
 const baseUrl = 'http://localhost:3000/api';
 const headers = {
 	Authorization: __CLIENT__ && localStorage && localStorage.accessToken ? localStorage.accessToken : '',
+	Accept: 'application/json',
+	'Content-Type': 'application/json',
 };
 
 function _fetch(url, options) {
-	return new Promise((resolve, reject) => {
-		if (!url) {
-			reject(new Error('There is no URL provided for the request.'));
-		}
+	if (!url) {
+		throw new Error('There is no URL provided for the request.');
+	}
 
-		options = Object.assign({}, options, headers);
+	options = assign({}, options, { headers });
 
-		fetch(url, options).then(response => {
-			return response.json();
-		}).then(response => {
-			if (response.status >= 200 && response.status < 300) {
-				return response.errors ? reject(response.errors) : reject(response);
+	return fetch(url, options)
+		.then(response => response.json())
+		.then(response => {
+			if (has(response, 'error')) {
+				throw response.error;
 			}
 
-			return resolve(response);
-		}).catch(error => {
-			reject(error);
-		});
-	});
+			if (response.status >= 200 && response.status < 300) {
+				throw new Error('Something wrong, response has error status code, but hasn\'t error object');
+			}
+
+			return response;
+		}).catch(error => { throw error; });
 }
+
 const API = {};
 
 export const User = {
@@ -702,6 +705,18 @@ export const Order = {
 	 * @return {Readablestream}
 	 */
 	createChangeStream: async (options) => {
+	},
+	
+	/**
+	 * Validate order by interval and sum
+	 * @param {object} data - start date, end date, start period, end period, sums
+	 * @return {Boolean} - status of validation
+	 */
+	check: async (data) => {
+		return _fetch(`${baseUrl}/orders/check`, {
+			method: 'post',
+			body: JSON.stringify(data),
+		});
 	},
 };
 		

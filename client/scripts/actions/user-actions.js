@@ -1,6 +1,10 @@
-import isNull from 'lodash/isNull';
+import { isNull } from 'lodash';
+
+import { User, Order } from '../API';
 
 import { redefineRoomSchedule } from './schedule-actions';
+
+import { calculateDatetimeOrderSum } from '../../../common/utils/schedule-helper';
 
 export const CHANGE_ORGANIZATION_TYPE = 'CHANGE_ORGANIZATION_TYPE';
 export const CHANGE_CITY = 'CHANGE_CITY';
@@ -10,10 +14,21 @@ export const CHANGE_USER_VIEWPORT = 'CHANGE_USER_VIEWPORT';
 
 export const UPDATE_ORDER_DATETIME_START = 'UPDATE_ORDER_DATETIME_START';
 export const UPDATE_ORDER_DATETIME_END = 'UPDATE_ORDER_DATETIME_END';
+export const UPDATE_ORDER_SUM = 'UPDATE_ORDER_SUM';
 
 export const RESET_ORDER = 'RESET_ORDER';
 
 export const SET_SOCKET_ID = 'SET_SOCKET_ID';
+
+export const CHECK_ORDER_REQUEST = 'CHECK_ORDER_REQUEST';
+export const CHECK_ORDER_SUCCESS = 'CHECK_ORDER_SUCCESS';
+export const CHECK_ORDER_FAILURE = 'CHECK_ORDER_FAILURE';
+
+export const SEND_ORDER_REQUEST = 'SEND_ORDER_REQUEST';
+export const SEND_ORDER_SUCCESS = 'SEND_ORDER_SUCCESS';
+export const SEND_ORDER_FAILURE = 'SEND_ORDER_FAILURE';
+
+export const CHANGE_ORDER_STEP = 'CHANGE_ORDER_STEP';
 
 /**
  * update start datetime of order
@@ -50,6 +65,23 @@ function updateOrderDatetimeEnd(date, period) {
 }
 
 /**
+ * update order sum for datetime or options
+ * @param {String} type - datetime or options
+ * @param {number} sum - order type sum
+ * @return {{type: string, payload: {Object}}} - action
+ * */
+function updateOrderSum(type = 'datetime', sum) {
+  return {
+    type: UPDATE_ORDER_SUM,
+    payload: {
+      type,
+      sum,
+    },
+  };
+}
+
+
+/**
  * Change city selected by the user.
  * @param {string} id - city id
  * @return {{type: string, payload: {id: string}}} - action
@@ -77,6 +109,11 @@ export function changeOrganizationType(id) {
   };
 }
 
+/**
+ * set user device
+ * @param {String} device - device
+ * @return {{type: string, payload: {id: string}}} - action
+ * */
 export function setUserDevice(device) {
   return {
     type: SET_USER_DEVICE,
@@ -86,6 +123,11 @@ export function setUserDevice(device) {
   };
 }
 
+/**
+ * set user device viewport
+ * @param {Object} viewport - height, width
+ * @return {{type: string, payload: {id: string}}} - action
+ * */
 export function changeUserViewport(viewport) {
   return {
     type: CHANGE_USER_VIEWPORT,
@@ -96,8 +138,9 @@ export function changeUserViewport(viewport) {
 }
 
 /**
- * get selected date and period of order. Perform this action twice for start and end of order(startDate, endDate, startPeriod,
- * endPeriod) see user-state for details.
+ * get selected date and period of order. Perform this action twice for start and end
+ * of order(startDate, endDate, startPeriod, endPeriod) see user-state for details.
+ * after calculate sum for datetime order
  * @param {string} id - room id
  * @param {Date} date - date of start or end
  * @param {number} period - period id
@@ -108,21 +151,167 @@ export function selectOrder(id, date, period) {
     const state = getState();
     const order = state.user.get('order');
 
-    isNull(order.get('roomId')) ?
-      dispatch(updateOrderDatetimeStart(id, date, period)) :
+    if (isNull(order.get('roomId'))) {
+      dispatch(updateOrderDatetimeStart(id, date, period));
+    } else {
       dispatch(updateOrderDatetimeEnd(date, period));
+
+      const datetimeOrder = {
+        startDate: order.getIn(['datetime', 'startDate']),
+        startPeriod: order.getIn(['datetime', 'startPeriod']),
+        endDate: date,
+        endPeriod: period,
+      };
+
+      const room = state.bathhouse.get('rooms').find(room => room.get('id') === id);
+      const prices = room.getIn(['price', 'chunks']);
+      const sum = calculateDatetimeOrderSum(datetimeOrder, prices.toJS());
+
+      dispatch(updateOrderSum('datetime', sum));
+    }
 
     dispatch(redefineRoomSchedule(id, date, period, isNull(order.get('roomId'))));
   };
 }
 
+/**
+ * change order step for choice(booking), prepayment(if room require that), confirm(mobile phone)
+ * @param {String} currentStep - choice, prepayment, confirm
+ * @param {String} nextStep - choice, prepayment, confirm
+ * @return {{type: string, payload: {}}}
+ * */
+function changeOrderStep(currentStep, nextStep) {
+  return {
+    type: CHANGE_ORDER_STEP,
+    payload: {
+      currentStep,
+      nextStep,
+    },
+  };
+}
+
+/**
+ * Request check order
+ * @return {{type: string, payload: {}}}
+ * */
+function checkOrderRequest() {
+  return {
+    type: CHECK_ORDER_REQUEST,
+  };
+}
+
+/**
+ * Success validation order
+ * @return {{type: string, payload: {}}}
+ * */
+function checkOrderSuccess() {
+  return {
+    type: CHECK_ORDER_SUCCESS,
+  };
+}
+
+/**
+ * Failure validation order
+ * @param {Object} error
+ * @return {{type: string, payload: {error: Object}}}
+ * */
+function checkOrderFailure(error) {
+  return {
+    type: CHECK_ORDER_FAILURE,
+    payload: {
+      error: error.message,
+    },
+    error,
+  };
+}
+
+/**
+ * check order before create
+ * @return {Function} - thunk action
+ * */
+export function checkOrder() {
+  return (dispatch, getState) => {
+    const state = getState();
+    const order = state.user.get('order');
+
+    dispatch(checkOrderRequest());
+
+    Order.check(order.toJS())
+      .then(data => {
+        dispatch(checkOrderSuccess(data));
+        dispatch(changeOrderStep('choice', 'confirm'));
+      })
+      .catch(error => dispatch(checkOrderFailure(error)));
+  };
+}
+
+/**
+ * Request create order
+ * @return {{type: string, payload: {}}}
+ * */
+function sendOrderRequest() {
+  return {
+    type: SEND_ORDER_REQUEST,
+  };
+}
+
+/**
+ * Success create order
+ * @return {{type: string, payload: {}}}
+ * */
+function sendOrderSuccess() {
+  return {
+    type: SEND_ORDER_SUCCESS,
+  };
+}
+
+/**
+ * Failure create order
+ * @param {Object} error
+ * @return {{type: string, payload: {error: Object}}}
+ * */
+function sendOrderFailure(error) {
+  return {
+    type: SEND_ORDER_FAILURE,
+    payload: {
+      error: error.message,
+    },
+    error,
+  };
+}
+
+/**
+ * create order
+ * @return {Function} - thunk action
+ * */
+export function sendOrder() {
+  return (dispatch, getState) => {
+    const state = getState();
+    const order = state.user.get('order');
+
+    dispatch(sendOrderRequest());
+
+    Order.create(order.toJS())
+      .then(() => dispatch(sendOrderSuccess()))
+      .catch(error => dispatch(sendOrderFailure(error)));
+  };
+}
+
+/**
+ * reset order
+ * */
 export function resetOrder() {
   return {
     type: RESET_ORDER,
   };
 }
 
-
+/**
+ * Socket side
+ * set socket id after initialization of app
+ * @param {String} id - socket id
+ * @return {{type: string, payload: {id: string}}} - action
+ * */
 export function setSocketId(id) {
   return {
     type: SET_SOCKET_ID,

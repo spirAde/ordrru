@@ -9,23 +9,29 @@
       "required": true,
       "index": true
     },
-    "startDate": {
-      "type": "date",
+    "datetime": {
+      "type": "object",
       "required": true,
-      "index": true
-    },
-    "endDate": {
-      "type": "date",
-      "required": true,
-      "index": true
-    },
-    "startPeriod": {
-      "type": "number",
-      "required": true
-    },
-    "endPeriod": {
-      "type": "number",
-      "required": true
+      "default": {
+        "startDate": {
+          "type": "date",
+          "required": true,
+          "index": true
+        },
+        "endDate": {
+          "type": "date",
+          "required": true,
+          "index": true
+        },
+        "startPeriod": {
+          "type": "number",
+          "required": true
+        },
+        "endPeriod": {
+          "type": "number",
+          "required": true
+        }
+      }
     },
     "services": {
       "type": "array"
@@ -38,14 +44,15 @@
       "type": "object",
       "required": true,
       "default": {
+        "datetime": 0,
         "services": 0,
-        "guests": 0,
-        "datetime": 0
+        "guests": 0
       }
     },
     "createdByUser": {
       "type": "boolean",
       "required": true,
+      "default": true,
       "comments": "Created by users or managers"
     },
     "createdByDatetime": {

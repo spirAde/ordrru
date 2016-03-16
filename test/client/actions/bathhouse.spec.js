@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiImmutable from 'chai-immutable';
 
 import { List, Map, fromJS } from 'immutable';
-import pluck from 'lodash/collection/pluck';
+import { map } from 'lodash';
 
 import { applyMiddleware } from 'redux';
 import configureStore from 'redux-mock-store';
@@ -28,7 +28,7 @@ const expect = chai.expect;
 
 chai.use(chaiImmutable);
 
-const defaultCityId = pluck(configs.cities, 'id')[0];
+const defaultCityId = map(configs.cities, 'id')[0];
 
 describe('bathhouse actions', () => {
 

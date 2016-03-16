@@ -15,12 +15,6 @@ export const CHANGE_SCHEDULE = 'CHANGE_SCHEDULE';
 export const ADD_SCHEDULE_CHANGES = 'ADD_SCHEDULE_CHANGES';
 export const CLEAR_SCHEDULE_CHANGES = 'CLEAR_SCHEDULE_CHANGES';
 
-export const PERIOD_STATUSES = {
-  FREE: 'FREE',
-  BUSY: 'BUSY',
-  LOCK: 'LOCK',
-};
-
 /**
  * Request fetching schedule
  * @return {{type: string, payload: {}}}
@@ -181,23 +175,28 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
   return (dispatch, getState) => {
     const state = getState();
 
-    const settings = state.bathhouse.get('rooms').find(room => room.get('id') === id).get('settings');
+    const settings = state.bathhouse.get('rooms')
+      .find(room => room.get('id') === id).get('settings');
     const minDuration = settings.get('minDuration');
 
     const firstPeriod = 0;
     const lastPeriod = parseInt(last(keys(configs.periods)), 10);
 
     const dates = {
-      prev: moment.max(moment(date).subtract(1, 'days'), moment()),
-      curr: moment(date),
-      next: moment.min(moment(date).add(1, 'days'), moment().add(30, 'days'))
+      prev: moment.max(moment(date).subtract(1, 'days'), moment()).toDate(),
+      curr: moment(date).toDate(),
+      next: moment.min(moment(date).add(1, 'days'), moment().add(30, 'days')).toDate(),
     };
 
-    const interval = [
-      period - minDuration < 0 ? lastPeriod + period - minDuration : period - minDuration,
-      period + minDuration > lastPeriod ? period + minDuration - lastPeriod : period + minDuration
-    ];
+    const interval = {
+      left: period - minDuration < firstPeriod ?
+        lastPeriod + period - minDuration : period - minDuration,
+      right: period + minDuration > lastPeriod ?
+        period + minDuration - lastPeriod : period + minDuration,
+    };
 
+    //console.log(dates);
+    //console.log(interval);
     //
   };
 }

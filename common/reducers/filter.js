@@ -48,7 +48,9 @@ export const reducer = createReducer({
       .setIn(
         ['filters', 'options'],
         options.update(
-          options.findIndex(option => option.get('name') === action.payload.value.get('name')),
+          options.findIndex(
+            option => option.get('name') === action.payload.value.get('name')
+          ),
           option => action.payload.value)
       );
   },
@@ -73,7 +75,9 @@ export const reducer = createReducer({
       .setIn(
         ['filters', 'types'],
         types.update(
-          types.findIndex(type => type.get('name') === action.payload.value.get('name')),
+          types.findIndex(
+            type => type.get('name') === action.payload.value.get('name')
+          ),
           type => action.payload.value)
       );
   },
@@ -81,7 +85,8 @@ export const reducer = createReducer({
     const changedValues = state.getIn(['filters', 'sorting']).map(value => {
       return Map({
         name: value.get('name'),
-        isDesc: value.get('name') === action.payload.value.get('name') && value.get('checked') ? !value.get('isDesc') : true,
+        isDesc: value.get('name') === action.payload.value.get('name') && value.get('checked') ?
+          !value.get('isDesc') : true,
         checked: value.get('name') === action.payload.value.get('name')
       });
     });

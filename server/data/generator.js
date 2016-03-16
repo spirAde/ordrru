@@ -30,7 +30,7 @@ const generators = {
 			location: utils.generateRandomPoint(city.center, 5000),
 			distance: 0,
 			isActive: true,
-			options: sampleSize(config.options.bathhouse, random(1, config.options.bathhouse)),
+			options: sampleSize(config.options.bathhouse, random(1, config.options.bathhouse.length)),
 			services: {
 				massage: utils.generateServices(config.services.massage),
 				steaming: utils.generateServices(config.services.steaming),
@@ -44,7 +44,7 @@ const generators = {
 			name: casual.title,
 			description: casual.description,
 			types: sampleSize(config.types, random(1, config.types.length)),
-			options: sampleSize(config.options.room, random(1, config.options.room)),
+			options: sampleSize(config.options.room, random(1, config.options.room.length)),
 			settings: {
 				minDuration: head(shuffle(config.duration)),
 				cleaningTime: 0,
@@ -67,16 +67,18 @@ const generators = {
 	order: function(room, order) {
 		return {
 			roomId: room.id,
-			startDate: order.startDate,
-			endDate: order.endDate,
-			startPeriod: order.startPeriod,
-			endPeriod: order.endPeriod,
+			datetime: {
+				startDate: order.startDate,
+				startPeriod: order.startPeriod,
+				endDate: order.endDate,
+				endPeriod: order.endPeriod,
+			},
 			services: [],
 			guests: 10,
 			sums: {
 				datetime: 1000,
-				guests: 1000,
-				services: 1000
+				services: 1000,
+				guests: 1000
 			},
 			createdByUser: Math.random() < 0.5
 		}
@@ -102,12 +104,14 @@ export default (models) => {
 
 		function createCity(data, callback) {
 			return app.models.City.create(data, (error, record) => {
+				if (error) console.log(error);
 				callback(null, record);
 			});
 		}
 
 		function getCities(callback) {
 			return app.models.City.find({}, (error, cities) => {
+				if (error) console.log(error);
 				callback(null, cities);
 			});
 		}
@@ -115,12 +119,14 @@ export default (models) => {
 		function createBathhouse(city, callback) {
 			const data = generators.bathhouse(city);
 			return app.models.Bathhouse.create(data, { center: city.center }, (error, record) => {
+				if (error) console.log(error);
 				return callback(null, record);
 			});
 		}
 
 		function getBathhouses(callback) {
 			return app.models.Bathhouse.find({}, (error, bathhouses) => {
+				if (error) console.log(error);
 				callback(null, bathhouses);
 			});
 		}
@@ -128,12 +134,14 @@ export default (models) => {
 		function createRoom(bathhouse, callback) {
 			const data = generators.room(bathhouse);
 			return app.models.Room.create(data, (error, record) => {
+				if (error) console.log(error);
 				return callback(null, record);
 			});
 		}
 
 		function getRooms(callback) {
 			return app.models.Room.find({}, (error, rooms) => {
+				if (error) console.log(error);
 				callback(null, rooms);
 			});
 		}
@@ -141,6 +149,7 @@ export default (models) => {
 		function createOrder(room, order, callback) {
 			const data = generators.order(room, order);
 			return app.models.Order.create(data, (error, record) => {
+				if (error) console.log(error);
 				return callback(null, record);
 			});
 		}
@@ -148,6 +157,7 @@ export default (models) => {
 		function createReview(room, callback) {
 			const data = generators.review(room);
 			return app.models.Review.create(data, (error, record) => {
+				if (error) console.log(error);
 				return callback(null, record);
 			});
 		}

@@ -2,9 +2,7 @@ import chai from 'chai'
 import chaiImmutable from 'chai-immutable';
 
 import { List, Map, fromJS } from 'immutable';
-import keys from 'lodash/object/keys';
-import assign from 'lodash/object/assign';
-import pluck from 'lodash/collection/pluck';
+import { keys, assign, map } from 'lodash';
 
 import { initialState as defaultInitialState, reducer } from '../../../common/reducers/filter';
 
@@ -19,7 +17,7 @@ const expect = chai.expect;
 
 chai.use(chaiImmutable);
 
-const defaultCityId = pluck(configs.cities, 'id')[0];
+const defaultCityId = map(configs.cities, 'id')[0];
 
 describe('filter reducer', () => {
 

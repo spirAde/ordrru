@@ -15,6 +15,8 @@ import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import SchedulePanelComponent from '../SchedulePanel/index.jsx';
 import IconComponent from '../Icon/index.jsx';
+import LoaderComponent from '../Loader/index.jsx';
+import OrderComponent from '../Order/index.jsx';
 
 import configs from '../../../../common/data/configs.json';
 
@@ -28,7 +30,7 @@ import bathhouseImg4 from '../../../images/bathhouse4.jpg';
 /**
  * RoomItemComponent - dumb component, room box
  * Smart components - none
- * Dumb components - SchedulePanelComponent
+ * Dumb components - SchedulePanelComponent, OrderComponent, IconComponent, LoaderComponent
  * */
 class RoomItemComponent extends Component {
 
@@ -85,19 +87,33 @@ class RoomItemComponent extends Component {
     let value = '';
 
     if (order.get('roomId') === id) {
-      if (order.getIn(['date', 'startDate'])) {
-        const startDate = order.getIn(['date', 'startDate']);
-        const startPeriod = order.getIn(['date', 'startPeriod']);
+      if (order.getIn(['datetime', 'startDate'])) {
+        const startDate = order.getIn(['datetime', 'startDate']);
+        const startPeriod = order.getIn(['datetime', 'startPeriod']);
         value += `${moment(startDate).format('Do MMMM')} ${configs.periods[startPeriod]} - `;
       }
-      if (order.getIn(['date', 'endDate'])) {
-        const endDate = order.getIn(['date', 'endDate']);
-        const endPeriod = order.getIn(['date', 'endPeriod']);
+      if (order.getIn(['datetime', 'endDate'])) {
+        const endDate = order.getIn(['datetime', 'endDate']);
+        const endPeriod = order.getIn(['datetime', 'endPeriod']);
         value += `${moment(endDate).format('Do MMMM')} ${configs.periods[endPeriod]}`;
       }
     }
 
     return value;
+  }
+
+  /**
+   * handleClickCheckOrder - handle check order click
+   * @return {void}
+   * */
+  handleClickCheckOrder(event) {
+    event.preventDefault();
+
+    const { order } = this.props;
+
+    if (!order.getIn(['sums', 'datetime'])) return false;
+
+    return this.props.onCheckOrder();
   }
 
   /**
@@ -182,12 +198,13 @@ class RoomItemComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { isOpen, room, bathhouse, schedule, isClosable, order } = this.props;
+    const { isOpen, room, bathhouse, schedule, isClosable, order, steps } = this.props;
     const { formatMessage } = this.props.intl;
 
-    const orderDatetimeValue = this.getDatetimeValue(room.get('id'), order);
-
     const { data } = this.state;
+
+    const orderDatetimeValue = this.getDatetimeValue(room.get('id'), order);
+    const orderSum = order.getIn(['sums', 'datetime']) + order.getIn(['sums', 'services']);
 
     const options = this.renderOptions(room.get('options').concat(bathhouse.get('options')));
     const stars = this.renderStars(room.get('rating'));
@@ -199,6 +216,9 @@ class RoomItemComponent extends Component {
 
     const typesClasses = sortBy(room.get('types').toJS()).join('-');
 
+    const isOrder = steps.getIn(['confirm', 'active']) && steps.getIn(['choice', 'valid']) &&
+        order.get('roomId') === room.get('id');
+
     return (
       <div className="RoomItem">
         <div className="RoomItem-inner">
@@ -206,6 +226,7 @@ class RoomItemComponent extends Component {
             <div className="RoomItem-preview-top g-clear">
               <h2 className={`RoomItem-name RoomItem-type-${typesClasses}`}>
                 {room.get('name')}
+                { __DEVELOPMENT__ ? <span> - {room.get('id')}</span> : null}
               </h2>
               <div className="RoomItem-stars g-clear">
                 {stars}
@@ -281,52 +302,70 @@ class RoomItemComponent extends Component {
                 {options}
               </div>
             </div>
-            <div className="RoomItem-booking">
-              <div className="RoomItem-booking-inner">
-                <div className="RoomItem-booking-step-1 g-clear">
-                  <div className="RoomItem-booking-left-fields">
-                    <div className="RoomItem-field-date-time g-field-date">
-                      <input
-                        className="RoomItem-field-date-time-input"
-                        placeholder={formatMessage({ id: 'selectTime' })}
-                        onClick={::this.handleOpenSchedule}
-                        value={orderDatetimeValue}
-                      />
-                    </div>
-                    <div className="RoomItem-field-select-services g-field-select">
-                      <div className="">
-                        <p className="RoomItem-field-select-services-input">
-                          <FormattedMessage id="additionalServicesIsEmpty" />
-                        </p>
+            {
+              isOrder ?
+                <OrderComponent
+                  order={order}
+                  steps={steps}
+                  prepayment={room.getIn(['settings', 'prepayment'])}
+                  onSendOrder={this.props.onSendOrder}
+                /> :
+                <div className="RoomItem-booking">
+                  <div className="RoomItem-booking-inner">
+                    <div className="RoomItem-booking-step-1 g-clear">
+                      <div className="RoomItem-booking-left-fields">
+                        <div className="RoomItem-field-date-time g-field-date">
+                          <input
+                            className="RoomItem-field-date-time-input"
+                            placeholder={formatMessage({ id: 'selectTime' })}
+                            onClick={::this.handleOpenSchedule}
+                            value={orderDatetimeValue}
+                          />
+                        </div>
+                        <div className="RoomItem-field-select-services g-field-select">
+                          <div className="">
+                            <p className="RoomItem-field-select-services-input">
+                              <FormattedMessage id="additionalServicesIsEmpty" />
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="RoomItem-booking-right-fields g-clear">
+                        <div className="RoomItem-select-guests">
+                          <p className="RoomItem-select-guests-text">
+                            <FormattedMessage id="guestCount" />
+                          </p>
+                          <div className="field field-select-people">
+                          </div>
+                        </div>
+                        <div className="RoomItem-next-step">
+                          <a
+                            className="RoomItem-next-step-button"
+                            onClick={::this.handleClickCheckOrder}
+                          >
+                            {
+                              steps.getIn(['choice', 'loading']) ?
+                                <LoaderComponent /> :
+                                <div>
+                                  <span className="RoomItem-total-cost">{orderSum} руб</span>
+                                  <span className="RoomItem-order-text">
+                                    <FormattedMessage id="toOrder" />
+                                  </span>
+                                </div>
+                            }
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="RoomItem-booking-right-fields g-clear">
-                    <div className="RoomItem-select-guests">
-                      <p className="RoomItem-select-guests-text">
-                        <FormattedMessage id="guestCount" />
-                      </p>
-                      <div className="field field-select-people">
-                      </div>
-                    </div>
-                    <div className="RoomItem-next-step">
-                      <a className="RoomItem-next-step-button">
-                        <span className="RoomItem-total-cost">0 руб</span>
-                        <span className="RoomItem-order-text">
-                          <FormattedMessage id="toOrder" />
-                        </span>
-                      </a>
-                    </div>
-                  </div>
+                  <SchedulePanelComponent
+                    schedule={schedule}
+                    prices={room.getIn(['price', 'chunks'])}
+                    isOpen={data.get('scheduleIsOpen')}
+                    onSelectOrder={this.handleSelectOrder}
+                  />
                 </div>
-              </div>
-              <SchedulePanelComponent
-                schedule={schedule}
-                prices={room.getIn(['price', 'chunks'])}
-                isOpen={data.get('scheduleIsOpen')}
-                onSelectOrder={this.handleSelectOrder}
-              />
-            </div>
+            }
           </div>
         </div>
       </div>
@@ -353,11 +392,14 @@ RoomItemComponent.propTypes = {
   room: ImmutablePropTypes.map.isRequired,
   schedule: ImmutablePropTypes.list,
   order: ImmutablePropTypes.map,
+  steps: ImmutablePropTypes.map,
   isClosable: PropTypes.bool,
   intl: intlShape.isRequired,
   onChangeActiveRoom: PropTypes.func.isRequired,
   onCloseRoom: PropTypes.func,
   onSelectOrder: PropTypes.func.isRequired,
+  onCheckOrder: PropTypes.func.isRequired,
+  onSendOrder: PropTypes.func.isRequired,
 };
 
 RoomItemComponent.defaultProps = {

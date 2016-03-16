@@ -9,7 +9,7 @@ import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import { changeActiveRoom } from '../../actions/bathhouse-actions';
 import { findRoomScheduleIfNeed } from '../../actions/schedule-actions';
-import { selectOrder, resetOrder } from '../../actions/user-actions';
+import { selectOrder, resetOrder, checkOrder, sendOrder } from '../../actions/user-actions';
 
 import RoomItemComponent from '../RoomItem/index.jsx';
 
@@ -38,7 +38,8 @@ class RoomsListComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -53,8 +54,10 @@ class RoomsListComponent extends Component {
   }
 
   /**
-   * handles selected cell twice. First for date and period of start order, and other for end of order.
-   * take into consideration, that need disabled nearby cells in min duration of order less than room setting.
+   * handles selected cell twice. First for date and period of start order,
+   * and other for end of order.
+   * take into consideration, that need disabled nearby cells in min duration
+   * of order less than room setting.
    * @param {string} id - room id
    * @param {Date} date - start or end date
    * @param {number} period - period id
@@ -72,10 +75,12 @@ class RoomsListComponent extends Component {
    * @return {Array.<Element>} RoomItems - room boxes
    * */
   renderRooms(bathhouses, rooms, schedules) {
-    const { activeRoomId, order } = this.props;
+    const { activeRoomId, order, steps } = this.props;
 
     return rooms.map((room, index) => {
-      const bathhouse = bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId'));
+      const bathhouse = bathhouses.find(
+        bathhouse => bathhouse.get('id') === room.get('bathhouseId')
+      );
       const schedule = schedules.get(room.get('id'));
 
       return (
@@ -85,8 +90,11 @@ class RoomsListComponent extends Component {
           bathhouse={bathhouse}
           schedule={schedule}
           order={order}
+          steps={steps}
           onChangeActiveRoom={this.handleChangeActiveRoom}
           onSelectOrder={this.props.selectOrder}
+          onCheckOrder={this.props.checkOrder}
+          onSendOrder={this.props.sendOrder}
           isClosable={false}
           key={index}
         />
@@ -112,8 +120,7 @@ class RoomsListComponent extends Component {
             nothingToShow ?
               <div className="RoomsList-empty-result">
                 <FormattedMessage id="emptyResultShowText" />
-              </div> :
-              <div></div>
+              </div> : null
           }
         </div>
       );
@@ -137,6 +144,7 @@ class RoomsListComponent extends Component {
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  * @property {Function} findRoomScheduleIfNeed - find room schedule if need
  * @property {Function} selectOrder - select order from room item
+ * @property {Function} checkOrder - send order to validate
  */
 RoomsListComponent.propTypes = {
   activeRoomId: PropTypes.string,
@@ -145,10 +153,13 @@ RoomsListComponent.propTypes = {
   schedules: ImmutablePropTypes.map,
   isActive: PropTypes.bool.isRequired,
   order: ImmutablePropTypes.map,
+  steps: ImmutablePropTypes.map,
   resetOrder: PropTypes.func.isRequired,
   changeActiveRoom: PropTypes.func.isRequired,
   findRoomScheduleIfNeed: PropTypes.func.isRequired,
   selectOrder: PropTypes.func.isRequired,
+  checkOrder: PropTypes.func.isRequired,
+  sendOrder: PropTypes.func.isRequired,
 };
 
 /**
@@ -161,7 +172,9 @@ function mapDispatchToProps(dispatch) {
     resetOrder: () => dispatch(resetOrder()),
     changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
     findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
-    selectOrder: (id, date, period) => dispatch(selectOrder(id, date, period))
+    selectOrder: (id, date, period) => dispatch(selectOrder(id, date, period)),
+    checkOrder: (order) => dispatch(checkOrder(order)),
+    sendOrder: () => dispatch(sendOrder()),
   };
 }
 

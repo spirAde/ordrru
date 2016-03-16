@@ -280,6 +280,7 @@
 		height: 95px;
 		font-family: var(--font-family-bold);
 		font-size: 28px;
+		cursor: pointer;
  	}
 
  	&-total-cost {

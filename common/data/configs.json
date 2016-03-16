@@ -327,22 +327,22 @@
         "lng": 53.41167831
       },
       "timezone": "Asia/Yekaterinburg",
-      "id": "867eb233-b435-4650-b7f5-8c4c800675b1"
+      "id": "83994afe-2a82-4f3d-a9fa-d3e3cd0229a1"
     }
   ],
   "filters": {
-    "867eb233-b435-4650-b7f5-8c4c800675b1": {
+    "83994afe-2a82-4f3d-a9fa-d3e3cd0229a1": {
       "datetime": {
-        "min": "2016-03-10",
-        "max": "2016-04-09"
+        "min": "2016-03-16",
+        "max": "2016-04-15"
       },
       "distance": {
-        "min": 707.2,
-        "max": 707.6,
-        "current": 707.6
+        "min": 704.6,
+        "max": 708.4,
+        "current": 708.4
       },
       "guest": {
-        "min": 21,
+        "min": 20,
         "max": 27,
         "current": 27
       },
@@ -361,11 +361,11 @@
         }
       ],
       "price": {
-        "min": 1000,
-        "max": 2100,
+        "min": 700,
+        "max": 2400,
         "current": {
-          "start": 1000,
-          "end": 2100
+          "start": 700,
+          "end": 2400
         }
       },
       "searchName": {

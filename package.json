@@ -3,7 +3,7 @@
   "description": "ordr",
   "version": "0.0.1",
   "scripts": {
-    "test": "karma start",
+    "test": "mocha --compilers js:babel-core/register --require ./test/client/helpers.js  --recursive",
     "test:watch": "npm run test -- --watch",
     "data": "babel-node server/data/index",
     "docs": "esdoc -c esdoc.json",
@@ -44,6 +44,7 @@
     "react-dom": "^0.14.6",
     "react-immutable-proptypes": "^1.6.0",
     "react-intl": "^2.0.0-beta-1",
+    "react-key-handler": "^0.1.0",
     "react-nouislider": "^1.9.1",
     "react-redux": "^4.4.0",
     "react-router": "^2.0.0",

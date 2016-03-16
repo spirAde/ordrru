@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 
 import './style.css';
 
@@ -10,18 +11,12 @@ import './style.css';
 class FooterComponent extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * render
    * @return {XML} - React element
    * */
   render() {
+    const nowYear = moment().format('YYYY');
+
     return (
       <div className="Footer">
         <div className="Footer-wrapper">
@@ -74,7 +69,7 @@ class FooterComponent extends Component {
               </ul>
             </div>
           </div>
-          <div className="Footer-copy">© 2015 «Ordr.ru»</div>
+          <div className="Footer-copy">© {nowYear} «Ordr.ru»</div>
         </div>
       </div>
     );

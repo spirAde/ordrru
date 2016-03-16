@@ -1,21 +1,17 @@
 import { List, Map, fromJS } from 'immutable';
 import { expect } from 'chai';
 
-import isNull from 'lodash/lang/isNull';
-import pluck from 'lodash/collection/pluck';
-import flatten from 'lodash/array/flatten';
-import omit from 'lodash/object/omit';
-import keys from 'lodash/object/keys';
+import { isNull, map, flatten, omit, keys } from 'lodash';
 
 import { initialState as defaultInitialState, reducer } from '../../../common/reducers/bathhouse';
 
-import { Bathhouses } from '../../../client/scripts/API1';
+import { Bathhouses } from '../../../client/scripts/API';
 
 import { FIND_BATHHOUSES_FAILURE, FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS } from '../../../client/scripts/actions/bathhouse-actions';
 
 import { getBathhouses } from '../../fixtures/bathhouse';
-import { getSchedule } from '../../fixtures/schedule';
+import getSchedule from '../../fixtures/schedule';
 
 describe('bathhouse reducer', () => {
 

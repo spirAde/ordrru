@@ -1,0 +1,76 @@
+@import "../../../styles/variables.css";
+
+.Order {
+
+  display: block;
+
+  &-inner {
+    padding: 20px;
+    background-color: rgba(75,95,106,.9);
+    color: #fff;
+  }
+
+  &-details {
+    width: 484px;
+    float: left;
+  }
+
+  &-details-inner {}
+
+  &-phone-description {
+    font-family: var(--font-family-bold);
+    margin-bottom: 15px;
+  }
+
+  &-details-datetime {
+    font-family: var(--font-family-bold);
+    margin-bottom: 15px;
+  }
+
+  &-details-list {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  &-phone {
+    width: 500px;
+    float: left;
+  }
+
+  &-phone-inner {
+    padding-left: 16px;
+  }
+
+  &-phone-input-field {
+    width: 360px;
+    float: left;
+  }
+
+  &-phone-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    color: #54595A;
+    font-family: var(--font-family-bold);
+    font-size: var(--font-size-base);
+    border: 1px solid #D4D6D9;
+  }
+
+  &-send-sms-button-field {
+    float: right;
+    width: 120px;
+  }
+
+  &-send-sms-button {
+    padding: 11px;
+    font-family: var(--font-family-bold);
+    font-size: var(--font-size-base);
+    color: #fff;
+    text-align: center;
+    display: block;
+    border: none;
+    background-color: #F4740C;
+    cursor: pointer;
+    width: 100%;
+  }
+}

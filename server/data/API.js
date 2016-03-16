@@ -120,33 +120,35 @@ function renderAPI(models, callback) {
 
 	API += `
 import fetch from 'isomorphic-fetch';
-import { isEmpty } from 'lodash';
+import { isEmpty, assign, has } from 'lodash';
 
 const baseUrl = '${process.env.API_PROTOCOL}://${process.env.API_HOST}:${process.env.API_PORT}/api';
 const headers = {
 	Authorization: __CLIENT__ && localStorage && localStorage.accessToken ? localStorage.accessToken : '',
+	Accept: 'application/json',
+	'Content-Type': 'application/json',
 };
 
 function _fetch(url, options) {
-	return new Promise((resolve, reject) => {
-		if (!url) {
-			reject(new Error('There is no URL provided for the request.'));
-		}
+	if (!url) {
+		throw new Error('There is no URL provided for the request.');
+	}
 
-		options = Object.assign({}, options, headers);
+	options = assign({}, options, { headers });
 
-		fetch(url, options).then(response => {
-			return response.json();
-		}).then(response => {
-			if (response.status >= 200 && response.status < 300) {
-				return response.errors ? reject(response.errors) : reject(response);
+	return fetch(url, options)
+		.then(response => response.json())
+		.then(response => {
+			if (has(response, 'error')) {
+				throw response.error;
 			}
 
-			return resolve(response);
-		}).catch(error => {
-			reject(error);
-		});
-	});
+			if (response.status >= 200 && response.status < 300) {
+				throw new Error('Something wrong, response has error status code, but hasn\'t error object');
+			}
+
+			return response;
+		}).catch(error => { throw error; });
 }\n`;
 
 	API += `const API = {};\n`;
