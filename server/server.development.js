@@ -6,8 +6,6 @@ import boot from 'loopback-boot';
 import { createServer } from 'http';
 import io from 'socket.io';
 
-import qs from 'query-string';
-
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
@@ -32,7 +30,7 @@ const app = loopback();
 
 const bootOptions = {
   appRootDir: __dirname,
-  bootScripts: ['./boot/authentication.js', './boot/preload.js'],
+  //bootScripts: ['./boot/authentication.js', './boot/preload.js'],
 };
 
 app.use('/build', loopback.static(path.join(__dirname, '../build')));

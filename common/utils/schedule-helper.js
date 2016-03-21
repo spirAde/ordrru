@@ -7,6 +7,7 @@ import { datesRange, isSameDate } from './date-helper';
 
 const FIRST_PERIOD = 0;
 const LAST_PERIOD = 144;
+const STEP = 3;
 
 /**
  * Use for server and client
@@ -201,7 +202,35 @@ export function calculateDatetimeOrderSum(order, prices) {
 }
 
 /**
- * deep console.log for schedule, look period level
+ * Fix endpoints periods for each order in schedule.
+ * example: schedule(disable periods) - [12, 15, 18, 21, 33, 36, 39, 42, 45], after use fixOrderEndpoints result
+ * will be: [15, 18, 36, 39, 42]
+ * @param {Array.<Object>} schedule
+ * @return {Array.<Object>} new schedule
+ * */
+export function fixOrderEndpoints(schedule) {
+	const busyPeriods = map(
+		filter(schedule, { enable: false }),
+		period => parseInt(period.period, 10)
+	);
+
+	if (!busyPeriods.length) return schedule;
+
+	const fixedPeriods = filter(busyPeriods, (period, index) => {
+		if (period && period !== LAST_PERIOD) {
+			if (index === 0 || index === busyPeriods.length - 1) return period;
+			if (busyPeriods[index + 1] !== period + STEP) return period;
+			if (busyPeriods[index - 1] !== period - STEP) return period;
+		}
+	});
+
+	return map(schedule, period => {
+		return includes(fixedPeriods, period.period) ? { period: period.period, enable: true } : period;
+	});
+}
+
+/**
+ * deep console.log for schedule, open period level
  * @param {Any} data
  * @returns void
  * */

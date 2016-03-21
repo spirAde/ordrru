@@ -1,23 +1,19 @@
-var loopback = require('loopback');
-var boot = require('loopback-boot');
+import loopback from 'loopback';
+import boot from 'loopback-boot';
 
-var app = loopback();
+const app = loopback();
 
 const bootOptions = {
   appRootDir: __dirname,
-  bootScripts: ['./boot/authentication.js'],
+  bootScripts: [],
 };
 
-app.start = function() {
+app.use('/api', loopback.rest());
 
-  boot(app, bootOptions);
-  app.use('/api', loopback.rest());
-  app.listen();
+app.start = () => {
+  boot(app, bootOptions, error => {
+    app.listen();
+  });
 };
 
-app.stop = function() {
-  console.log(`Web server stop`);
-  app.close();
-};
-
-module.exports = app;
+export default app;

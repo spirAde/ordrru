@@ -3,7 +3,8 @@ import chai from 'chai'
 import { map, find, includes, slice } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, recalculateSchedule,
-	checkSchedulesIntersection, fixNeighboringSchedules, mergeSchedules } from '../../../common/utils/schedule-helper';
+	checkSchedulesIntersection, fixNeighboringSchedules, mergeSchedules,
+	fixOrderEndpoints } from '../../../common/utils/schedule-helper';
 import getSchedule from '../../fixtures/schedule';
 
 const expect = chai.expect;
@@ -185,6 +186,16 @@ describe('schedule helpers', () => {
 		it('for empty schedule', () => {
 			const schedule = getSchedule();
 			const order = [132, 135, 138, 141, 144];
+			const minDuration = 4;
+
+			const expectedSchedule = generateSchedule(schedule, order);
+
+			expect(recalculateSchedule(schedule, order, minDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('for empty schedule and full day order', () => {
+			const schedule = getSchedule();
+			const order = map(schedule, period => parseInt(period, 10));
 			const minDuration = 4;
 
 			const expectedSchedule = generateSchedule(schedule, order);
@@ -509,6 +520,64 @@ describe('schedule helpers', () => {
 			};
 
 			expect(fixNeighboringSchedules(prevSchedule, nextSchedule, minDuration)).to.deep.equal(expectedSchedules);
+		});
+	});
+
+
+	describe('fixOrderEndpoints', () => {
+		
+		it('for empty schedule', () => {
+			const schedule = getSchedule();
+
+			const expectedSchedule = getSchedule();
+
+			expect(fixOrderEndpoints(schedule)).to.deep.equal(expectedSchedule);
+		});
+
+		it('for full day order', () => {
+			const schedule = getSchedule();
+			const order = map(schedule, period => parseInt(period, 10));
+			const orderedSchedule = generateSchedule(schedule, order);
+
+			const expectedSchedule = generateSchedule(schedule, order);
+
+			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
+		});
+
+		it('for one order in start of schedule', () => {
+			const schedule = getSchedule();
+			const orderedSchedule = generateSchedule(schedule, [0, 3, 6, 9, 12, 15]);
+
+			const expectedSchedule = generateSchedule(schedule, [0, 3, 6, 9, 12]);
+
+			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
+		});
+
+		it('for one order in the end of schedule', () => {
+			const schedule = getSchedule();
+			const orderedSchedule = generateSchedule(schedule, [132, 135, 138, 141, 144]);
+
+			const expectedSchedule = generateSchedule(schedule, [135, 138, 141, 144]);
+
+			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
+		});
+
+		it('for one order in not start or end of schedule', () => {
+			const schedule = getSchedule();
+			const orderedSchedule = generateSchedule(schedule, [81, 84, 87, 90, 93, 96]);
+
+			const expectedSchedule = generateSchedule(schedule, [84, 87, 90, 93]);
+
+			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
+		});
+
+		it('for few orders', () => {
+			const schedule = getSchedule();
+			const orderedSchedule = generateSchedule(schedule, [12, 15, 18, 21, 24, 81, 84, 87, 90, 93, 96, 123, 126, 129, 132, 135]);
+
+			const expectedSchedule = generateSchedule(schedule, [15, 18, 21, 84, 87, 90, 93, 126, 129, 132]);
+
+			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
 		});
 	});
 });

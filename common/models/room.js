@@ -17,8 +17,8 @@ export default (Room) => {
     if (!ctx.isNewInstance) next();
 
     const id = ctx.instance.id;
-    const now = moment().toDate();
-    const end = moment(now).add(31, 'days').toDate();
+    const now = moment().subtract(1, 'days');
+    const end = moment(now).add(32, 'days');
 
     const app = Room.app;
     const Schedule = app.models.Schedule;

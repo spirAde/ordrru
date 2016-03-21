@@ -41,7 +41,7 @@
     "other": ["hookah", "karaoke", "barbecue set", "cards", "domino", "backgammon", "projector", "whores"]
   },
   "types": ["hammam", "sauna", "bathhouse"],
-  "duration": [3, 6, 9],
+  "duration": [3, 6, 9, 12],
   "thresholds": [
     [
       [30, 36, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78],

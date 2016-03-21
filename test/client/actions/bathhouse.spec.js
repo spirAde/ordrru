@@ -8,18 +8,13 @@ import { applyMiddleware } from 'redux';
 import configureStore from 'redux-mock-store';
 import thunkMiddleware from 'redux-thunk';
 
-import nock from 'nock';
-
 import { initialState as defaultInitialState, reducer } from '../../../common/reducers/bathhouse';
 import { findBathhousesAndRooms, updateRooms, changeActiveRoom } from '../../../client/scripts/actions/bathhouse-actions';
 import { FIND_BATHHOUSES_FAILURE, FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS } from '../../../client/scripts/actions/bathhouse-actions';
 
-import { CHANGE_DATETIME_FILTER_VALUES, CHANGE_DISTANCE_FILTER_VALUE, CHANGE_GUEST_FILTER_VALUE,
-  CHANGE_SEARCH_NAME_FILTER_VALUE, CHANGE_OPTIONS_FILTER_VALUE, CHANGE_PREPAYMENT_FILTER_VALUE,
-  CHANGE_PRICE_FILTER_VALUES, CHANGE_TYPES_FILTER_VALUE } from '../../../client/scripts/actions/filter-actions';
-
 import configs from '../../../common/data/configs.json';
+import { importDB, getModelDataFor } from '../../utils/index';
 
 const middlewares = [ thunkMiddleware ];
 const mockStore = configureStore(middlewares);
@@ -32,17 +27,9 @@ const defaultCityId = map(configs.cities, 'id')[0];
 
 describe('bathhouse actions', () => {
 
-  afterEach(() => {
-    nock.cleanAll();
-  });
-
   it('handles FIND_BATHHOUSES_SUCCESS when fetching bathhouses has been done', (done) => {
-    nock('http://localhost:3000/')
-      .get('/api/bathhouses?filter=%7B%22include%22:%22rooms%22,%22where%22:%7B%22cityId%22:%22' + defaultCityId + '%22,%22isActive%22:true%7D%7D')
-      .reply(200, [
-        { id: 1, name: 'smth1', rooms: [{ id: 1, name: 'smth1', popularity: 1 }] },
-        { id: 2, name: 'smth2', rooms: [{ id: 2, name: 'smth2', popularity: 6 }] }
-      ]);
+
+    importDB(['Bathhouse', 'Room', 'ACL']);
 
     const initialState = {
       filter: fromJS({
@@ -52,25 +39,26 @@ describe('bathhouse actions', () => {
       })
     };
 
+    const cityId = '335aba1d-ac72-4f55-b69d-4677c49f5100';
+    const bathhouses = getModelDataFor('Bathhouse', { cityId, });
+
     const expectedActions = [
       { type: FIND_BATHHOUSES_REQUEST, payload: {} },
       { type: FIND_BATHHOUSES_SUCCESS, payload: {
-        bathhouses: fromJS([
-          { id: 1, name: 'smth1', rooms: [1] },
-          { id: 2, name: 'smth2', rooms: [2] }
-        ]),
-        rooms: fromJS([
-          { id: 2, name: 'smth2', popularity: 6 },
-          { id: 1, name: 'smth1', popularity: 1 }
-        ])
-      }}
+          bathhouses: fromJS(bathhouses),
+          rooms: fromJS([
+            { id: 2, name: 'smth2', popularity: 6 },
+            { id: 1, name: 'smth1', popularity: 1 }
+          ])
+        }
+      }
     ];
 
     const store = mockStore(initialState, expectedActions, done);
-    store.dispatch(findBathhousesAndRooms(defaultCityId));
+    store.dispatch(findBathhousesAndRooms(cityId));
   });
 
-  it('handles FIND_BATHHOUSES_FAILURE when fetching bathhouses has been failed', (done) => {
+  /*it('handles FIND_BATHHOUSES_FAILURE when fetching bathhouses has been failed', (done) => {
     nock('http://localhost:3000/')
       .get('/api/bathhouses?filter=%7B%22include%22:%22rooms%22,%22where%22:%7B%22cityId%22:%22' + defaultCityId + '%22,%22isActive%22:true%7D%7D')
       .replyWithError({ error: new Error('request to http://localhost:3000/api/bathhouses failed') });
@@ -108,5 +96,5 @@ describe('bathhouse actions', () => {
       }
     };
     expect(changeActiveRoom(id)).to.deep.equal(expectedAction);
-  });
+  });*/
 });

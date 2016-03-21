@@ -121,6 +121,8 @@ export function findBathhousesAndRooms(cityId) {
         const sortedRooms =
           sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
 
+        console.log('SMTH');
+
         dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
       })
       .catch(error => dispatch(fetchBathhousesFailure(error)));
@@ -216,7 +218,7 @@ export function updateRoomsByDistance(value) {
     dispatch(changeDistanceFilterValue(value));
 
     //  if active room is not valid after check, set activeRoomId to null
-    if (!newValid.includes(state.bathhouse.get('activeRoomId')) && state.bathhouse.get('activeRoomId')) {
+    if (!newValid.includes(state.bathhouse.get('activeRoomId')) &&state.bathhouse.get('activeRoomId')) {
       dispatch(changeActiveRoom(state.bathhouse.get('activeRoomId')));
     }
 

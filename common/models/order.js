@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber } from 'lodash';
+import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber, take, takeRight } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
   recalculateSchedule, fixNeighboringSchedules,
@@ -83,6 +83,8 @@ export default (Order) => {
     // 2016-01-02: 138-144, 2016-01-03: 0-144, 2016-01-04: 0-12
     const splittedOrder = splitOrderByDatesAndPeriods({ startDate, endDate, startPeriod, endPeriod }, step);
 
+    //console.log(splittedOrder);
+
     Promise.all([
       Schedule.find({
         where: {
@@ -102,18 +104,16 @@ export default (Order) => {
         return recalculateSchedule(schedule.periods, chunkOrder.periods, minDuration);
       });
 
-      const prevSchedule = isSameDate(schedules[0].date, prevDate) ? head(schedules) : null;
-      const nextSchedule = isSameDate(last(schedules).date, nextDate) ? last(schedules) : null;
+      const prevSchedule = head(schedules);
+      const nextSchedule = last(schedules);
 
       let fixedNewPeriodsPacks = [];
 
-      const prevSchedulePeriods = prevSchedule && prevSchedule.periods || defaultPeriodsByType;
-      const nextSchedulePeriods = nextSchedule && nextSchedule.periods || defaultPeriodsByType;
-
-      const leftFix = fixNeighboringSchedules(prevSchedulePeriods, head(newSchedules), minDuration, step);
-      const rightFix = fixNeighboringSchedules(last(newSchedules), nextSchedulePeriods, minDuration, step);
+      const leftFix = fixNeighboringSchedules(prevSchedule.periods, head(newSchedules), minDuration);
+      const rightFix = fixNeighboringSchedules(last(newSchedules), nextSchedule.periods, minDuration);
 
       if (isOneDayOrder) {
+        // TODO: need fix, because if order has fixNeighboringSchedules for both sides, then right overwrites left fix
         fixedNewPeriodsPacks = [leftFix.prev, mergeSchedules(leftFix.next, rightFix.prev), rightFix.next];
       } else {
         const fixedLeftSchedule = newSchedules.splice(0, 1);
@@ -121,29 +121,28 @@ export default (Order) => {
 
         fixedNewPeriodsPacks = [
           leftFix.prev,
-          ...mergeSchedules(fixedLeftSchedule, leftFix.next),
+          mergeSchedules(...fixedLeftSchedule, leftFix.next),
           ...newSchedules,
-          ...mergeSchedules(fixedRightSchedule, rightFix.prev),
+          mergeSchedules(...fixedRightSchedule, rightFix.prev),
           rightFix.next,
         ];
       }
 
-      const fixedNewSchedules = zipWith(fixedNewPeriodsPacks, dates, (periods, date) => {
+      const fixedNewSchedules = zipWith(fixedNewPeriodsPacks, schedules, (periods, schedule) => {
         return {
-          roomId: room.id,
-          date: moment(date).toDate(),
+          id: schedule.id,
+          roomId: schedule.roomId,
+          date: schedule.date,
           periods,
         }
       });
 
-      if (!prevSchedule) fixedNewSchedules.splice(0, 1);
-      if (!nextSchedule) fixedNewSchedules.splice(-1, 1);
+      //clog(fixedNewSchedules);
 
-      const updateSchedulePromises = map(fixedNewSchedules, (fixNewSchedule, index) => {
-        return Schedule.update({ id: schedules[index].id }, fixNewSchedule);
+      const updateSchedulePromises = map(fixedNewSchedules, schedule => {
+        return Schedule.update({ id: schedule.id }, schedule);
       });
 
-      //next();
       return Promise.all(updateSchedulePromises)
         .then(schedules => {
           //TODO: logger
@@ -271,7 +270,10 @@ export default (Order) => {
         return callback(error);
       }*/
 
-      const splittedOrder = splitOrderByDatesAndPeriods({ startDate, endDate, startPeriod, endPeriod }, step);
+      const checkedStartPeriod = startPeriod === firstPeriod ? startPeriod : startPeriod + step;
+      const checkedEndPeriod = endPeriod === lastPeriod ? endPeriod : endPeriod - step;
+
+      const splittedOrder = splitOrderByDatesAndPeriods({ startDate, endDate, startPeriod: checkedStartPeriod, endPeriod: checkedEndPeriod }, step);
 
       const notValid = [];
       const createSchedulePromises = [];

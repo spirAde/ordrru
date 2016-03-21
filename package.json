@@ -3,7 +3,7 @@
   "description": "ordr",
   "version": "0.0.1",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register --require ./test/client/helpers.js  --recursive",
+    "test": "mocha --compilers js:babel-core/register --require ./test/index.js --recursive",
     "test:watch": "npm run test -- --watch",
     "data": "babel-node server/data/index",
     "docs": "esdoc -c esdoc.json",
@@ -11,7 +11,9 @@
     "webpack-build": "webpack --verbose --colors --display-error-details --config webpack/production.config.js",
     "start": "nodemon ./server/index.js",
     "start-production": "NODE_ENV=production node server/index.js",
-    "start-test": "NODE_ENV=test node server/index.js"
+    "start-test": "NODE_ENV=test node server/index.js",
+    "migrate": "rethink-migrate",
+    "create-dump": "rethinkdb dump"
   },
   "dependencies": {
     "classnames": "^2.2.3",
@@ -55,7 +57,7 @@
     "redux-promise-middleware": "^2.3.3",
     "redux-thunk": "^1.0.3",
     "reselect": "^2.0.3",
-    "rethinkdb": "^2.2.1",
+    "rethinkdb": "^2.2.2",
     "scroll-behavior": "^0.3.2",
     "serialize-javascript": "^1.1.2",
     "serve-favicon": "^2.3.0",
@@ -128,7 +130,8 @@
     "redux-devtools-dock-monitor": "^1.0.1",
     "redux-devtools-log-monitor": "^1.0.4",
     "redux-logger": "2.3.2",
-    "redux-mock-store": "0.0.2",
+    "redux-mock-store": "1.0.2",
+    "rethink-migrate": "^1.2.2",
     "sinon": "^2.0.0-pre",
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.6",

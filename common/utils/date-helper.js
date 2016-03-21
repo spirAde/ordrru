@@ -33,5 +33,6 @@ export function datesRange(start, end) {
 export function isSameDate(start, end) {
 	start = moment.isMoment(start) ? start.format(MOMENT_FORMAT) : moment(start).format(MOMENT_FORMAT);
 	end = moment.isMoment(end) ? end.format(MOMENT_FORMAT) : moment(end).format(MOMENT_FORMAT);
+
 	return moment(start).isSame(end);
 }

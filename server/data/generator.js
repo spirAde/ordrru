@@ -104,14 +104,14 @@ export default (models) => {
 
 		function createCity(data, callback) {
 			return app.models.City.create(data, (error, record) => {
-				if (error) console.log(error);
+				if (error) console.log('createCity', error);
 				callback(null, record);
 			});
 		}
 
 		function getCities(callback) {
 			return app.models.City.find({}, (error, cities) => {
-				if (error) console.log(error);
+				if (error) console.log('getCities', error);
 				callback(null, cities);
 			});
 		}
@@ -119,14 +119,14 @@ export default (models) => {
 		function createBathhouse(city, callback) {
 			const data = generators.bathhouse(city);
 			return app.models.Bathhouse.create(data, { center: city.center }, (error, record) => {
-				if (error) console.log(error);
+				if (error) console.log('createBathhouse', error);
 				return callback(null, record);
 			});
 		}
 
 		function getBathhouses(callback) {
 			return app.models.Bathhouse.find({}, (error, bathhouses) => {
-				if (error) console.log(error);
+				if (error) console.log('getBathhouses', error);
 				callback(null, bathhouses);
 			});
 		}
@@ -134,14 +134,14 @@ export default (models) => {
 		function createRoom(bathhouse, callback) {
 			const data = generators.room(bathhouse);
 			return app.models.Room.create(data, (error, record) => {
-				if (error) console.log(error);
+				if (error) console.log('createRoom', error);
 				return callback(null, record);
 			});
 		}
 
 		function getRooms(callback) {
 			return app.models.Room.find({}, (error, rooms) => {
-				if (error) console.log(error);
+				if (error) console.log('getRooms', error);
 				callback(null, rooms);
 			});
 		}
@@ -149,7 +149,7 @@ export default (models) => {
 		function createOrder(room, order, callback) {
 			const data = generators.order(room, order);
 			return app.models.Order.create(data, (error, record) => {
-				if (error) console.log(error);
+				if (error) console.log('createOrder', error);
 				return callback(null, record);
 			});
 		}
@@ -157,7 +157,7 @@ export default (models) => {
 		function createReview(room, callback) {
 			const data = generators.review(room);
 			return app.models.Review.create(data, (error, record) => {
-				if (error) console.log(error);
+				if (error) console.log('createReview', error);
 				return callback(null, record);
 			});
 		}
@@ -183,10 +183,10 @@ export default (models) => {
 		};
 
 		const counts = {
-			city: 1,
-			bathhouse: 3,
-			room: 5,
-			order: 10,
+			city: 5,
+			bathhouse: 2,
+			room: 3,
+			order: 5,
 			review: 10,
 		};
 

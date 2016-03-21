@@ -1,5 +1,5 @@
 import util from 'util';
-import { head, shuffle, random, map, forEach, sample, reduce, range, compact, take } from 'lodash';
+import { head, shuffle, random, map, forEach, sample, sampleSize, reduce, range, compact, take } from 'lodash';
 import moment from 'moment';
 
 import { datesRange, isSameDate } from '../../common/utils/date-helper';
@@ -46,12 +46,12 @@ export function clog(data) {
 }
 
 export  function generateServices(services) {
-	const items = sample(services, random(1, services.length));
+	const items = sampleSize(services, random(1, services.length));
 
 	return map(items, item => {
 		return {
 			name: item,
-			price: head(sample(range(1000, 2000, 100), 1)),
+			price: sample(range(1000, 2000, 100)),
 		}
 	});
 }
