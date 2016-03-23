@@ -47,7 +47,7 @@ app.use((req, res, next) => {
     isomorphicTools.refresh();
   }
 
-  const memoryHistory = createMemoryHistory(req.url);
+  const memoryHistory = createMemoryHistory(req.originalUrl);
   const store = configureStore(memoryHistory);
   const history = syncHistoryWithStore(memoryHistory, store);
 

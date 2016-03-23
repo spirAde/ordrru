@@ -118,9 +118,14 @@ export function findBathhousesAndRooms(cityId) {
           data, bathhouse => assign({}, bathhouse, { rooms: map(bathhouse.rooms, 'id') })
         ));
 
+<<<<<<< HEAD
         const sortedRooms = sortingRoomsByType(
           bathhouses, rooms, sorting.get('name'), sorting.get('isDesc')
         );
+=======
+        const sortedRooms =
+          sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
+>>>>>>> 5f962fe
 
         dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
       })

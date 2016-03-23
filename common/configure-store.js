@@ -1,15 +1,15 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { routerMiddleware } from 'react-router-redux';
-
 import io from 'socket.io-client';
 
 import thunk from 'redux-thunk';
+import { routerMiddleware } from 'react-router-redux'
 
 import { Iterable } from 'immutable';
 
 import createSocketMiddleware from './middlewares/socket-middleware';
 
-export default function configureStore(history, initialState) {
+export default function configureStore(history, initialState = {}) {
 
   const middleware = [thunk, routerMiddleware(history)];
 
@@ -45,8 +45,6 @@ export default function configureStore(history, initialState) {
 
   const reducers = require('./reducers/index');
   const store = finalCreateStore(reducers, initialState);
-
-  //reduxRouterMiddleware.listenForReplays(store);
 
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./reducers/index', () => {
