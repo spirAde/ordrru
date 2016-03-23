@@ -192,139 +192,143 @@ export default (models) => {
 
 		if (error) throw error;
 
-		if (statuses.city) {
+		dataSources.automigrate(error => {
+			if (error) throw  error;
 
-			funcs.city = function (callback) {
-				const funcs = map(take(config.cities, counts.city), city => {
-					return async.apply(createCity, city);
-				});
+			if (statuses.city) {
 
-				return async.parallel(flatten(funcs), (error, cities) => {
-					console.log('cities', 'x', cities.length);
-					callback(null, cities);
-				});
-			}
+				funcs.city = function (callback) {
+					const funcs = map(take(config.cities, counts.city), city => {
+						return async.apply(createCity, city);
+					});
 
-			queue.push(funcs.city);
-		}
-		if (statuses.bathhouse) {
-
-			if (!statuses.city) {
-				funcs.city = function(callback) {
-					getCities((error, cities) => {
+					return async.parallel(flatten(funcs), (error, cities) => {
+						console.log('cities', 'x', cities.length);
 						callback(null, cities);
 					});
-				};
+				}
 
 				queue.push(funcs.city);
 			}
+			if (statuses.bathhouse) {
 
-			funcs.bathhouse = function (cities, callback) {
-				const funcs = map(cities, city => {
-					return map(range(0, counts.bathhouse), index => {
-						return async.apply(createBathhouse, city);
+				if (!statuses.city) {
+					funcs.city = function(callback) {
+						getCities((error, cities) => {
+							callback(null, cities);
+						});
+					};
+
+					queue.push(funcs.city);
+				}
+
+				funcs.bathhouse = function (cities, callback) {
+					const funcs = map(cities, city => {
+						return map(range(0, counts.bathhouse), index => {
+							return async.apply(createBathhouse, city);
+						});
 					});
-				});
 
-				return async.parallel(flatten(funcs), (error, bathhouses) => {
-					console.log('bathhouses', 'x', compact(map(bathhouses, 'id')).length);
-					callback(null, bathhouses);
-				});
-			}
-
-			queue.push(funcs.bathhouse);
-		}
-		if (statuses.room) {
-
-			if (!statuses.bathhouse) {
-				funcs.bathhouse = function(callback) {
-					getBathhouses((error, bathhouses) => {
+					return async.parallel(flatten(funcs), (error, bathhouses) => {
+						console.log('bathhouses', 'x', compact(map(bathhouses, 'id')).length);
 						callback(null, bathhouses);
 					});
 				}
 
 				queue.push(funcs.bathhouse);
 			}
+			if (statuses.room) {
 
-			funcs.room = function (bathhouses, callback) {
-				const funcs = map(bathhouses, bathhouse => {
-					return map(range(0, counts.room, 1), index => {
-						return async.apply(createRoom, bathhouse);
+				if (!statuses.bathhouse) {
+					funcs.bathhouse = function(callback) {
+						getBathhouses((error, bathhouses) => {
+							callback(null, bathhouses);
+						});
+					}
+
+					queue.push(funcs.bathhouse);
+				}
+
+				funcs.room = function (bathhouses, callback) {
+					const funcs = map(bathhouses, bathhouse => {
+						return map(range(0, counts.room, 1), index => {
+							return async.apply(createRoom, bathhouse);
+						});
 					});
-				});
 
-				return async.parallel(flatten(funcs), (error, rooms) => {
-					console.log('rooms', 'x', compact(map(rooms, 'id')).length);
-					callback(null, rooms);
-				});
-			}
-
-			queue.push(funcs.room);
-		}
-		/*if (statuses.review) {
-
-			if (!statuses.room) {
-				funcs.room = function(callback) {
-					getRooms((error, bathhouses) => {
-						callback(null, bathhouses);
+					return async.parallel(flatten(funcs), (error, rooms) => {
+						console.log('rooms', 'x', compact(map(rooms, 'id')).length);
+						callback(null, rooms);
 					});
 				}
 
 				queue.push(funcs.room);
 			}
+			/*if (statuses.review) {
 
-			funcs.review = function (rooms, callback) {
-				const funcs = map(rooms, room => {
-					return map(range(0, counts.review, 1), index => {
-						return async.apply(createReview, room);
+				if (!statuses.room) {
+					funcs.room = function(callback) {
+						getRooms((error, bathhouses) => {
+							callback(null, bathhouses);
+						});
+					}
+
+					queue.push(funcs.room);
+				}
+
+				funcs.review = function (rooms, callback) {
+					const funcs = map(rooms, room => {
+						return map(range(0, counts.review, 1), index => {
+							return async.apply(createReview, room);
+						});
 					});
-				});
 
-				return async.parallel(flatten(funcs), (error, reviews) => {
-					console.log('reviews', 'x', compact(map(reviews, 'id')).length);
-					callback(null, reviews);
-				});
-			}
-
-			queue.push(funcs.review);
-		}*/
-		if (statuses.order) {
-
-			if (!statuses.room) {
-				funcs.room = function(callback) {
-					getRooms((error, bathhouses) => {
-						callback(null, bathhouses);
+					return async.parallel(flatten(funcs), (error, reviews) => {
+						console.log('reviews', 'x', compact(map(reviews, 'id')).length);
+						callback(null, reviews);
 					});
 				}
 
-				queue.push(funcs.room);
-			}
+				queue.push(funcs.review);
+			}*/
+			if (statuses.order) {
 
-			funcs.order = function (rooms, callback) {
-				const now = moment().toDate();
-				const end = moment(now).add(31, 'days').toDate();
+				if (!statuses.room) {
+					funcs.room = function(callback) {
+						getRooms((error, bathhouses) => {
+							callback(null, bathhouses);
+						});
+					}
 
-				const funcs = map(rooms, room => {
-					const orders = utils.generateOrders(now, end, counts.order);
-					return map(orders, order => {
-						return async.apply(createOrder, room, order);
+					queue.push(funcs.room);
+				}
+
+				funcs.order = function (rooms, callback) {
+					const now = moment().toDate();
+					const end = moment(now).add(31, 'days').toDate();
+
+					const funcs = map(rooms, room => {
+						const orders = utils.generateOrders(now, end, counts.order);
+						return map(orders, order => {
+							return async.apply(createOrder, room, order);
+						});
 					});
-				});
 
-				return async.parallel(flatten(funcs), (error, orders) => {
-					console.log('orders', 'x', compact(map(orders, 'id')).length);
-					callback(null, rooms);
-				});
+					return async.parallel(flatten(funcs), (error, orders) => {
+						console.log('orders', 'x', compact(map(orders, 'id')).length);
+						callback(null, rooms);
+					});
+				}
+
+				queue.push(funcs.order);
 			}
 
-			queue.push(funcs.order);
-		}
+			async.waterfall(queue, (error, data) => {
 
-		async.waterfall(queue, (error, data) => {
+				if (error) throw error;
 
-			if (error) throw error;
-
-			process.exit();
+				process.exit();
+			});
 		});
 	});
 }

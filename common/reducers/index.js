@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { routeReducer } from 'react-router-redux';
+import { routerReducer } from 'react-router-redux';
 import { reducer as reduxAsyncConnect } from 'redux-async-connect';
 
 import { reducer as application } from './application';
@@ -10,12 +10,12 @@ import { reducer as schedule } from './schedule';
 import { reducer as user } from './user';
 
 export default combineReducers({
-  routing: routeReducer,
+  routing: routerReducer,
   reduxAsyncConnect,
   application,
   bathhouse,
   city,
   filter,
   schedule,
-  user
+  user,
 });

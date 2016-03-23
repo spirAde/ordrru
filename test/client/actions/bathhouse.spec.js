@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiImmutable from 'chai-immutable';
 
 import { List, Map, fromJS } from 'immutable';
-import { map } from 'lodash';
+import { map, orderBy } from 'lodash';
 
 import { applyMiddleware } from 'redux';
 import configureStore from 'redux-mock-store';
@@ -29,8 +29,6 @@ describe('bathhouse actions', () => {
 
   it('handles FIND_BATHHOUSES_SUCCESS when fetching bathhouses has been done', (done) => {
 
-    importDB(['Bathhouse', 'Room', 'ACL']);
-
     const initialState = {
       filter: fromJS({
         filters: {
@@ -41,21 +39,41 @@ describe('bathhouse actions', () => {
 
     const cityId = '335aba1d-ac72-4f55-b69d-4677c49f5100';
     const bathhouses = getModelDataFor('Bathhouse', { cityId, });
+    
+    const firstRooms = getModelDataFor('Room', { bathhouseId: bathhouses[0].id });
+    const secondRooms = getModelDataFor('Room', { bathhouseId: bathhouses[1].id });
 
+    const rooms = orderBy([...firstRooms, ...secondRooms], ['popularity'], ['desc']);
+
+    bathhouses[0].rooms = map(firstRooms, 'id');
+    bathhouses[1].rooms = map(secondRooms, 'id');
+    
     const expectedActions = [
-      { type: FIND_BATHHOUSES_REQUEST, payload: {} },
-      { type: FIND_BATHHOUSES_SUCCESS, payload: {
+      {
+        type: FIND_BATHHOUSES_REQUEST,
+        payload: {}
+      },
+      {
+        type: FIND_BATHHOUSES_SUCCESS,
+        payload: {
           bathhouses: fromJS(bathhouses),
-          rooms: fromJS([
-            { id: 2, name: 'smth2', popularity: 6 },
-            { id: 1, name: 'smth1', popularity: 1 }
-          ])
+          rooms: fromJS(rooms),
         }
       }
     ];
 
-    const store = mockStore(initialState, expectedActions, done);
-    store.dispatch(findBathhousesAndRooms(cityId));
+    const store = mockStore(initialState);
+    
+    store.dispatch(findBathhousesAndRooms(cityId))
+      .then(() => {
+        const actions = store.getActions();
+        //console.log(actions[1].payload);
+        //expect(actions).to.deep.equal(expectedActions);
+        expect(actions[0]).to.deep.equal(expectedActions[0]);
+        expect(actions[1].type).to.equal(expectedActions[1].type);
+        expect(actions[1].payload.bathhouses).to.deep.equal(expectedActions[1].payload.bathhouses);
+        expect(actions[1].payload.rooms).to.deep.equal(expectedActions[1].payload.rooms);
+      }).then(done).catch(done);
   });
 
   /*it('handles FIND_BATHHOUSES_FAILURE when fetching bathhouses has been failed', (done) => {
@@ -70,7 +88,7 @@ describe('bathhouse actions', () => {
 
     const store = mockStore(defaultInitialState, expectedActions, done);
     store.dispatch(findBathhousesAndRooms(defaultCityId));
-  });
+  });*/
 
   it('handles UPDATE_ROOMS rooms', () => {
     const valid = List.of('1a1a1f58-1078-4bca-a2d4-bc00c3948002', '06277a33-446e-4929-b197-1ccdae31f8bc', '41a8f37a-ce06-4735-bbf1-cc127db45278');
@@ -96,5 +114,5 @@ describe('bathhouse actions', () => {
       }
     };
     expect(changeActiveRoom(id)).to.deep.equal(expectedAction);
-  });*/
+  });
 });

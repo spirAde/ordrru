@@ -11,9 +11,10 @@ import ReactDOMServer from 'react-dom/server';
 
 import { IntlProvider } from 'react-intl';
 
-import { match } from 'react-router';
+import { match, createMemoryHistory } from 'react-router';
 import { ReduxAsyncConnect, loadOnServer } from 'redux-async-connect';
-import createHistory from 'react-router/lib/createMemoryHistory';
+import { syncHistoryWithStore } from 'react-router-redux';
+
 import { Provider } from 'react-redux';
 
 import PrettyError from 'pretty-error';
@@ -30,7 +31,7 @@ const app = loopback();
 
 const bootOptions = {
   appRootDir: __dirname,
-  //bootScripts: ['./boot/authentication.js', './boot/preload.js'],
+  bootScripts: ['./boot/authentication.js', './boot/preload.js'],
 };
 
 app.use('/build', loopback.static(path.join(__dirname, '../build')));
@@ -46,8 +47,9 @@ app.use((req, res, next) => {
     isomorphicTools.refresh();
   }
 
-  const history = createHistory(req.originalUrl);
-  const store = configureStore(history);
+  const memoryHistory = createMemoryHistory(req.url);
+  const store = configureStore(memoryHistory);
+  const history = syncHistoryWithStore(memoryHistory, store);
 
   function hydrateOnClient() {
     res.send('<!doctype html>\n' +
@@ -80,10 +82,9 @@ app.use((req, res, next) => {
           </IntlProvider>
         );
 
+        global.navigator = { userAgent: req.headers['user-agent'] };
+
         res.status(200);
-
-        global.navigator = {userAgent: req.headers['user-agent']};
-
         res.send('<!doctype html>\n' +
           ReactDOMServer.renderToString(
             <Root

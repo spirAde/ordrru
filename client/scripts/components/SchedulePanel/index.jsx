@@ -50,14 +50,14 @@ class SchedulePanelComponent extends Component {
    * @return {Array.<Element>} - schedule rows element
    * */
   renderScheduleRows(schedule, prices) {
-    return schedule.map((day, index) => {
+    return schedule.map((row, index) => {
       return (
         <ScheduleRowComponent
-          cells={day.get('periods')}
-          prices={prices.get(moment(day.get('date')).day())}
-          date={day.get('date')}
+          cells={row.get('periods')}
+          prices={prices.get(moment(row.get('date')).day())}
+          date={row.get('date')}
           isLast={index === schedule.size - 1}
-          key={index}
+          key={row.get('id')}
           onSelectOrder={this.props.onSelectOrder}
         />
       );

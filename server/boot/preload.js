@@ -3,7 +3,7 @@ import fs from 'fs';
 import moment from 'moment';
 import { flatten, assign, invert, map, floor, ceil, min, max } from 'lodash';
 
-export default (app, callback) => {
+export default (app) => {
 
 	const Bathhouse = app.models.Bathhouse;
 	const City = app.models.City;
@@ -51,6 +51,7 @@ export default (app, callback) => {
 
 		let commonData = {
 			mapboxAccessToken: app.get('mapboxAccessToken'),
+			limitOrderDuration: app.get('limitOrderDuration'),
 			periods: app.get('periods'),
 			invertPeriods: invert(app.get('periods')),
 			organizationType: app.get('organizationType'),
@@ -107,10 +108,11 @@ export default (app, callback) => {
 				outData.filters[city.id] = assign({}, commonFilters, { distance: cityDistance, guest: guest, price: prices });
 			});
 
-			fs.writeFile(configFile, JSON.stringify(outData, null, 2), function(error) {
-				if (error) console.log(error);
-				callback();
-			});
+			try {
+				fs.writeFileSync(configFile, JSON.stringify(outData, null, 2));	
+			} catch (error) {
+				throw error;
+			}
 		});
 	});
 };

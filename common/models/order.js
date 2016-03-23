@@ -307,7 +307,7 @@ export default (Order) => {
 
       return Promise.all(createSchedulePromises)
         .then(schedules => {
-          callback(null, { status: true });
+          callback(null, true);
         })
         .catch(error => callback(error));
     });

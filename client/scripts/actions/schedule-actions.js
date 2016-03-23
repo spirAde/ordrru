@@ -10,11 +10,6 @@ export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
 export const FIND_ROOM_SCHEDULE_FAILURE = 'FIND_ROOM_SCHEDULE_FAILURE';
 
-export const CHANGE_SCHEDULE = 'CHANGE_SCHEDULE';
-
-export const ADD_SCHEDULE_CHANGES = 'ADD_SCHEDULE_CHANGES';
-export const CLEAR_SCHEDULE_CHANGES = 'CLEAR_SCHEDULE_CHANGES';
-
 /**
  * Request fetching schedule
  * @return {{type: string, payload: {}}}
@@ -58,76 +53,6 @@ function fetchRoomScheduleFailure(error) {
 }
 
 /**
- * change schedule for room, as result as combination between original and changes
- * @param {string} id - room id
- * @param {Array<Object>} schedule - list of periods
- * @return {{type: string, payload: {error: Object}}}
- * */
-function changeSchedule(id, schedule) {
-  return {
-    type: CHANGE_SCHEDULE,
-    payload: {
-      id,
-      schedule,
-    },
-  };
-}
-
-/**
- * clear all changes in schedule for room
- * @param {string} id - room id
- * @return {{type: string, payload: {error: Object}}}
- * */
-function clearScheduleChanges(roomId) {
-  return {
-    type: CLEAR_SCHEDULE_CHANGES,
-    payload: {
-      id: roomId,
-    },
-  };
-}
-
-/**
- * create combination between originals and changes in schedule for room
- * @param {string} roomId - room id
- * @param {Array<Object>} original - original schedule for room
- * @param {Array<Object>} changes - changes of schedule for room
- * @param {number} minDuration - min duration for order for current room
- * @return {Array<Object>} - combined schedule between original and changes
- * */
-function combineOriginalAndChangesSchedule(roomId, original, changes, minDuration) {
-  return original;
-}
-
-export function addScheduleChanges(roomId, changes) {
-  return {
-    type: ADD_SCHEDULE_CHANGES,
-    payload: {
-      id: roomId,
-      changes,
-    },
-  };
-}
-
-export function receiveScheduleChanges(roomId, changes) {
-  return (dispatch, getState) => {
-    const state = getState();
-
-    if (state.schedule.hasIn(['originals', roomId])) {
-      const original = state.schedule.getIn(['originals', roomId]);
-      const settings = state.bathhouse.get('rooms').find(room => room.get('id') === roomId).get('settings');
-      const minDuration = settings.get('minDuration');
-      const combinedSchedule = combineOriginalAndChangesSchedule(roomId, original, changes, minDuration);
-
-      dispatch(changeSchedule(roomId, combinedSchedule));
-    } else {
-      dispatch(addScheduleChanges(roomId, changes));
-    }
-  };
-}
-
-
-/**
  * Fetch schedule for room if need
  * @param {string} roomId - room id
  * @return {Function} - thunk action
@@ -143,20 +68,9 @@ export function findRoomScheduleIfNeed(roomId) {
 
     dispatch(fetchRoomScheduleRequest());
 
-    return Schedule.find({ where: { roomId: roomId, date: { gte: currentDate } }, order: 'date ASC' })
+    return Schedule.find({ where: { roomId, date: { gte: currentDate } }, order: 'date ASC' })
       .then(schedule => {
         dispatch(fetchRoomScheduleSuccess(roomId, schedule));
-        if (state.schedule.hasIn(['changes', roomId])) {
-          const changes = state.schedule.getIn(['changes', roomId]);
-          const settings = state.bathhouse.get('rooms').find(room => room.get('id') === roomId).get('settings');
-          const minDuration = settings.get('minDuration');
-          const combinedSchedule = combineOriginalAndChangesSchedule(roomId, schedule, changes, minDuration);
-
-          dispatch(changeSchedule(roomId, combinedSchedule));
-          dispatch(clearScheduleChanges(roomId));
-        } else {
-          dispatch(changeSchedule(roomId, schedule));
-        }
       })
       .catch(error => dispatch(fetchRoomScheduleFailure(error)));
   };
@@ -178,14 +92,15 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
     const settings = state.bathhouse.get('rooms')
       .find(room => room.get('id') === id).get('settings');
     const minDuration = settings.get('minDuration');
+    const limitOrderDuration = configs.limitOrderDuration.bathhouse;
 
     const firstPeriod = 0;
     const lastPeriod = parseInt(last(keys(configs.periods)), 10);
 
     const dates = {
-      prev: moment.max(moment(date).subtract(1, 'days'), moment()).toDate(),
+      prev: moment.max(moment(date).subtract(limitOrderDuration, 'days'), moment()).toDate(),
       curr: moment(date).toDate(),
-      next: moment.min(moment(date).add(1, 'days'), moment().add(30, 'days')).toDate(),
+      next: moment.min(moment(date).add(limitOrderDuration, 'days'), moment().add(30, 'days')).toDate(),
     };
 
     const interval = {
@@ -195,8 +110,8 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
         period + minDuration - lastPeriod : period + minDuration,
     };
 
-    //console.log(dates);
-    //console.log(interval);
+    console.log(dates);
+    console.log(interval);
     //
   };
 }

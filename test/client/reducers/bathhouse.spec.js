@@ -10,7 +10,6 @@ import { Bathhouses } from '../../../client/scripts/API';
 import { FIND_BATHHOUSES_FAILURE, FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS } from '../../../client/scripts/actions/bathhouse-actions';
 
-import { getBathhouses } from '../../fixtures/bathhouse';
 import getSchedule from '../../fixtures/schedule';
 
 describe('bathhouse reducer', () => {

@@ -12,10 +12,13 @@ require('babel-core/register')({
 require('css-modules-require-hook')();
 
 import loopback from 'loopback';
-
 import jsdom from 'jsdom';
 import chai from 'chai';
 import chaiImmutable from 'chai-immutable';
+
+import { importDB } from './utils/index';
+
+importDB(['Bathhouse', 'Room', 'ACL', 'Order', 'Schedule', 'City', 'Review']);
 
 const doc = jsdom.jsdom('<!doctype html><html><body></body></html>');
 const win = doc.defaultView;

@@ -1,5 +1,9 @@
 {
   "mapboxAccessToken": "pk.eyJ1Ijoic3BpcmFkZSIsImEiOiJMV1ZvLU04In0.j6dZfUFsE9JyctT4kiOq4g",
+  "limitOrderDuration": {
+    "bathhouse": 1,
+    "carwash": null
+  },
   "periods": {
     "0": "00:00",
     "1": "00:10",
@@ -327,7 +331,7 @@
         "lng": 61.435837
       },
       "timezone": "Asia/Yekaterinburg",
-      "id": "335aba1d-ac72-4f55-b69d-4677c49f5100"
+      "id": "115e5a73-5afc-4434-bbdf-c4c3165a08a1"
     },
     {
       "name": "Magnitogorsk",
@@ -337,27 +341,7 @@
         "lng": 53.41167831
       },
       "timezone": "Asia/Yekaterinburg",
-      "id": "3d27f93a-3fdf-479c-8814-2455b3db1f1a"
-    },
-    {
-      "name": "Moscow",
-      "slug": "msk",
-      "center": {
-        "lat": 55.751244,
-        "lng": 37.618423
-      },
-      "timezone": "Europe/Moscow",
-      "id": "6c8d321c-4cc1-4d39-8a5d-d3295195228e"
-    },
-    {
-      "name": "Saint Petersburg",
-      "slug": "spb",
-      "center": {
-        "lat": 59.9342802,
-        "lng": 30.3350986
-      },
-      "timezone": "Europe/Moscow",
-      "id": "cdcdb2a5-49ae-4729-ad8b-e8706463d9db"
+      "id": "25e310fa-8bcf-46e1-978d-a3ee676be44d"
     },
     {
       "name": "Yekaterinburg",
@@ -367,24 +351,44 @@
         "lng": 60.628636
       },
       "timezone": "Asia/Yekaterinburg",
-      "id": "dbb6407e-8c4e-4d01-882b-8f657f91a24d"
+      "id": "6da2cea5-6211-478e-a521-6c2079c177f7"
+    },
+    {
+      "name": "Saint Petersburg",
+      "slug": "spb",
+      "center": {
+        "lat": 59.9342802,
+        "lng": 30.3350986
+      },
+      "timezone": "Europe/Moscow",
+      "id": "a2b0d83e-8d51-46a9-b7fe-a80ad3ea343b"
+    },
+    {
+      "name": "Moscow",
+      "slug": "msk",
+      "center": {
+        "lat": 55.751244,
+        "lng": 37.618423
+      },
+      "timezone": "Europe/Moscow",
+      "id": "d4f2e237-5a45-4c45-ac4d-008273cb6a0d"
     }
   ],
   "filters": {
-    "335aba1d-ac72-4f55-b69d-4677c49f5100": {
+    "115e5a73-5afc-4434-bbdf-c4c3165a08a1": {
       "datetime": {
-        "min": "2016-03-21",
-        "max": "2016-04-20"
+        "min": "2016-03-23",
+        "max": "2016-04-22"
       },
       "distance": {
-        "min": 780.9,
-        "max": 782.2,
-        "current": 782.2
+        "min": 782.1,
+        "max": 784.7,
+        "current": 784.7
       },
       "guest": {
         "min": 22,
-        "max": 27,
-        "current": 27
+        "max": 25,
+        "current": 25
       },
       "prepayment": [
         {
@@ -402,10 +406,10 @@
       ],
       "price": {
         "min": 1100,
-        "max": 2900,
+        "max": 2700,
         "current": {
           "start": 1100,
-          "end": 2900
+          "end": 2700
         }
       },
       "searchName": {
@@ -481,15 +485,15 @@
         }
       ]
     },
-    "3d27f93a-3fdf-479c-8814-2455b3db1f1a": {
+    "25e310fa-8bcf-46e1-978d-a3ee676be44d": {
       "datetime": {
-        "min": "2016-03-21",
-        "max": "2016-04-20"
+        "min": "2016-03-23",
+        "max": "2016-04-22"
       },
       "distance": {
-        "min": 707.1,
-        "max": 710.3,
-        "current": 710.3
+        "min": 707,
+        "max": 711.2,
+        "current": 711.2
       },
       "guest": {
         "min": 22,
@@ -511,120 +515,10 @@
         }
       ],
       "price": {
-        "min": 1400,
-        "max": 2900,
-        "current": {
-          "start": 1400,
-          "end": 2900
-        }
-      },
-      "searchName": {
-        "text": ""
-      },
-      "sorting": [
-        {
-          "name": "popularity",
-          "checked": true,
-          "isDesc": true
-        },
-        {
-          "name": "distance",
-          "checked": false,
-          "isDesc": true
-        },
-        {
-          "name": "price",
-          "checked": false,
-          "isDesc": true
-        }
-      ],
-      "options": [
-        {
-          "name": "bar",
-          "checked": false
-        },
-        {
-          "name": "icehole",
-          "checked": false
-        },
-        {
-          "name": "internet",
-          "checked": false
-        },
-        {
-          "name": "kitchen",
-          "checked": false
-        },
-        {
-          "name": "parking",
-          "checked": false
-        },
-        {
-          "name": "smoking",
-          "checked": false
-        },
-        {
-          "name": "billiards",
-          "checked": false
-        },
-        {
-          "name": "karaoke",
-          "checked": false
-        },
-        {
-          "name": "pool",
-          "checked": false
-        }
-      ],
-      "types": [
-        {
-          "name": "bathhouse",
-          "checked": false
-        },
-        {
-          "name": "sauna",
-          "checked": false
-        },
-        {
-          "name": "hammam",
-          "checked": false
-        }
-      ]
-    },
-    "6c8d321c-4cc1-4d39-8a5d-d3295195228e": {
-      "datetime": {
-        "min": "2016-03-21",
-        "max": "2016-04-20"
-      },
-      "distance": {
-        "min": 2430,
-        "max": 2430.7,
-        "current": 2430.7
-      },
-      "guest": {
-        "min": 20,
-        "max": 26,
-        "current": 26
-      },
-      "prepayment": [
-        {
-          "isRequired": null,
-          "checked": true
-        },
-        {
-          "isRequired": true,
-          "checked": false
-        },
-        {
-          "isRequired": false,
-          "checked": false
-        }
-      ],
-      "price": {
-        "min": 900,
+        "min": 700,
         "max": 2300,
         "current": {
-          "start": 900,
+          "start": 700,
           "end": 2300
         }
       },
@@ -701,18 +595,18 @@
         }
       ]
     },
-    "cdcdb2a5-49ae-4729-ad8b-e8706463d9db": {
+    "6da2cea5-6211-478e-a521-6c2079c177f7": {
       "datetime": {
-        "min": "2016-03-21",
-        "max": "2016-04-20"
+        "min": "2016-03-23",
+        "max": "2016-04-22"
       },
       "distance": {
-        "min": 3957.4,
-        "max": 3957.6,
-        "current": 3957.6
+        "min": 477.1,
+        "max": 479.4,
+        "current": 479.4
       },
       "guest": {
-        "min": 20,
+        "min": 22,
         "max": 26,
         "current": 26
       },
@@ -732,10 +626,10 @@
       ],
       "price": {
         "min": 800,
-        "max": 2600,
+        "max": 2800,
         "current": {
           "start": 800,
-          "end": 2600
+          "end": 2800
         }
       },
       "searchName": {
@@ -811,18 +705,18 @@
         }
       ]
     },
-    "dbb6407e-8c4e-4d01-882b-8f657f91a24d": {
+    "a2b0d83e-8d51-46a9-b7fe-a80ad3ea343b": {
       "datetime": {
-        "min": "2016-03-21",
-        "max": "2016-04-20"
+        "min": "2016-03-23",
+        "max": "2016-04-22"
       },
       "distance": {
-        "min": 478,
-        "max": 478.7,
-        "current": 478.7
+        "min": 3955.8,
+        "max": 3959.6,
+        "current": 3959.6
       },
       "guest": {
-        "min": 21,
+        "min": 20,
         "max": 26,
         "current": 26
       },
@@ -841,11 +735,121 @@
         }
       ],
       "price": {
-        "min": 1300,
-        "max": 2800,
+        "min": 700,
+        "max": 1700,
         "current": {
-          "start": 1300,
-          "end": 2800
+          "start": 700,
+          "end": 1700
+        }
+      },
+      "searchName": {
+        "text": ""
+      },
+      "sorting": [
+        {
+          "name": "popularity",
+          "checked": true,
+          "isDesc": true
+        },
+        {
+          "name": "distance",
+          "checked": false,
+          "isDesc": true
+        },
+        {
+          "name": "price",
+          "checked": false,
+          "isDesc": true
+        }
+      ],
+      "options": [
+        {
+          "name": "bar",
+          "checked": false
+        },
+        {
+          "name": "icehole",
+          "checked": false
+        },
+        {
+          "name": "internet",
+          "checked": false
+        },
+        {
+          "name": "kitchen",
+          "checked": false
+        },
+        {
+          "name": "parking",
+          "checked": false
+        },
+        {
+          "name": "smoking",
+          "checked": false
+        },
+        {
+          "name": "billiards",
+          "checked": false
+        },
+        {
+          "name": "karaoke",
+          "checked": false
+        },
+        {
+          "name": "pool",
+          "checked": false
+        }
+      ],
+      "types": [
+        {
+          "name": "bathhouse",
+          "checked": false
+        },
+        {
+          "name": "sauna",
+          "checked": false
+        },
+        {
+          "name": "hammam",
+          "checked": false
+        }
+      ]
+    },
+    "d4f2e237-5a45-4c45-ac4d-008273cb6a0d": {
+      "datetime": {
+        "min": "2016-03-23",
+        "max": "2016-04-22"
+      },
+      "distance": {
+        "min": 2425.9,
+        "max": 2429.6,
+        "current": 2429.6
+      },
+      "guest": {
+        "min": 22,
+        "max": 27,
+        "current": 27
+      },
+      "prepayment": [
+        {
+          "isRequired": null,
+          "checked": true
+        },
+        {
+          "isRequired": true,
+          "checked": false
+        },
+        {
+          "isRequired": false,
+          "checked": false
+        }
+      ],
+      "price": {
+        "min": 1000,
+        "max": 2500,
+        "current": {
+          "start": 1000,
+          "end": 2500
         }
       },
       "searchName": {

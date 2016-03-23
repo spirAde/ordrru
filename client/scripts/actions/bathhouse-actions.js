@@ -114,14 +114,13 @@ export function findBathhousesAndRooms(cityId) {
 
         const rooms = fromJS(flatten(map(data, 'rooms')));
 
-        const bathhouses = fromJS(data.map(
-          bathhouse => assign({}, bathhouse, { rooms: map(bathhouse.rooms, 'id') })
+        const bathhouses = fromJS(map(
+          data, bathhouse => assign({}, bathhouse, { rooms: map(bathhouse.rooms, 'id') })
         ));
 
-        const sortedRooms =
-          sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
-
-        console.log('SMTH');
+        const sortedRooms = sortingRoomsByType(
+          bathhouses, rooms, sorting.get('name'), sorting.get('isDesc')
+        );
 
         dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
       })

@@ -24,15 +24,15 @@ const IntlUtils = {
       switch (locale) {
       case 'ru':
         if (!areIntlLocalesSupported('ru')) {
-          require.ensure(['intl/locale-data/jsonp/ru', 'react-intl/lib/locale-data/ru'], require => {
+          require.ensure(['intl/locale-data/jsonp/ru', 'react-intl/locale-data/ru'], require => {
             require('intl/locale-data/jsonp/ru');
-            addLocaleData(require('react-intl/lib/locale-data/ru'));
+            addLocaleData(require('react-intl/locale-data/ru'));
             console.log(`Intl and ReactIntl locale-data for "${locale}" has been downloaded`);
             resolve();
           }, 'locale-ru');
         } else {
-          require.ensure(['react-intl/lib/locale-data/ru'], require => {
-            addLocaleData(require('react-intl/lib/locale-data/ru'));
+          require.ensure(['react-intl/locale-data/ru'], require => {
+            addLocaleData(require('react-intl/locale-data/ru'));
             console.log(`ReactIntl locale-data for "${locale}" has been downloaded`);
             resolve();
           }, 'react-locale-ru');

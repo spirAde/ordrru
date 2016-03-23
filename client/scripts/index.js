@@ -3,10 +3,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
 import { ReduxAsyncConnect } from 'redux-async-connect';
 import { IntlProvider } from 'react-intl';
-
-import useScroll from 'scroll-behavior/lib/useStandardScroll';
 
 import moment from 'moment';
 import messages from '../../common/data/messages/index';
@@ -19,9 +18,9 @@ import IntlUtils from './utils/IntlUtils';
 import '../styles/core.css';
 import '../styles/fonts.css';
 
-const history = useScroll(() => browserHistory)();
+const store = configureStore(browserHistory, window.__initialState__);
+const history = syncHistoryWithStore(browserHistory, store);
 
-const store = configureStore(history, window.__INITIAL_STATE__);
 const reactRoot = document.getElementById('root');
 
 const localization = navigator.languages ?
