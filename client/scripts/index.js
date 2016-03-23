@@ -2,11 +2,12 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router, browserHistory } from 'react-router';
 import { ReduxAsyncConnect } from 'redux-async-connect';
+import { Router, browserHistory, useRouterHistory } from 'react-router'
+import { syncHistoryWithStore } from 'react-router-redux'
 import { IntlProvider } from 'react-intl';
-
-import useScroll from 'scroll-behavior/lib/useStandardScroll';
+import useScroll from 'scroll-behavior/lib/useStandardScroll'
+import createBrowserHistory from 'history/lib/createBrowserHistory'
 
 import moment from 'moment';
 import messages from '../../common/data/messages/index';
@@ -19,9 +20,11 @@ import IntlUtils from './utils/IntlUtils';
 import '../styles/core.css';
 import '../styles/fonts.css';
 
-const history = useScroll(() => browserHistory)();
+const store = configureStore(browserHistory, window.__INITIAL_STATE__);
+const createScrollHistory = useScroll(createBrowserHistory);
+const appHistory = useRouterHistory(createScrollHistory)();
+const history = syncHistoryWithStore(appHistory, store);
 
-const store = configureStore(history, window.__INITIAL_STATE__);
 const reactRoot = document.getElementById('root');
 
 const localization = navigator.languages ?

@@ -25,7 +25,9 @@ import MapComponent from '../components/Map/index.jsx';
   promise: ({ store: { dispatch, getState } }) => {
     const promises = [];
     const state = getState();
-    const params = qs.parse(state.routing.location.search);
+
+    console.log(state);
+    const params = state.routing.locationBeforeTransitions.query;
     const city = getCityBySlug(state, params.city);
 
     if (shouldChangeActiveCity(state, city.get('id'))) {

@@ -11,9 +11,9 @@ import ReactDOMServer from 'react-dom/server';
 
 import { IntlProvider } from 'react-intl';
 
-import { match } from 'react-router';
+import { match, createMemoryHistory } from 'react-router';
 import { ReduxAsyncConnect, loadOnServer } from 'redux-async-connect';
-import createHistory from 'react-router/lib/createMemoryHistory';
+import { syncHistoryWithStore } from 'react-router-redux';
 import { Provider } from 'react-redux';
 
 import PrettyError from 'pretty-error';
@@ -46,8 +46,9 @@ app.use((req, res, next) => {
     isomorphicTools.refresh();
   }
 
-  const history = createHistory(req.originalUrl);
-  const store = configureStore(history);
+  const memoryHistory = createMemoryHistory(req.originalUrl);
+  const store = configureStore(memoryHistory);
+  const history = syncHistoryWithStore(memoryHistory, store);
 
   function hydrateOnClient() {
     res.send('<!doctype html>\n' +
