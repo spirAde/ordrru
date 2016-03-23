@@ -1,9 +1,8 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { routerMiddleware } from 'react-router-redux';
-import io from 'socket.io-client';
 
+import io from 'socket.io-client';
 import thunk from 'redux-thunk';
-import { routerMiddleware } from 'react-router-redux'
 
 import { Iterable } from 'immutable';
 

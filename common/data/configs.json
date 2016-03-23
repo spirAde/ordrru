@@ -330,13 +330,8 @@
         "lat": 55.751244,
         "lng": 37.618423
       },
-<<<<<<< HEAD
-      "timezone": "Asia/Yekaterinburg",
-      "id": "115e5a73-5afc-4434-bbdf-c4c3165a08a1"
-=======
       "timezone": "Europe/Moscow",
       "id": "34eda6f6-6b4b-4827-857d-7058ed4001b6"
->>>>>>> 5f962fe
     },
     {
       "name": "Magnitogorsk",
@@ -346,8 +341,17 @@
         "lng": 53.41167831
       },
       "timezone": "Asia/Yekaterinburg",
-<<<<<<< HEAD
-      "id": "25e310fa-8bcf-46e1-978d-a3ee676be44d"
+      "id": "3d4c906e-0adc-4625-9594-3c25f2085728"
+    },
+    {
+      "name": "Chelyabinsk",
+      "slug": "chel",
+      "center": {
+        "lat": 55.163249,
+        "lng": 61.435837
+      },
+      "timezone": "Asia/Yekaterinburg",
+      "id": "84888fde-774b-4ac9-bf06-b87f28a0eec1"
     },
     {
       "name": "Yekaterinburg",
@@ -356,59 +360,6 @@
         "lat": 56.82842,
         "lng": 60.628636
       },
-      "timezone": "Asia/Yekaterinburg",
-      "id": "6da2cea5-6211-478e-a521-6c2079c177f7"
-    },
-    {
-      "name": "Saint Petersburg",
-      "slug": "spb",
-=======
-      "id": "3d4c906e-0adc-4625-9594-3c25f2085728"
-    },
-    {
-      "name": "Chelyabinsk",
-      "slug": "chel",
->>>>>>> 5f962fe
-      "center": {
-        "lat": 55.163249,
-        "lng": 61.435837
-      },
-<<<<<<< HEAD
-      "timezone": "Europe/Moscow",
-      "id": "a2b0d83e-8d51-46a9-b7fe-a80ad3ea343b"
-=======
-      "timezone": "Asia/Yekaterinburg",
-      "id": "84888fde-774b-4ac9-bf06-b87f28a0eec1"
->>>>>>> 5f962fe
-    },
-    {
-      "name": "Moscow",
-      "slug": "msk",
-      "center": {
-        "lat": 55.751244,
-        "lng": 37.618423
-      },
-<<<<<<< HEAD
-      "timezone": "Europe/Moscow",
-      "id": "d4f2e237-5a45-4c45-ac4d-008273cb6a0d"
-    }
-  ],
-  "filters": {
-    "115e5a73-5afc-4434-bbdf-c4c3165a08a1": {
-      "datetime": {
-        "min": "2016-03-23",
-        "max": "2016-04-22"
-      },
-      "distance": {
-        "min": 782.1,
-        "max": 784.7,
-        "current": 784.7
-      },
-      "guest": {
-        "min": 22,
-        "max": 25,
-        "current": 25
-=======
       "timezone": "Asia/Yekaterinburg",
       "id": "985df260-0abf-4b59-90cc-3ff279cf2996"
     },
@@ -438,7 +389,6 @@
         "min": 21,
         "max": 28,
         "current": 28
->>>>>>> 5f962fe
       },
       "prepayment": [
         {
@@ -455,19 +405,11 @@
         }
       ],
       "price": {
-<<<<<<< HEAD
-        "min": 1100,
-        "max": 2700,
-        "current": {
-          "start": 1100,
-          "end": 2700
-=======
         "min": 700,
         "max": 2000,
         "current": {
           "start": 700,
           "end": 2000
->>>>>>> 5f962fe
         }
       },
       "searchName": {
@@ -543,17 +485,6 @@
         }
       ]
     },
-<<<<<<< HEAD
-    "25e310fa-8bcf-46e1-978d-a3ee676be44d": {
-      "datetime": {
-        "min": "2016-03-23",
-        "max": "2016-04-22"
-      },
-      "distance": {
-        "min": 707,
-        "max": 711.2,
-        "current": 711.2
-=======
     "3d4c906e-0adc-4625-9594-3c25f2085728": {
       "datetime": {
         "min": "2016-03-24",
@@ -563,7 +494,6 @@
         "min": 708.2,
         "max": 708.5,
         "current": 708.5
->>>>>>> 5f962fe
       },
       "guest": {
         "min": 22,
@@ -585,19 +515,11 @@
         }
       ],
       "price": {
-<<<<<<< HEAD
-        "min": 700,
-        "max": 2300,
-        "current": {
-          "start": 700,
-          "end": 2300
-=======
         "min": 900,
         "max": 2200,
         "current": {
           "start": 900,
           "end": 2200
->>>>>>> 5f962fe
         }
       },
       "searchName": {
@@ -673,17 +595,6 @@
         }
       ]
     },
-<<<<<<< HEAD
-    "6da2cea5-6211-478e-a521-6c2079c177f7": {
-      "datetime": {
-        "min": "2016-03-23",
-        "max": "2016-04-22"
-      },
-      "distance": {
-        "min": 477.1,
-        "max": 479.4,
-        "current": 479.4
-=======
     "84888fde-774b-4ac9-bf06-b87f28a0eec1": {
       "datetime": {
         "min": "2016-03-24",
@@ -693,10 +604,9 @@
         "min": 787.3,
         "max": 789.9,
         "current": 789.9
->>>>>>> 5f962fe
       },
       "guest": {
-        "min": 22,
+        "min": 20,
         "max": 26,
         "current": 26
       },
@@ -716,17 +626,10 @@
       ],
       "price": {
         "min": 800,
-<<<<<<< HEAD
-        "max": 2800,
-        "current": {
-          "start": 800,
-          "end": 2800
-=======
         "max": 2200,
         "current": {
           "start": 800,
           "end": 2200
->>>>>>> 5f962fe
         }
       },
       "searchName": {
@@ -802,17 +705,6 @@
         }
       ]
     },
-<<<<<<< HEAD
-    "a2b0d83e-8d51-46a9-b7fe-a80ad3ea343b": {
-      "datetime": {
-        "min": "2016-03-23",
-        "max": "2016-04-22"
-      },
-      "distance": {
-        "min": 3955.8,
-        "max": 3959.6,
-        "current": 3959.6
-=======
     "985df260-0abf-4b59-90cc-3ff279cf2996": {
       "datetime": {
         "min": "2016-03-24",
@@ -822,7 +714,6 @@
         "min": 475.8,
         "max": 479,
         "current": 479
->>>>>>> 5f962fe
       },
       "guest": {
         "min": 21,
@@ -845,17 +736,10 @@
       ],
       "price": {
         "min": 700,
-<<<<<<< HEAD
-        "max": 1700,
-        "current": {
-          "start": 700,
-          "end": 1700
-=======
         "max": 2700,
         "current": {
           "start": 700,
           "end": 2700
->>>>>>> 5f962fe
         }
       },
       "searchName": {
@@ -931,22 +815,6 @@
         }
       ]
     },
-<<<<<<< HEAD
-    "d4f2e237-5a45-4c45-ac4d-008273cb6a0d": {
-      "datetime": {
-        "min": "2016-03-23",
-        "max": "2016-04-22"
-      },
-      "distance": {
-        "min": 2425.9,
-        "max": 2429.6,
-        "current": 2429.6
-      },
-      "guest": {
-        "min": 22,
-        "max": 27,
-        "current": 27
-=======
     "c8350dbc-24cb-4ef3-b078-27f4efd26171": {
       "datetime": {
         "min": "2016-03-24",
@@ -961,7 +829,6 @@
         "min": 21,
         "max": 25,
         "current": 25
->>>>>>> 5f962fe
       },
       "prepayment": [
         {
@@ -978,19 +845,11 @@
         }
       ],
       "price": {
-<<<<<<< HEAD
-        "min": 1000,
-        "max": 2500,
-        "current": {
-          "start": 1000,
-          "end": 2500
-=======
         "min": 900,
         "max": 2900,
         "current": {
           "start": 900,
           "end": 2900
->>>>>>> 5f962fe
         }
       },
       "searchName": {
