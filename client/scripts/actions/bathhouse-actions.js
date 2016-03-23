@@ -121,8 +121,6 @@ export function findBathhousesAndRooms(cityId) {
         const sortedRooms =
           sortingRoomsByType(bathhouses, rooms, sorting.get('name'), sorting.get('isDesc'));
 
-        console.log('SMTH');
-
         dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
       })
       .catch(error => dispatch(fetchBathhousesFailure(error)));
