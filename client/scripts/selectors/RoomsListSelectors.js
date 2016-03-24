@@ -18,7 +18,6 @@ export const RoomsListSelectors = createSelector(
   schedulesSelector,
   (bathhouses, rooms, validRooms, activeRoomId, order, steps, schedules) => {
     return {
-      city: 
       bathhouses,
       activeRoomId,
       order,

@@ -38,7 +38,8 @@ export function generateRandomPoint({ lat, lng }, radius) {
 
 	const xp = x / Math.cos(lat);
 
-	return { lat: y + lng, lng: xp + lat };
+
+	return { lat: y + lat, lng: xp + lng };
 }
 
 export function clog(data) {

@@ -86,8 +86,6 @@ class RoomItemComponent extends Component {
   getDatetimeValue(id, order) {
     let value = '';
 
-    console.log(order);
-
     if (order.get('roomId') === id) {
       if (order.getIn(['datetime', 'startDate'])) {
         const startDate = order.getIn(['datetime', 'startDate']);

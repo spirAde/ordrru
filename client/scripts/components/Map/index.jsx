@@ -1,4 +1,4 @@
-import { List, Map } from 'immutable';
+import { Map } from 'immutable';
 
 import compact from 'lodash/compact';
 import indexOf from 'lodash/indexOf';
@@ -172,8 +172,8 @@ class MapComponent extends Component {
    * @return {XML} content - popup content
    * */
   getPopupContent(properties) {
-    const roomItems = properties.rooms.map((room, index) => {
-      return (
+    const roomItems = properties.rooms.map((room, index) =>
+      (
         <div className="Map-popup-room" key={index}>
           <h3 className="Map-popup-room-name">{room.get('name')}</h3>
           <p className="Map-popup-room-info">
@@ -184,8 +184,8 @@ class MapComponent extends Component {
             Подробнее
           </a>
         </div>
-      );
-    });
+      )
+    );
 
     return (
       <div>
