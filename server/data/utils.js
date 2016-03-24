@@ -37,8 +37,7 @@ export function generateRandomPoint({ lat, lng }, radius) {
 	const y = w * Math.sin(t);
 
 	const xp = x / Math.cos(lat);
-
-
+	
 	return { lat: y + lat, lng: xp + lng };
 }
 
