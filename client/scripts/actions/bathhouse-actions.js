@@ -217,7 +217,7 @@ export function updateRoomsByDistance(value) {
     dispatch(changeDistanceFilterValue(value));
 
     //  if active room is not valid after check, set activeRoomId to null
-    if (!newValid.includes(state.bathhouse.get('activeRoomId')) &&state.bathhouse.get('activeRoomId')) {
+    if (!newValid.includes(state.bathhouse.get('activeRoomId')) && state.bathhouse.get('activeRoomId')) {
       dispatch(changeActiveRoom(state.bathhouse.get('activeRoomId')));
     }
 

@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { asyncConnect } from 'redux-async-connect';
-import qs from 'query-string';
 
 import { BathhousesListSelectors } from '../selectors/BathhousesListSelectors';
 

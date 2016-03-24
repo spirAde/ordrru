@@ -5,7 +5,10 @@ import indexOf from 'lodash/indexOf';
 
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom/server';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
+
+import { MapSelector } from '../../selectors/MapSelector';
 
 import RoomItemComponent from '../RoomItem/index.jsx';
 
@@ -47,7 +50,7 @@ class MapComponent extends Component {
      * @property {string} data.selectedRoomId - selected room id
      */
     this.state = {
-      data: Map({ selectedRoomId: null })
+      data: Map({ selectedRoomId: null }),
     };
   }
 
@@ -66,7 +69,7 @@ class MapComponent extends Component {
       zoomControl: isActive,
       dragging: isActive,
       scrollWheelZoom: isActive,
-      attributionControl: false
+      attributionControl: false,
     });
 
     new L.control.attribution().addAttribution('<a href="https://www.mapbox.com/">Mapbox</a> - We love it =)').addTo(map);
@@ -82,17 +85,24 @@ class MapComponent extends Component {
     map.on('popupopen', (event) => {
       Ps.initialize(event.popup._container);
       roomsContainerElement = document.querySelector('.Map-popup-rooms');
-      roomsContainerElement.addEventListener('click', this.handleShowRoom.bind(this, event.popup._source.feature.properties.rooms));
+      roomsContainerElement.addEventListener(
+        'click',
+        this.handleShowRoom.bind(this, event.popup._source.feature.properties.rooms)
+      );
     });
 
     map.on('popupclose', (event) => {
       Ps.destroy(event.popup._container);
-      roomsContainerElement.removeEventListener('click', this.handleShowRoom.bind(this, event.popup._source.feature.properties.rooms));
+      roomsContainerElement.removeEventListener(
+        'click',
+        this.handleShowRoom.bind(this, event.popup._source.feature.properties.rooms)
+      );
     });
   }
 
   /**
-   * componentWillReceiveProps - if mode is map, then active control, zoom, touch for map. close all active popups
+   * componentWillReceiveProps - if mode is map, then active control, zoom, touch for map.
+   * close all active popups
    * @param {object} nextProps
    * @return {void}
    * */
@@ -101,7 +111,8 @@ class MapComponent extends Component {
     nextProps.isActive ? map.scrollWheelZoom.enable() : map.scrollWheelZoom.disable();
     nextProps.isActive ? map.doubleClickZoom.enable() : map.doubleClickZoom.disable();
     nextProps.isActive ? map.touchZoom.enable() : map.touchZoom.disable();
-    nextProps.isActive ? layer.setGeoJSON(this.getMarkers(nextProps.bathhouses, nextProps.rooms)) : layer.setGeoJSON([]);
+    nextProps.isActive ? layer.setGeoJSON(this.getMarkers(nextProps.bathhouses, nextProps.rooms))
+      : layer.setGeoJSON([]);
 
     map.closePopup();
   }
@@ -111,7 +122,8 @@ class MapComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    return !shallowEqualImmutable(this.props, nextProps) || !shallowEqualImmutable(this.state, nextState);
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -123,21 +135,27 @@ class MapComponent extends Component {
   getMarkers(bathhouses, rooms) {
     const markers = bathhouses.map(bathhouse => {
       let marker;
-      const bathhouseValidRooms = rooms.filter(room => room.get('bathhouseId') === bathhouse.get('id'));
+      const bathhouseValidRooms = rooms.filter(
+        room => room.get('bathhouseId') === bathhouse.get('id')
+      );
+
+      const lat = bathhouse.getIn(['location', 'lat']);
+      const lng = bathhouse.getIn(['location', 'lng']);
+
       if (bathhouseValidRooms.size > 0) {
         marker = {
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [bathhouse.getIn(['location', 'lat']), bathhouse.getIn(['location', 'lng'])]
+            coordinates: [lat, lng],
           },
           properties: {
             'marker-color': '#18B2AE',
             'marker-symbol': bathhouseValidRooms.size,
             name: bathhouse.get('name'),
             address: bathhouse.get('address'),
-            rooms: bathhouseValidRooms
-          }
+            rooms: bathhouseValidRooms,
+          },
         };
       } else {
         marker = false;
@@ -159,7 +177,7 @@ class MapComponent extends Component {
         <div className="Map-popup-room" key={index}>
           <h3 className="Map-popup-room-name">{room.get('name')}</h3>
           <p className="Map-popup-room-info">
-            <span>Цена от р/час</span><br/>
+            <span>Цена от р/час</span><br />
             <span>до человек</span>
           </p>
           <a className="Map-popup-room-button">
@@ -189,13 +207,14 @@ class MapComponent extends Component {
   handleShowRoom(rooms, event) {
     if (event.target.nodeName !== 'A') return false;
 
-    const roomIndex = indexOf(event.target.parentNode.parentNode.childNodes, event.target.parentNode);
+    const childNodes = event.target.parentNode.parentNode.childNodes;
+    const roomIndex = indexOf(childNodes, event.target.parentNode);
     const room = rooms.getIn([roomIndex]);
 
     this.props.changeActiveRoom(room.get('id'));
 
-    this.setState(({ data }) => ({
-      data: data.set('selectedRoomId', room.get('id'))
+    return this.setState(({ data }) => ({
+      data: data.set('selectedRoomId', room.get('id')),
     }));
   }
 
@@ -223,7 +242,7 @@ class MapComponent extends Component {
     this.props.changeActiveRoom(this.state.data.get('selectedRoomId'));
 
     this.setState(({ data }) => ({
-      data: data.set('selectedRoomId', null)
+      data: data.set('selectedRoomId', null),
     }));
   }
 
@@ -235,18 +254,21 @@ class MapComponent extends Component {
     let roomItem = null;
 
     if (this.state.data.get('selectedRoomId') && this.props.isActive) {
-      const { rooms, bathhouses } = this.props;
+      const { rooms, bathhouses, order, steps } = this.props;
       const room = rooms.find(room => room.get('id') === this.state.data.get('selectedRoomId'));
-      const bathhouse = bathhouses.find(bathhouse => bathhouse.get('id') === room.get('bathhouseId'));
+      const bathhouse = bathhouses.find(
+        bathhouse => bathhouse.get('id') === room.get('bathhouseId')
+      );
 
       roomItem = (
         <RoomItemComponent
           isOpen={true}
+          isClosable={true}
           room={room}
           bathhouse={bathhouse}
-          isClosable={true}
-          onSwitchRoom={this.props.onChangeActiveRoom}
-          onCloseRoom={this.handleCloseRoom.bind(this)}
+          onCloseRoom={::this.handleCloseRoom}
+          order={order}
+          steps={steps}
         />
       );
     }
@@ -271,28 +293,16 @@ class MapComponent extends Component {
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  */
 MapComponent.propTypes = {
-  bathhouses: PropTypes.instanceOf(List).isRequired,
-  rooms: PropTypes.instanceOf(List).isRequired,
-  city: PropTypes.instanceOf(Map).isRequired,
+  city: ImmutablePropTypes.map.isRequire,
+  activeRoomId: PropTypes.string,
+  bathhouses: ImmutablePropTypes.list.isRequired,
+  rooms: ImmutablePropTypes.list.isRequired,
+  schedules: ImmutablePropTypes.map,
   isActive: PropTypes.bool.isRequired,
-  changeActiveRoom: PropTypes.func.isRequired
+  order: ImmutablePropTypes.map,
+  steps: ImmutablePropTypes.map,
+  changeActiveRoom: PropTypes.func.isRequired,
 };
-
-/**
- * pass state to props
- * @param {Object} state - current redux state
- * @return {Object.<string, string|number|Array|Object>} props - list of params
- * */
-function mapStateToProps(state) {
-  const validRooms = state.bathhouse.get('valid');
-  return {
-    city: state.city.get('cities').find(city => city.get('id') === state.city.get('activeCityId')),
-    bathhouses: state.bathhouse.get('bathhouses'),
-    rooms: state.bathhouse.get('rooms').filter(room => validRooms.includes(room.get('id'))),
-    schedules: state.schedule,
-    activeRoomId: state.bathhouse.get('activeRoomId')
-  };
-}
 
 /**
  * pass method to props
@@ -301,8 +311,8 @@ function mapStateToProps(state) {
  * */
 function mapDispatchToProps(dispatch) {
   return {
-    changeActiveRoom: (id) => dispatch(changeActiveRoom(id))
+    changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MapComponent);
+export default connect(MapSelector, mapDispatchToProps)(MapComponent);

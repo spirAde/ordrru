@@ -86,6 +86,8 @@ class RoomItemComponent extends Component {
   getDatetimeValue(id, order) {
     let value = '';
 
+    console.log(order);
+
     if (order.get('roomId') === id) {
       if (order.getIn(['datetime', 'startDate'])) {
         const startDate = order.getIn(['datetime', 'startDate']);
@@ -393,7 +395,7 @@ RoomItemComponent.propTypes = {
   schedule: ImmutablePropTypes.list,
   order: ImmutablePropTypes.map,
   steps: ImmutablePropTypes.map,
-  isClosable: PropTypes.bool,
+  isClosable: PropTypes.bool.isRequired,
   intl: intlShape.isRequired,
   onChangeActiveRoom: PropTypes.func.isRequired,
   onCloseRoom: PropTypes.func,

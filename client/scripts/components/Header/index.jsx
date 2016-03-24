@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link, browserHistory } from 'react-router';
+import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 
@@ -39,7 +39,7 @@ class HeaderComponent extends Component {
       return false;
     }
 
-    return browserHistory.push(`/bathhouses?city=mgn&mode=${mode}`);
+    return this.context.router.push(`/bathhouses?city=mgn&mode=${mode}`);
   }
 
   /**
@@ -108,6 +108,14 @@ class HeaderComponent extends Component {
  */
 HeaderComponent.propTypes = {
   mode: PropTypes.oneOf(['list', 'map']),
+};
+
+/**
+ * contextTypes
+ * @property {Object} router
+ */
+HeaderComponent.contextTypes = {
+  router: PropTypes.object.isRequired,
 };
 
 export default connect(HeaderSelectors)(HeaderComponent);

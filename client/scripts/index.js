@@ -3,13 +3,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ReduxAsyncConnect } from 'redux-async-connect';
-import { Router, browserHistory, useRouterHistory } from 'react-router'
-import { syncHistoryWithStore } from 'react-router-redux'
+import { Router, browserHistory, useRouterHistory } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
 import { IntlProvider } from 'react-intl';
 
-import useScroll from 'scroll-behavior/lib/useStandardScroll'
-import createBrowserHistory from 'history/lib/createBrowserHistory'
-
+import useScroll from 'scroll-behavior/lib/useStandardScroll';
+import createBrowserHistory from 'history/lib/createBrowserHistory';
 
 import moment from 'moment';
 import messages from '../../common/data/messages/index';
