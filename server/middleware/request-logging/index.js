@@ -79,9 +79,6 @@ export default function(config) {
 				payload = properties;
 			} else {
 				payload = pick(properties, config.features);
-				console.log('properties', properties);
-				console.log('config.features', config.features);
-				console.log('payload', payload);
 			}
 
 			/*if (payload.userAgent && config.parseUA) {

@@ -6,8 +6,9 @@ import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
   recalculateSchedule, fixNeighboringSchedules,
   clog, calculateDatetimeOrderSum, mergeSchedules, fixOrderEndpoints } from '../utils/schedule-helper';
 import { datesRange, isSameDate } from '../utils/date-helper';
+import mkLogger from '../../server/utils/logger';
 
-const logger = require('../../server/utils/logger')('model:Order');
+const logger = mkLogger('model:Order');
 
 export default (Order) => {
 
@@ -148,11 +149,6 @@ export default (Order) => {
 
       return Promise.all(updateSchedulePromises)
         .then(schedules => {
-          //TODO: logger
-          //console.log(schedules);
-
-          logger('afterSave').info({ important: 'value' }, 'some associated message')
-
           app.io.in('01f13c1a-1481-4ea0-869d-901d74bebde4').emit('action', {
             type: 'UPDATE_SCHEDULE_BY_SOCKET',
             payload: {
@@ -161,6 +157,14 @@ export default (Order) => {
                 {}, schedule, { periods: fixOrderEndpoints(schedule.periods) })
               ),
             },
+          });
+
+          logger('afterSave').info({
+            roomId: room.id,
+            minDuration: minDuration,
+            order: ctx.instance,
+            oldSchedule: schedules,
+            newSchedule: fixedNewSchedules,
           });
 
           next();

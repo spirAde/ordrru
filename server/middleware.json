@@ -1,7 +1,9 @@
 {
   "initial:before": {
     "loopback#context": {
-      "params": { "enableHttpContext": true }
+      "params": {
+        "enableHttpContext": true
+      }
     },
     "loopback#favicon": {},
     "./middleware/logging": {},
@@ -18,11 +20,9 @@
     }
   },
   "session": {},
-  "auth": {
-  },
+  "auth": {},
   "parse": {},
-  "routes": {
-  },
+  "routes": {},
   "files": {},
   "final": {
     "loopback#urlNotFound": {}
