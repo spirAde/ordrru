@@ -13,7 +13,8 @@
     "coverage",
     "node_modules",
     "rethinkdb_data",
-    "test"
+    "test",
+    "logs"
   ],
   "ext": "js json"
 }

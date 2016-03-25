@@ -129,11 +129,8 @@ app.start = () => {
       app.io = io.listen(socketServer);
 
       app.io.on('connection', socket => {
-        socket.emit('action', {
-          type: 'SET_SOCKET_ID',
-          payload: {
-            id: socket.id,
-          }
+        socket.on('server/ADD_TO_SOCKET_ROOM', (data) => {
+          socket.join(data.cityId);
         });
       });
 

@@ -9,6 +9,7 @@ import shallowEqualImmutable from '../utils/shallowEqualImmutable';
 import { shouldFetchBathhousesForCity, findBathhousesAndRooms } from '../actions/bathhouse-actions';
 import { shouldChangeActiveCity, changeActiveCity, getCityBySlug } from '../actions/city-actions';
 import { setFiltersData, shouldSetFilters } from '../actions/filter-actions';
+import { addToSocketRoom } from '../actions/user-actions';
 
 import HeaderComponent from '../components/Header/index.jsx';
 import FiltersListComponent from '../components/FiltersList/index.jsx';
@@ -45,6 +46,15 @@ import MapComponent from '../components/Map/index.jsx';
 class BathhouseListPage extends Component {
 
   /**
+   * componentDidMount - send city id by socket, added to socket room
+   * @return {void}
+   * */
+  componentDidMount() {
+    const { activeCityId, addToSocketRoom } = this.props;
+    addToSocketRoom(activeCityId);
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -78,6 +88,19 @@ class BathhouseListPage extends Component {
  */
 BathhouseListPage.propTypes = {
   mode: PropTypes.oneOf(['list', 'map']),
+  activeCityId: PropTypes.string.isRequired,
+  addToSocketRoom: PropTypes.func.isRequired,
 };
 
-export default connect(BathhousesListSelectors)(BathhouseListPage);
+/**
+ * pass method to props
+ * @param {Function} dispatch
+ * @return {Object} props - list of methods
+ * */
+function mapDispatchToProps(dispatch) {
+  return {
+    addToSocketRoom: (id) => dispatch(addToSocketRoom(id)),
+  };
+}
+
+export default connect(BathhousesListSelectors, mapDispatchToProps)(BathhouseListPage);

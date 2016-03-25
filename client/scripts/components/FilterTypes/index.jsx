@@ -2,9 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
 
+import classNames from 'classnames';
+
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
-import classNames from 'classnames';
+import IconComponent from '../Icon/index.jsx';
 
 import './style.css';
 
@@ -14,14 +16,6 @@ import './style.css';
  * Dumb components - none
  * */
 class FilterTypeComponent extends Component {
-
-  /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
 
   /**
    * shouldComponentUpdate
@@ -48,9 +42,9 @@ class FilterTypeComponent extends Component {
    * */
   renderTypes(types) {
     return types.map((type, index) => {
-      const classes = classNames({
-        'FilterType-field-label': true,
-        'FilterType-field-label--checked': type.get('checked')
+      const typeClasses = classNames({
+        'FilterType-field-type-name': true,
+        'FilterType-field-type-name-checked': type.get('checked'),
       });
       const name = type.get('name');
       return (
@@ -59,10 +53,24 @@ class FilterTypeComponent extends Component {
           onClick={this.handleChangeType.bind(this, type)}
           key={index}
         >
-          <input id={`type-${name}`} className="FilterType-field-input" type="checkbox" />
-          <label className={classes} htmlFor={`type-${name}`}>
+          {
+            type.get('checked') ?
+              <IconComponent
+                name="icon-checkbox-checked"
+                color="#18B2AE"
+                style={{ marginRight: '10px', marginTop: '5px' }}
+                rate={1.25}
+              /> :
+              <IconComponent
+                name="icon-checkbox-unchecked"
+                color="#BCC1C9"
+                style={{ marginRight: '10px', marginTop: '5px' }}
+                rate={1.25}
+              />
+          }
+          <span className={typeClasses}>
             <FormattedMessage id={`bathhouseType.${name}`} />
-          </label>
+          </span>
         </div>
       );
     });
@@ -96,7 +104,7 @@ class FilterTypeComponent extends Component {
  */
 FilterTypeComponent.propTypes = {
   values: ImmutablePropTypes.list.isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default FilterTypeComponent;

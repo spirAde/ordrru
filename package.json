@@ -16,6 +16,7 @@
     "create-dump": "rethinkdb dump"
   },
   "dependencies": {
+    "bunyan": "^1.8.0",
     "classnames": "^2.2.3",
     "compression": "^1.6.1",
     "cors": "^2.7.1",
@@ -64,6 +65,7 @@
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5",
     "strong-express-metrics": "^2.0.1",
+    "uuid": "^2.0.1",
     "webpack-isomorphic-tools": "^2.2.29"
   },
   "devDependencies": {
@@ -88,7 +90,7 @@
     "babel-runtime": "^6.5.0",
     "casual": "^1.5.1",
     "chai": "^3.5.0",
-    "chai-immutable": "^1.5.3",
+    "chai-immutable": "^1.5.4",
     "clean-webpack-plugin": "^0.1.5",
     "css-loader": "^0.23.1",
     "css-modules-require-hook": "^4.0.0",
@@ -108,7 +110,7 @@
     "json-loader": "^0.5.4",
     "loopback-component-explorer": "^2.3.0",
     "mocha": "^2.4.5",
-    "nock": "^7.5.0",
+    "nock": "^7.6.0",
     "postcss": "^5.0.16",
     "postcss-custom-properties": "^5.0.0",
     "postcss-import": "^8.0.2",
@@ -132,10 +134,10 @@
     "redux-mock-store": "1.0.2",
     "rethink-migrate": "^1.2.2",
     "sinon": "^2.0.0-pre",
-    "style-loader": "^0.13.0",
+    "style-loader": "^0.13.1",
     "url-loader": "^0.5.6",
     "webpack": "^1.12.13",
-    "webpack-dev-middleware": "^1.5.1",
+    "webpack-dev-middleware": "^1.6.0",
     "webpack-dev-server": "^1.14.1",
     "webpack-hot-middleware": "^2.7.1"
   },

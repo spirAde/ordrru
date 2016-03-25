@@ -286,10 +286,14 @@ class MapComponent extends Component {
 
 /**
  * propTypes
+ * @property {Object.<string, string|Object>} city - selected city
+ * @property {string} activeRoomId - active room id
  * @property {Array.<Object>} bathhouses - list of bathhouses
  * @property {Array.<Object>} rooms - list of valid rooms
- * @property {Object.<string, string|Object>} city - selected city
+ * @property {Array.<Object>} schedules - list of schedules
  * @property {boolean} isActive - active map or not
+ * @property {Object} order - selected order by user
+ * @property {Object} steps - steps for order
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  */
 MapComponent.propTypes = {

@@ -3,7 +3,7 @@
 .FilterOptions {
 
 	&-wrapper {
-		padding:20px 0 0 220px;
+		padding: 20px 0 0 220px;
 		position: relative;
 		margin-top: 20px;
 		border-top: 1px solid #dce0e0;
@@ -21,13 +21,13 @@
 
  	&-field {
 		position: relative;
+		cursor: pointer;
  	}
 
  	&-field-checkbox {
 		 float: left;
-		 width: 130px;
-		 padding-left: 30px;
-		 margin-bottom: 20px !important;
+		 width: 160px;
+		 margin-bottom: 10px !important;
 		 display: block;
  	}
 
@@ -35,39 +35,15 @@
 		display: none;
  	}
 
- 	&-field-label {
-
-	 	&:before {
-			font-size: 24px;
-			position: absolute;
-			left: 28px;
-			top: -3px;
-	 	}
-
-		&:after {
-			top: -1px;
-			content: '';
-			display: inline-block;
-			height: 16px;
-			width: 16px;
-			margin: 0 5px 0 0;
-			background-color: #fff;
-			border: 2px solid #BCC1C9;
-			border-radius: 2px;
-			position: absolute;
-			left: 0px;
-	 	}
-
-		&--checked {
-
-			color: #18B2AE;
-			font-family: var(--font-family-bold);
-
-			&:after {
-				content: 'a';
-				border-color: #18B2AE;
-				color: #18B2AE;
-			}
-		}
+ 	&-field-option-name {
+		position: absolute;
+		top: 5px;
  	}
+
+	&-field-option-name-checked {
+		position: absolute;
+		top: 5px;
+	 	font-family: var(--font-family-bold);
+		color: #18B2AE
+	}
 }

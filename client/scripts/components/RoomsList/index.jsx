@@ -138,6 +138,7 @@ class RoomsListComponent extends Component {
  * @property {Object.<string, Array>} schedules - original and changes of schedules
  * @property {boolean} isActive - room is open or close
  * @property {Object} order - selected order by user
+ * @property {Object} steps - steps for order
  * @property {Function} resetOrder - reset selected user order
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  * @property {Function} findRoomScheduleIfNeed - find room schedule if need

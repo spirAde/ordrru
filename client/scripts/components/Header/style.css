@@ -51,6 +51,7 @@
 		text-align: center;
  		position: relative;
 	 	line-height: 1;
+	 	cursor: pointer;
 
 		&:before {
 		 	position: absolute;

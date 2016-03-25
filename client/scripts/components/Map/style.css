@@ -57,6 +57,7 @@
 		background-color: #18b2ae;
 		padding: 5px 10px;
 		margin-top: 10px;
+	 	cursor: pointer;
 
 		&:hover {
 			background-color: #5ec9c6;

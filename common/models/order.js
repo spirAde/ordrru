@@ -1,10 +1,13 @@
 import moment from 'moment';
-import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber, take, takeRight } from 'lodash';
+import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber,
+  take, takeRight, assign } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
   recalculateSchedule, fixNeighboringSchedules,
-  clog, calculateDatetimeOrderSum, mergeSchedules } from '../utils/schedule-helper';
+  clog, calculateDatetimeOrderSum, mergeSchedules, fixOrderEndpoints } from '../utils/schedule-helper';
 import { datesRange, isSameDate } from '../utils/date-helper';
+
+const logger = require('../../server/utils/logger')('model:Order');
 
 export default (Order) => {
 
@@ -147,6 +150,19 @@ export default (Order) => {
         .then(schedules => {
           //TODO: logger
           //console.log(schedules);
+
+          logger('afterSave').info({ important: 'value' }, 'some associated message')
+
+          app.io.in('01f13c1a-1481-4ea0-869d-901d74bebde4').emit('action', {
+            type: 'UPDATE_SCHEDULE_BY_SOCKET',
+            payload: {
+              roomId: room.id,
+              schedule: map(fixedNewSchedules, schedule => assign(
+                {}, schedule, { periods: fixOrderEndpoints(schedule.periods) })
+              ),
+            },
+          });
+
           next();
         })
         .catch(error => next(error));

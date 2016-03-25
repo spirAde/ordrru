@@ -2,9 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
 
+import classNames from 'classnames';
+
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
-import classNames from 'classnames';
+import IconComponent from '../Icon/index.jsx';
 
 import './style.css';
 
@@ -14,14 +16,6 @@ import './style.css';
  * Dumb components - none
  * */
 class FilterOptionsComponent extends Component {
-
-  /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
 
   /**
    * shouldComponentUpdate
@@ -48,9 +42,9 @@ class FilterOptionsComponent extends Component {
    * */
   renderOptions(options) {
     return options.map((option, index) => {
-      const classes = classNames({
-        'FilterOptions-field-label': true,
-        'FilterOptions-field-label--checked': option.get('checked')
+      const optionClasses = classNames({
+        'FilterOptions-field-option-name': true,
+        'FilterOptions-field-option-name-checked': option.get('checked'),
       });
       const name = option.get('name');
       return (
@@ -59,10 +53,24 @@ class FilterOptionsComponent extends Component {
           onClick={this.handleChangeOption.bind(this, option)}
           key={index}
         >
-          <input id={`service-${name}`} className="FilterOptions-field-input" type="checkbox" />
-          <label className={classes} htmlFor={`service-${name}`}>
+          {
+            option.get('checked') ?
+              <IconComponent
+                name="icon-checkbox-checked"
+                color="#18B2AE"
+                style={{ marginRight: '10px', marginTop: '5px' }}
+                rate={1.25}
+              /> :
+              <IconComponent
+                name="icon-checkbox-unchecked"
+                color="#BCC1C9"
+                style={{ marginRight: '10px', marginTop: '5px' }}
+                rate={1.25}
+              />
+          }
+          <span className={optionClasses}>
             <FormattedMessage id={`options.${name}`} />
-          </label>
+          </span>
         </div>
       );
     });

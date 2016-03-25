@@ -4,7 +4,7 @@ import createReducer from '../utils/create-reducer';
 
 import { CHANGE_CITY, CHANGE_ORGANIZATION_TYPE,
   SET_USER_DEVICE, CHANGE_USER_VIEWPORT,
-  RESET_ORDER, SET_SOCKET_ID,
+  RESET_ORDER,
   UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END, UPDATE_ORDER_SUM,
   CHECK_ORDER_REQUEST, CHECK_ORDER_SUCCESS, CHECK_ORDER_FAILURE,
   CHANGE_ORDER_STEP } from '../../client/scripts/actions/user-actions';
@@ -38,8 +38,7 @@ export const initialState = fromJS({
       height: null,
       width: null
     },
-  },
-  socket: null,
+  }
 });
 
 export const reducer = createReducer({
@@ -75,9 +74,6 @@ export const reducer = createReducer({
   [UPDATE_ORDER_SUM](state, action) {
     return state.setIn(['order', 'sums', action.payload.type], action.payload.sum);
   },
-  [SET_SOCKET_ID](state, action) {
-    return state.set('socket', action.payload.id);
-  },
   [CHANGE_ORDER_STEP](state, action) {
     return state
       .setIn(['steps', action.payload.currentStep, 'active'], false)
@@ -97,4 +93,5 @@ export const reducer = createReducer({
       .setIn(['steps', 'choice', 'valid'], false)
       .setIn(['steps', 'choice', 'error'], action.payload.error);
   },
+  
 }, initialState);

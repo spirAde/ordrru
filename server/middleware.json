@@ -1,6 +1,11 @@
 {
   "initial:before": {
-    "loopback#favicon": {}
+    "loopback#context": {
+      "params": { "enableHttpContext": true }
+    },
+    "loopback#favicon": {},
+    "./middleware/logging": {},
+    "./middleware/request-logging": {}
   },
   "initial": {
     "compression": {},

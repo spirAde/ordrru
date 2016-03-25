@@ -18,7 +18,7 @@ export const UPDATE_ORDER_SUM = 'UPDATE_ORDER_SUM';
 
 export const RESET_ORDER = 'RESET_ORDER';
 
-export const SET_SOCKET_ID = 'SET_SOCKET_ID';
+export const ADD_TO_SOCKET_ROOM = 'ADD_TO_SOCKET_ROOM';
 
 export const CHECK_ORDER_REQUEST = 'CHECK_ORDER_REQUEST';
 export const CHECK_ORDER_SUCCESS = 'CHECK_ORDER_SUCCESS';
@@ -307,16 +307,15 @@ export function resetOrder() {
 }
 
 /**
- * Socket side
- * set socket id after initialization of app
- * @param {String} id - socket id
+ * After initialize page, send selected city id, that add socket to socket room
+ * @param {String} cityId - active city id
  * @return {{type: string, payload: {id: string}}} - action
  * */
-export function setSocketId(id) {
+export function addToSocketRoom(cityId) {
   return {
-    type: SET_SOCKET_ID,
+    type: ADD_TO_SOCKET_ROOM,
     payload: {
-      id,
+      cityId,
     },
     meta: {
       remote: true,

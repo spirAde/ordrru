@@ -10,6 +10,8 @@ export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
 export const FIND_ROOM_SCHEDULE_FAILURE = 'FIND_ROOM_SCHEDULE_FAILURE';
 
+export const UPDATE_SCHEDULE_BY_SOCKET = 'UPDATE_SCHEDULE_BY_SOCKET';
+
 /**
  * Request fetching schedule
  * @return {{type: string, payload: {}}}
@@ -77,8 +79,9 @@ export function findRoomScheduleIfNeed(roomId) {
 }
 
 /**
- * redefine/recalculate schedule for room, considering min duration for current room and the presence
- * of prohibited periods, and start or end of orders. Add new periods to schedule store changes
+ * redefine/recalculate schedule for room, considering min duration for
+ * current room and the presence of prohibited periods, and start or end of orders.
+ * Add new periods to schedule store changes
  * @param {string} id - room id
  * @param {Date} date - start or end date of order
  * @param {number} period - period id
@@ -100,7 +103,10 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
     const dates = {
       prev: moment.max(moment(date).subtract(limitOrderDuration, 'days'), moment()).toDate(),
       curr: moment(date).toDate(),
-      next: moment.min(moment(date).add(limitOrderDuration, 'days'), moment().add(30, 'days')).toDate(),
+      next: moment.min(
+        moment(date).add(limitOrderDuration, 'days'),
+        moment().add(30, 'days')
+      ).toDate(),
     };
 
     const interval = {
