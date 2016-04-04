@@ -67,7 +67,7 @@
       "accessType": "*",
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "permission": "DENY"
+      "permission": "ALLOW"
     },
     {
       "accessType": "EXECUTE",
@@ -79,27 +79,6 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$authenticated",
-      "permission": "ALLOW",
-      "property": "create"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "admin",
-      "permission": "ALLOW",
-      "property": "upsert"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "manager",
-      "permission": "ALLOW",
-      "property": "upsert"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
       "principalId": "manager",
       "permission": "ALLOW",
       "property": "destroyById"
@@ -110,6 +89,13 @@
       "principalId": "admin",
       "permission": "ALLOW",
       "property": "destroyById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "find"
     },
     {
       "accessType": "EXECUTE",
@@ -130,7 +116,7 @@
       "principalType": "ROLE",
       "principalId": "$owner",
       "permission": "ALLOW",
-      "property": "find"
+      "property": "findOne"
     },
     {
       "accessType": "EXECUTE",
@@ -143,13 +129,6 @@
       "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "admin",
-      "permission": "ALLOW",
-      "property": "findOne"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$owner",
       "permission": "ALLOW",
       "property": "findOne"
     }

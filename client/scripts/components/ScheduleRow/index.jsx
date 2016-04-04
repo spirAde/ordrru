@@ -8,8 +8,6 @@ import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import classNames from 'classnames';
 
-import moment from 'moment';
-
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import configs from '../../../../common/data/configs.json';
@@ -59,7 +57,7 @@ class ScheduleRowComponent extends Component {
 
     const data = this.props.cells.find(cell => cell.get('period') === period);
 
-    if (!data.get('enable') || data.get('status') === 'lock') return false;
+    if (!data.get('enable') || data.getIn(['status', 'isForceDisable'])) return false;
 
     return this.props.onSelectOrder(date, period);
   }
@@ -108,9 +106,8 @@ class ScheduleRowComponent extends Component {
       const classes = classNames({
         'ScheduleRow-cell': true,
         'ScheduleRow-cell--odd': index % 2 === 1,
-        'ScheduleRow-cell--free': cell.get('enable'),
-        'ScheduleRow-cell--busy': !cell.get('enable'),
-        'ScheduleRow-cell--lock': !cell.get('enable') && cell.get('temp'),
+        'ScheduleRow-cell--free': cell.get('enable') && !cell.getIn(['status', 'isForceDisable']),
+        'ScheduleRow-cell--busy': !cell.get('enable') || cell.getIn(['status', 'isForceDisable']),
       });
       const cellTime = configs.periods[cell.get('period')];
 
@@ -167,14 +164,14 @@ class ScheduleRowComponent extends Component {
           <div className="ScheduleRow-price-interval">
             {
               !isNull(data.get('shownInterval')) ?
-              <FormattedMessage
-                id="priceOfInterval"
-                values={{
-                  start: data.getIn(['shownInterval', 'start']),
-                  end: data.getIn(['shownInterval', 'end']),
-                  price: data.getIn(['shownInterval', 'price']),
-                }}
-              /> : null
+                <FormattedMessage
+                  id="priceOfInterval"
+                  values={{
+                    start: data.getIn(['shownInterval', 'start']),
+                    end: data.getIn(['shownInterval', 'end']),
+                    price: data.getIn(['shownInterval', 'price']),
+                  }}
+                /> : null
             }
           </div>
         </div>

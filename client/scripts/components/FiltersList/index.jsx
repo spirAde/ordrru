@@ -99,8 +99,8 @@ class FiltersListComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    return !shallowEqualImmutable(this.props, nextProps)
-      || !shallowEqualImmutable(this.state, nextState);
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -325,6 +325,10 @@ class FiltersListComponent extends Component {
             />
           </div>
           <div className={bottomFiltersClasses}>
+            <FilterSearchNameComponent
+              value={searchName}
+              onSelect={this.handleSearchNameFilter}
+            />
             <FilterDistanceComponent
               values={distance}
               onSelect={this.handleDistanceFilter}
@@ -336,10 +340,6 @@ class FiltersListComponent extends Component {
             <FilterGuestsComponent
               values={guest}
               onSelect={this.handleGuestsFilter}
-            />
-            <FilterSearchNameComponent
-              value={searchName}
-              onSelect={this.handleSearchNameFilter}
             />
           </div>
         </div>

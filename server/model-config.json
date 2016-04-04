@@ -13,8 +13,13 @@
       "./mixins"
     ]
   },
+  "Manager": {
+    "dataSource": "ordrDB",
+    "public": true
+  },
   "User": {
-    "dataSource": "ordrDB"
+    "dataSource": "ordrDB",
+    "public": false
   },
   "AccessToken": {
     "dataSource": "ordrDB",

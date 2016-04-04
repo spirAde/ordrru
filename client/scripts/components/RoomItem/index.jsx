@@ -21,11 +21,10 @@ import OrderComponent from '../Order/index.jsx';
 import configs from '../../../../common/data/configs.json';
 
 import './style.css';
+
 import bathhouseImg from '../../../images/bathhouse.jpg';
 import bathhouseImg1 from '../../../images/bathhouse1.jpg';
-import bathhouseImg2 from '../../../images/bathhouse2.jpg';
 import bathhouseImg3 from '../../../images/bathhouse3.jpg';
-import bathhouseImg4 from '../../../images/bathhouse4.jpg';
 
 /**
  * RoomItemComponent - dumb component, room box
@@ -121,8 +120,8 @@ class RoomItemComponent extends Component {
    * @return {void}
    * */
   handleOpenDescription() {
-    const { room } = this.props;
-    this.props.onChangeActiveRoom(room.get('id'));
+    const { room, isOpen } = this.props;
+    this.props.onChangeActiveRoom(isOpen ? undefined : room.get('id'));
   }
 
   /**
@@ -141,7 +140,14 @@ class RoomItemComponent extends Component {
    * @return {void}
    * */
   handleSelectOrder(date, period) {
-    const { room } = this.props;
+    const { room, order } = this.props;
+
+    if (order.getIn(['datetime', 'startDate'])) {
+      this.setState(({ data }) => ({
+        data: data.set('scheduleIsOpen', false),
+      }));
+    }
+
     this.props.onSelectOrder(room.get('id'), date, period);
   }
 
@@ -159,11 +165,9 @@ class RoomItemComponent extends Component {
     const halfStars = fill(Array(halfStarsCount), 'icon-star-half');
     const emptyStars = fill(Array(emptyStarsCount), 'icon-star-empty');
 
-    return [...fullStars, ...halfStars, ...emptyStars].map((icon, index) => {
-      return (
-        <IconComponent name={icon} color="#F4740C" key={index} />
-      );
-    });
+    return [...fullStars, ...halfStars, ...emptyStars].map((icon, index) => (
+      <IconComponent name={icon} color="#F4740C" key={index} />
+    ));
   }
 
   /**
@@ -321,6 +325,22 @@ class RoomItemComponent extends Component {
                             onClick={::this.handleOpenSchedule}
                             value={orderDatetimeValue}
                           />
+                          {
+                            order.getIn(['datetime', 'startDate']) ?
+                              <span onClick={this.props.onResetDatetimeOrder}>
+                                <IconComponent
+                                  name="icon-cancel"
+                                  rate={1.5}
+                                  color="#5A6B74"
+                                  style={{
+                                    position: 'absolute',
+                                    top: '22%',
+                                    right: '10px',
+                                    cursor: 'pointer',
+                                  }}
+                                />
+                              </span> : null
+                          }
                         </div>
                         <div className="RoomItem-field-select-services g-field-select">
                           <div className="">
@@ -385,6 +405,7 @@ class RoomItemComponent extends Component {
  * @property {Function} onChangeActiveRoom - change data about active room
  * @property {Function} onCloseRoom - close room by clicked on cancel icon
  * @property {Function} onSelectOrder - select date and period of order
+ * @property {Function} onResetDatetimeOrder - reset datetime order
  */
 RoomItemComponent.propTypes = {
   isOpen: PropTypes.bool.isRequired,
@@ -400,6 +421,7 @@ RoomItemComponent.propTypes = {
   onSelectOrder: PropTypes.func.isRequired,
   onCheckOrder: PropTypes.func.isRequired,
   onSendOrder: PropTypes.func.isRequired,
+  onResetDatetimeOrder: PropTypes.func.isRequired,
 };
 
 RoomItemComponent.defaultProps = {

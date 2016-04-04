@@ -14,16 +14,8 @@ import { setCurrentDate, setCurrentPeriod } from '../actions/application-actions
  * */
 class App extends Component {
 
-  /**
-   * constructor
-   * @param {Object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
-    //this.initServiceWorker();
+    this.initServiceWorker();
     this.initCurrentDateAndPeriod();
 
     this.props.changeUserViewport(this.getViewPort());
@@ -38,7 +30,7 @@ class App extends Component {
   }
 
   initServiceWorker() {
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && window.__FIRST_RENDER__) {
       console.log('service worker detect');
     }
   }

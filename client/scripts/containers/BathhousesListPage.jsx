@@ -2,14 +2,19 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { asyncConnect } from 'redux-async-connect';
 
+import { trim, escape } from 'lodash';
+import moment from 'moment-timezone';
+
 import { BathhousesListSelectors } from '../selectors/BathhousesListSelectors';
 
 import shallowEqualImmutable from '../utils/shallowEqualImmutable';
 
-import { shouldFetchBathhousesForCity, findBathhousesAndRooms } from '../actions/bathhouse-actions';
+import { shouldFetchBathhousesForCity, findBathhousesAndRooms,
+  changeActiveRoom } from '../actions/bathhouse-actions';
 import { shouldChangeActiveCity, changeActiveCity, getCityBySlug } from '../actions/city-actions';
 import { setFiltersData, shouldSetFilters } from '../actions/filter-actions';
 import { addToSocketRoom } from '../actions/user-actions';
+import { findRoomScheduleIfNeed } from '../actions/schedule-actions';
 
 import HeaderComponent from '../components/Header/index.jsx';
 import FiltersListComponent from '../components/FiltersList/index.jsx';
@@ -28,6 +33,8 @@ import MapComponent from '../components/Map/index.jsx';
     const params = state.routing.locationBeforeTransitions.query;
     const city = getCityBySlug(state, params.city);
 
+    moment.tz.setDefault(city.timezone);
+
     if (shouldChangeActiveCity(state, city.get('id'))) {
       dispatch(changeActiveCity(city.get('id')));
     }
@@ -40,6 +47,12 @@ import MapComponent from '../components/Map/index.jsx';
       promises.push(dispatch(findBathhousesAndRooms(city.get('id'))));
     }
 
+    if (params.room) {
+      const roomId = escape(trim(params.room));
+      dispatch(changeActiveRoom(roomId));
+      promises.push(dispatch(findRoomScheduleIfNeed(roomId)));
+    }
+
     return Promise.all(promises);
   },
 }])
@@ -50,8 +63,8 @@ class BathhouseListPage extends Component {
    * @return {void}
    * */
   componentDidMount() {
-    const { activeCityId, addToSocketRoom } = this.props;
-    addToSocketRoom(activeCityId);
+    const { activeCityId } = this.props;
+    this.props.addToSocketRoom(activeCityId);
   }
 
   /**
@@ -87,6 +100,7 @@ class BathhouseListPage extends Component {
  * @property {string} mode - current mode of page(list or map)
  */
 BathhouseListPage.propTypes = {
+  store: PropTypes.object,
   mode: PropTypes.oneOf(['list', 'map']),
   activeCityId: PropTypes.string.isRequired,
   addToSocketRoom: PropTypes.func.isRequired,
@@ -100,6 +114,8 @@ BathhouseListPage.propTypes = {
 function mapDispatchToProps(dispatch) {
   return {
     addToSocketRoom: (id) => dispatch(addToSocketRoom(id)),
+    changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
+    findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
   };
 }
 

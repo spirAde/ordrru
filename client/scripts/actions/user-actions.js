@@ -1,6 +1,6 @@
 import { isNull } from 'lodash';
 
-import { User, Order } from '../API';
+import { Order } from '../API';
 
 import { redefineRoomSchedule } from './schedule-actions';
 
@@ -16,7 +16,8 @@ export const UPDATE_ORDER_DATETIME_START = 'UPDATE_ORDER_DATETIME_START';
 export const UPDATE_ORDER_DATETIME_END = 'UPDATE_ORDER_DATETIME_END';
 export const UPDATE_ORDER_SUM = 'UPDATE_ORDER_SUM';
 
-export const RESET_ORDER = 'RESET_ORDER';
+export const RESET_FULL_ORDER = 'RESET_FULL_ORDER';
+export const RESET_DATETIME_ORDER = 'RESET_DATETIME_ORDER';
 
 export const ADD_TO_SOCKET_ROOM = 'ADD_TO_SOCKET_ROOM';
 
@@ -151,7 +152,7 @@ export function selectOrder(id, date, period) {
     const state = getState();
     const order = state.user.get('order');
 
-    if (isNull(order.get('roomId'))) {
+    if (isNull(order.getIn(['datetime', 'startDate']))) {
       dispatch(updateOrderDatetimeStart(id, date, period));
     } else {
       dispatch(updateOrderDatetimeEnd(date, period));
@@ -170,7 +171,8 @@ export function selectOrder(id, date, period) {
       dispatch(updateOrderSum('datetime', sum));
     }
 
-    dispatch(redefineRoomSchedule(id, date, period, isNull(order.get('roomId'))));
+    const isStartOrder = isNull(order.getIn(['datetime', 'startDate']));
+    dispatch(redefineRoomSchedule(id, date, period, isStartOrder));
   };
 }
 
@@ -298,11 +300,21 @@ export function sendOrder() {
 }
 
 /**
- * reset order
+ * reset full order
+ * Datetime, services, guests, sums
  * */
-export function resetOrder() {
+export function resetFullOrder() {
   return {
-    type: RESET_ORDER,
+    type: RESET_FULL_ORDER,
+  };
+}
+
+/**
+ * reset datetime order
+ * */
+export function resetDatetimeOrder() {
+  return {
+    type: RESET_DATETIME_ORDER,
   };
 }
 

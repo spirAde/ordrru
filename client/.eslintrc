@@ -1,7 +1,10 @@
 {
   "parser": "babel-eslint",
-  "ecmaFeatures": {
-    "modules": true
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true
+    }
   },
   "rules": {
     "strict": 0,

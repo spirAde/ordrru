@@ -15,14 +15,6 @@ import logoImage from '../../../images/logo.png';
 class FaceComponent extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * render
    * @return {XML} - React element
    * */
@@ -39,10 +31,16 @@ class FaceComponent extends Component {
           </div>
           <div className="Face-info">
             <h1 className="Face-text-heading">Банный отдых</h1>
-            <p className="Face-text-branding">Планируйте свое время правильно! Бронируйте бани,<br />автомойки и другие уникальные услуги. </p>
-            <Link className="Face-next-page-button g-icons" to={{ pathname: '/bathhouses', query: { city: 'mgn', mode: 'list' } }}>
+            <p className="Face-text-branding">
+              Планируйте свое время правильно! Бронируйте бани, <br />
+              автомойки и другие уникальные услуги.
+            </p>
+            <Link
+              className="Face-next-page-button g-icons"
+              to={{ pathname: '/bathhouses', query: { city: 'mgn', mode: 'list' } }}
+            >
               <span>Подобрать</span>
-              <IconComponent name="icon-chevron-right" style={{ margin: '0 -14px -4px 5px' }}/>
+              <IconComponent name="icon-chevron-right" style={{ margin: '0 -14px -4px 5px' }} />
             </Link>
           </div>
           <div className="Face-select-city">

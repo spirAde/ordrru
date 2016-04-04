@@ -42,7 +42,7 @@ export const reducer = createReducer({
   },
   [CHANGE_ACTIVE_ROOM](state, action) {
     return state
-      .set('activeRoomId', action.payload.id === state.get('activeRoomId') ? undefined : action.payload.id);
+      .set('activeRoomId', action.payload.id);
   },
   [UPDATE_ROOMS](state, action) {
     return state

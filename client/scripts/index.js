@@ -41,8 +41,12 @@ const component = (
   </Router>
 );
 
+window.__FIRST_RENDER__ = false;
+
 function runApp() {
   moment.locale(locale);
+
+  if (!__DEVTOOLS__) window.__FIRST_RENDER__ = true;
 
   ReactDOM.render(
     <IntlProvider locale={locale} messages={messages[locale]}>
@@ -70,6 +74,9 @@ function runApp() {
 
   if (__DEVTOOLS__) {
     const DevTools = require('./containers/DevTools.jsx');
+
+    window.__FIRST_RENDER__ = true;
+
     ReactDOM.render(
       <IntlProvider locale={locale} messages={messages[locale]}>
         <Provider store={store} key="provider">

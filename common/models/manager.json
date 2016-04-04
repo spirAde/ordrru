@@ -1,0 +1,35 @@
+{
+  "name": "Manager",
+  "plural": "managers",
+  "base": "User",
+  "strict": false,
+  "idInjection": true,
+  "options": {
+    "realmRequired": true
+  },
+  "properties": {
+    "organizationId": {
+      "type": "string",
+      "required": true
+    },
+    "firstName": {
+      "type": "string",
+      "required": true
+    },
+    "secondName": {
+      "type": "string",
+      "required": true
+    },
+    "middleName": {
+      "type": "string",
+      "required": "true"
+    },
+    "position": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

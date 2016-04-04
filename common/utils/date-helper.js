@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-const MOMENT_FORMAT = 'YYYY-MM-DD';
+export const MOMENT_FORMAT = 'YYYY-MM-DD';
 
 /**
  * Returns all dates between start and end.
@@ -15,6 +15,8 @@ export function datesRange(start, end) {
 		start.format(MOMENT_FORMAT) : moment(start).format(MOMENT_FORMAT);
 	end = moment.isMoment(end) ?
 		end.add(1, 'days').format(MOMENT_FORMAT) : moment(end).add(1, 'days').format(MOMENT_FORMAT);
+
+	if (moment(start).isAfter(end)) return [];
 
 	while (start !== end) {
 		datesRange.push(moment(start).format(MOMENT_FORMAT));

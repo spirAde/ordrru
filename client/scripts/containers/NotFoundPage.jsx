@@ -8,14 +8,6 @@ import React, {Component} from 'react';
 class NotFoundPage extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * render
    * @return {XML} - React element
    * */

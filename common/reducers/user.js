@@ -4,7 +4,7 @@ import createReducer from '../utils/create-reducer';
 
 import { CHANGE_CITY, CHANGE_ORGANIZATION_TYPE,
   SET_USER_DEVICE, CHANGE_USER_VIEWPORT,
-  RESET_ORDER,
+  RESET_FULL_ORDER, RESET_DATETIME_ORDER,
   UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END, UPDATE_ORDER_SUM,
   CHECK_ORDER_REQUEST, CHECK_ORDER_SUCCESS, CHECK_ORDER_FAILURE,
   CHANGE_ORDER_STEP } from '../../client/scripts/actions/user-actions';
@@ -55,10 +55,16 @@ export const reducer = createReducer({
     return state
       .setIn(['device', 'viewport'], action.payload.viewport);
   },
-  [RESET_ORDER](state) {
+  [RESET_FULL_ORDER](state) {
     return state
       .set('order', initialState.get('order'))
-      .set('steps', initialState.get('steps'));
+      .set('steps', initialState.get('steps'))
+      .setIn(['order', 'sums'], initialState.getIn(['order', 'sums']));
+  },
+  [RESET_DATETIME_ORDER](state) {
+    return state
+      .setIn(['order', 'datetime'], initialState.getIn(['order', 'datetime']))
+      .setIn(['order', 'sums', 'datetime'], 0)
   },
   [UPDATE_ORDER_DATETIME_START](state, action) {
     return state
@@ -93,5 +99,4 @@ export const reducer = createReducer({
       .setIn(['steps', 'choice', 'valid'], false)
       .setIn(['steps', 'choice', 'error'], action.payload.error);
   },
-  
 }, initialState);

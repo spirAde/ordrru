@@ -51,7 +51,7 @@ export default (app) => {
 
 		let commonData = {
 			mapboxAccessToken: app.get('mapboxAccessToken'),
-			limitOrderDuration: app.get('limitOrderDuration'),
+			maxOrderDuration: app.get('maxOrderDuration'),
 			periods: app.get('periods'),
 			invertPeriods: invert(app.get('periods')),
 			organizationType: app.get('organizationType'),

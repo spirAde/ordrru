@@ -59,7 +59,7 @@ module.exports = {
 		bathhouse: 3,
 		carwash: 1,
 	},
-	limitOrderDuration: {
+	maxOrderDuration: {
 		bathhouse: 1,
 		carwash: null,
 	}

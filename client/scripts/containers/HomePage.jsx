@@ -32,17 +32,6 @@ class HomePage extends Component {
     this.handleChangeOrganizationType = this.handleChangeOrganizationType.bind(this);
   }
 
-  /**
-   * SSR method. Preload state with data fetched inside this method
-   * @param {Function} dispatch
-   * @param {Function} getState
-   * @param {Object} location
-   * @return {Promise} - promise contains api methods for fetching data
-   * */
-  static fetchData(dispatch, getState, location) {
-    return Promise.all([]);
-  }
-
   componentDidMount() {
     this.props.changeCity(this.props.cities[0].id);
     this.props.changeOrganizationType(this.props.types[0].id);

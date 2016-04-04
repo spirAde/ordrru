@@ -9,6 +9,8 @@ import { removeTag, addTag, changeSearchNameFilterValue, changeOptionsFilterValu
   changeGuestFilterValue, changeTypesFilterValue, changePriceFilterValues,
   changeSortingFilterValue } from './filter-actions';
 
+import { findRoomScheduleIfNeed } from './schedule-actions';
+
 export const FIND_BATHHOUSES_REQUEST = 'FIND_BATHHOUSES_REQUEST';
 export const FIND_BATHHOUSES_SUCCESS = 'FIND_BATHHOUSES_SUCCESS';
 export const FIND_BATHHOUSES_FAILURE = 'FIND_BATHHOUSES_FAILURE';
@@ -50,6 +52,20 @@ function sortingRoomsByType(bathhouses, rooms, type, isDesc) {
   }
 
   return sorted;
+}
+
+/**
+ * Change active room, which will be open or close.
+ * @param {string} id - room id
+ * @return {{type: string, payload: {id: string}}} - action
+ * */
+export function changeActiveRoom(id) {
+  return {
+    type: CHANGE_ACTIVE_ROOM,
+    payload: {
+      id,
+    },
+  };
 }
 
 /**
@@ -168,20 +184,6 @@ export function sortRooms(rooms) {
     type: SORT_ROOMS,
     payload: {
       rooms,
-    },
-  };
-}
-
-/**
- * Change active room, which will be open or close.
- * @param {string} id - room id
- * @return {{type: string, payload: {id: string}}} - action
- * */
-export function changeActiveRoom(id) {
-  return {
-    type: CHANGE_ACTIVE_ROOM,
-    payload: {
-      id,
     },
   };
 }
@@ -481,6 +483,7 @@ export function updateRoomsBySearchName(value) {
       });
     });
 
+    console.log(newInvalid);
     const newValid = state.bathhouse.get('valid').withMutations(list => {
       const allInvalidRoomIds = newInvalid.toList().flatten();
       const allUniqueInvalidRoomIds = List.of(...new Set(allInvalidRoomIds.toJS()));

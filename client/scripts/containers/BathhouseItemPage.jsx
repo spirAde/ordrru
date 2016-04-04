@@ -9,14 +9,6 @@ import { connect } from 'react-redux';
 class BathhouseItemPage extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * render
    * @return {XML} - React element
    * */

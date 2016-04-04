@@ -1,15 +1,19 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
+
+import { indexOf } from 'lodash';
 
 import { RoomsListSelectors } from '../../selectors/RoomsListSelectors';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import { changeActiveRoom } from '../../actions/bathhouse-actions';
-import { findRoomScheduleIfNeed } from '../../actions/schedule-actions';
-import { selectOrder, resetOrder, checkOrder, sendOrder } from '../../actions/user-actions';
+import { findRoomScheduleIfNeed, resetOrderSchedule } from '../../actions/schedule-actions';
+import { selectOrder, resetFullOrder, resetDatetimeOrder, checkOrder,
+  sendOrder } from '../../actions/user-actions';
 
 import RoomItemComponent from '../RoomItem/index.jsx';
 
@@ -33,6 +37,30 @@ class RoomsListComponent extends Component {
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
   }
 
+  componentDidMount() {
+    const { activeRoomId } = this.props;
+
+    if (window.__FIRST_RENDER__) {
+      if (activeRoomId) {
+        const activeRoomComponent = this.refs.activeRoom;
+
+        if (activeRoomComponent) {
+          const domNode = ReactDOM.findDOMNode(activeRoomComponent);
+          const parentNode = ReactDOM.findDOMNode(this);
+
+          const rectObject = domNode.getBoundingClientRect();
+
+          const domNodeIndex = indexOf(parentNode.childNodes, domNode);
+          const domNodeOffsetY = (domNodeIndex - 1) * rectObject.height;
+
+          console.log(domNodeOffsetY);
+
+          window.scrollTo(0, domNodeOffsetY);
+        }
+      }
+    }
+  }
+
   /**
    * shouldComponentUpdate
    * @return {boolean}
@@ -44,13 +72,31 @@ class RoomsListComponent extends Component {
 
   /**
    * handle change active room, active room box is open
-   * @param {string} id - room id
+   * if room is opened first time, then load data
+   * if room was close, then reset order and cancel forceDisable periods
+   * @param {string} id - room id or undefined
    * @return {void}
    */
   handleChangeActiveRoom(id) {
-    this.props.resetOrder();
     this.props.changeActiveRoom(id);
-    this.props.findRoomScheduleIfNeed(id);
+
+    if (id) this.props.findRoomScheduleIfNeed(id);
+
+    if (!id) {
+      this.props.resetFullOrder();
+      this.props.resetOrderSchedule();
+    }
+  }
+
+  /**
+   * handle click reset datetime order
+   * @return {void}
+   * */
+  handleResetDatetimeOrder(event) {
+    event.preventDefault();
+
+    this.props.resetDatetimeOrder();
+    this.props.resetOrderSchedule();
   }
 
   /**
@@ -77,7 +123,7 @@ class RoomsListComponent extends Component {
   renderRooms(bathhouses, rooms, schedules) {
     const { activeRoomId, order, steps } = this.props;
 
-    return rooms.map((room, index) => {
+    return rooms.map(room => {
       const bathhouse = bathhouses.find(
         bathhouse => bathhouse.get('id') === room.get('bathhouseId')
       );
@@ -91,12 +137,14 @@ class RoomsListComponent extends Component {
           schedule={schedule}
           order={order}
           steps={steps}
+          isClosable={false}
           onChangeActiveRoom={this.handleChangeActiveRoom}
           onSelectOrder={this.props.selectOrder}
           onCheckOrder={this.props.checkOrder}
           onSendOrder={this.props.sendOrder}
-          isClosable={false}
-          key={index}
+          onResetDatetimeOrder={::this.handleResetDatetimeOrder}
+          key={room.get('id')}
+          ref={activeRoomId === room.get('id') ? 'activeRoom' : null}
         />
       );
     });
@@ -139,11 +187,13 @@ class RoomsListComponent extends Component {
  * @property {boolean} isActive - room is open or close
  * @property {Object} order - selected order by user
  * @property {Object} steps - steps for order
- * @property {Function} resetOrder - reset selected user order
+ * @property {Function} resetFullOrder - reset selected user order
+ * @property {Function} resetDatetimeOrder - reset datetime user order
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  * @property {Function} findRoomScheduleIfNeed - find room schedule if need
  * @property {Function} selectOrder - select order from room item
  * @property {Function} checkOrder - send order to validate
+ * @property {Function} resetOrderSchedule - reset order schedule
  */
 RoomsListComponent.propTypes = {
   activeRoomId: PropTypes.string,
@@ -153,12 +203,14 @@ RoomsListComponent.propTypes = {
   isActive: PropTypes.bool.isRequired,
   order: ImmutablePropTypes.map,
   steps: ImmutablePropTypes.map,
-  resetOrder: PropTypes.func.isRequired,
+  resetFullOrder: PropTypes.func.isRequired,
+  resetDatetimeOrder: PropTypes.func.isRequired,
   changeActiveRoom: PropTypes.func.isRequired,
   findRoomScheduleIfNeed: PropTypes.func.isRequired,
   selectOrder: PropTypes.func.isRequired,
   checkOrder: PropTypes.func.isRequired,
   sendOrder: PropTypes.func.isRequired,
+  resetOrderSchedule: PropTypes.func.isRequired,
 };
 
 /**
@@ -168,12 +220,14 @@ RoomsListComponent.propTypes = {
  * */
 function mapDispatchToProps(dispatch) {
   return {
-    resetOrder: () => dispatch(resetOrder()),
+    resetFullOrder: () => dispatch(resetFullOrder()),
+    resetDatetimeOrder: () => dispatch(resetDatetimeOrder()),
     changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
     findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
     selectOrder: (id, date, period) => dispatch(selectOrder(id, date, period)),
     checkOrder: (order) => dispatch(checkOrder(order)),
     sendOrder: () => dispatch(sendOrder()),
+    resetOrderSchedule: () => dispatch(resetOrderSchedule()),
   };
 }
 

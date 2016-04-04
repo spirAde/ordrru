@@ -1,7 +1,6 @@
 import { Map } from 'immutable';
 
-import compact from 'lodash/compact';
-import indexOf from 'lodash/indexOf';
+import { compact, indexOf } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom/server';
@@ -297,7 +296,7 @@ class MapComponent extends Component {
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  */
 MapComponent.propTypes = {
-  city: ImmutablePropTypes.map.isRequire,
+  city: ImmutablePropTypes.map.isRequired,
   activeRoomId: PropTypes.string,
   bathhouses: ImmutablePropTypes.list.isRequired,
   rooms: ImmutablePropTypes.list.isRequired,

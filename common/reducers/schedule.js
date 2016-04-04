@@ -3,7 +3,7 @@ import { fromJS } from 'immutable';
 import createReducer from '../utils/create-reducer';
 
 import { FIND_ROOM_SCHEDULE_REQUEST, FIND_ROOM_SCHEDULE_SUCCESS,
-  FIND_ROOM_SCHEDULE_FAILURE, UPDATE_SCHEDULE_BY_SOCKET } from '../../client/scripts/actions/schedule-actions';
+  FIND_ROOM_SCHEDULE_FAILURE, UPDATE_SCHEDULE } from '../../client/scripts/actions/schedule-actions';
 
 export const initialState = fromJS({
   schedules: {},
@@ -22,7 +22,7 @@ export const reducer = createReducer({
   [FIND_ROOM_SCHEDULE_FAILURE](state) {
     return state.set('isFetching', false);
   },
-  [UPDATE_SCHEDULE_BY_SOCKET](state, action) {
+  [UPDATE_SCHEDULE](state, action) {
     return state
       .updateIn(['schedules', action.payload.roomId], schedules => schedules.merge(fromJS(action.payload.schedule)));
   },

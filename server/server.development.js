@@ -35,6 +35,7 @@ const bootOptions = {
 };
 
 app.use('/build', loopback.static(path.join(__dirname, '../build')));
+app.use('/images', loopback.static(path.join(__dirname, '../client/images')));
 app.use('/api', loopback.rest());
 
 app.use((req, res, next) => {

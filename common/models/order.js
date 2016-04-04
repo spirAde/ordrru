@@ -150,13 +150,16 @@ export default (Order) => {
       return Promise.all(updateSchedulePromises)
         .then(schedules => {
           app.io.in('01f13c1a-1481-4ea0-869d-901d74bebde4').emit('action', {
-            type: 'UPDATE_SCHEDULE_BY_SOCKET',
+            type: 'UPDATE_SCHEDULE',
             payload: {
               roomId: room.id,
               schedule: map(fixedNewSchedules, schedule => assign(
                 {}, schedule, { periods: fixOrderEndpoints(schedule.periods) })
               ),
             },
+            meta: {
+              reason: 'socket',
+            }
           });
 
           logger('afterSave').info({
@@ -178,7 +181,7 @@ export default (Order) => {
     const { roomId, datetime: { startDate, startPeriod, endDate, endPeriod }, services, sums } = order;
 
     const step = app.get('steps').bathhouse;
-    const limitOrderDuration = app.get('limitOrderDuration').bathhouse;
+    const maxOrderDuration = app.get('maxOrderDuration').bathhouse;
 
     const firstPeriod = app.get('firstPeriod');
     const lastPeriod = app.get('lastPeriod');
@@ -192,7 +195,7 @@ export default (Order) => {
       return callback(error);
     }
 
-    if (moment(endDate).diff(moment(startDate), 'days') > limitOrderDuration) {
+    if (moment(endDate).diff(moment(startDate), 'days') > maxOrderDuration) {
       const error = new Error();
       error.statusCode = 422;
       error.message = 'Order has so long duration';

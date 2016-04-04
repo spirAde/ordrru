@@ -1,7 +1,8 @@
-import debounce from 'lodash/debounce';
+import { trim } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import { FormattedMessage } from 'react-intl';
+import DebounceInput from 'react-debounce-input';
 
 import './style.css';
 
@@ -13,22 +14,11 @@ import './style.css';
 class FilterSearchNameComponent extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-
-    this.handleKeyUp = debounce(this.handleKeyUp.bind(this), 750);
-  }
-
-  /**
-   * handle keyup event and pass text value to parent component
-   * {Object} event - SyntheticEvent
-   * @return {void}
+   * handle debounce value from input
    * */
-  handleKeyUp(event) {
-    this.props.onSelect(event.target.value);
+  handleChange(event) {
+    event.preventDefault();
+    this.props.onSelect(trim(event.target.value));
   }
 
   /**
@@ -36,13 +26,20 @@ class FilterSearchNameComponent extends Component {
    * @return {XML} ReactElement
    */
   render() {
+    const { value } = this.props;
+
     return (
       <div className="FilterSearchName">
         <div className="FilterSearchName-wrapper g-clear">
           <h3 className="FilterSearchName-heading">
             <FormattedMessage id="filters.searchName" />
           </h3>
-          <input className="FilterSearchName-input" type="text" onKeyUp={this.handleKeyUp}/>
+          <DebounceInput
+            className="FilterSearchName-input"
+            onChange={::this.handleChange}
+            debounceTimeout={750}
+            value={value.get('text')}
+          />
         </div>
       </div>
     );
@@ -56,7 +53,7 @@ class FilterSearchNameComponent extends Component {
  */
 FilterSearchNameComponent.propTypes = {
   value: PropTypes.object.isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default FilterSearchNameComponent;
