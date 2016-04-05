@@ -1,13 +1,13 @@
 import moment from 'moment';
-import { last, head, findIndex, findLastIndex, find, map, assign, slice,
-  takeRightWhile, takeWhile, range, includes, filter, omit, pull, flatten, floor,
-  reverse, isNull } from 'lodash';
+import { last, head, map, assign, range, omit, isNull } from 'lodash';
 
 import { Schedule } from '../API';
 
 import configs from '../../../common/data/configs.json';
 
-import { isSameDate, datesRange, MOMENT_FORMAT } from '../../../common/utils/date-helper';
+import { splitScheduleByAvailability, findFirstOrLastDisablePeriod,
+  getLeftAndRightClosestEnablePeriods,
+  setIsForceDisable } from '../../../common/utils/schedule-helper';
 
 export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
@@ -129,157 +129,6 @@ export function resetOrderSchedule() {
 }
 
 /**
- * When the user starts to choose the time of the order in the schedule it becomes available
- * some dates. Therefore, we divide the schedule in the following way:
- * 1) If any date is at a greater distance than the maxOrderDuration, then
- *    this date will be unavailable
- * 2) The dates that will lie between the selected and unavailable dates will be allocated as
- *    the valid dates (on for them will be other checks)
- * 3) User-selected date
- * @param {Array.<Object>} schedule - all schedules for all dates
- * @param {String} selectedDate - selected date
- * @param {Number} maxOrderDuration - max duration for order, example: 1 day
- * @return {Object.<Object>} splitted schedule, contains:
- *  - unavailable - 100% unavailable schedule on the left and right of the selected date
- *  - available - available schedule on the left and right of the selected date
- *  - selected - schedule of selected date
- * */
-function splitScheduleByAvailability(schedule, selectedDate, maxOrderDuration) {
-  const selectedDateSchedule = find(schedule, row => isSameDate(row.date, selectedDate));
-
-  const prevDate = moment.max(
-    moment(selectedDate).subtract(1, 'days'), moment(head(schedule).date)
-  ).toDate();
-  const nextDate = moment.min(
-    moment(selectedDate).add(1, 'days'), moment(last(schedule).date)
-  ).toDate();
-
-  // left 100% disabled dates and schedules
-  const utmostLeftDisabledDate = moment.max(
-    moment(selectedDate).subtract(maxOrderDuration, 'days'), moment(head(schedule).date)
-  ).toDate();
-  const utmostLeftDisableDateIndex = findIndex(
-    schedule, row => isSameDate(row.date, utmostLeftDisabledDate)
-  );
-  const leftDisabledSchedules = utmostLeftDisableDateIndex !== -1 ?
-    slice(schedule, 0, utmostLeftDisableDateIndex) : [];
-
-  // right 100% disabled dates and schedules
-  const utmostRightDisabledDate = moment.min(
-    moment(selectedDate).add(maxOrderDuration, 'days'), moment(last(schedule).date)
-  ).toDate();
-  const utmostRightDisableDateIndex = findIndex(
-    schedule, row => isSameDate(row.date, utmostRightDisabledDate)
-  );
-  const rightDisabledSchedules = utmostRightDisableDateIndex !== -1 ?
-    slice(schedule, utmostRightDisableDateIndex + 1, schedule.length) : [];
-
-  // left intermediate dates and schedules between absolutely disabled and selected date
-  const intermediateLeftDates = pull(
-    datesRange(utmostLeftDisabledDate, prevDate), moment(selectedDate).format(MOMENT_FORMAT)
-  );
-  const intermediateLeftSchedules = filter(
-    schedule, row => includes(intermediateLeftDates, moment(row.date).format(MOMENT_FORMAT))
-  );
-
-  // right intermediate dates and schedules between absolutely disabled and selected date
-  const intermediateRightDates = pull(
-    datesRange(nextDate, utmostRightDisabledDate), moment(selectedDate).format(MOMENT_FORMAT)
-  );
-  const intermediateRightSchedules = filter(
-    schedule, row => includes(intermediateRightDates, moment(row.date).format(MOMENT_FORMAT))
-  );
-
-  return {
-    unavailable: {
-      left: leftDisabledSchedules,
-      right: rightDisabledSchedules,
-    },
-    available: {
-      left: intermediateLeftSchedules,
-      right: intermediateRightSchedules,
-    },
-    selected: selectedDateSchedule,
-  };
-}
-
-/**
- * find last disable period for left intermediate date, and find first disable period for right
- * intermediate dates
- * @param {Array.<Object>} schedule
- * @param {String} direction - left or right
- * @returns {Object} result - row index of schedules and period index in periods
- * */
-function findFirstOrLastDisablePeriod(schedule, direction) {
-  if (!schedule.length) return null;
-  if (direction !== 'left' && direction !== 'right') {
-    throw new Error('set direction for searching');
-  }
-
-  const isLeft = direction === 'left';
-
-  const allPeriods = flatten(map(schedule, 'periods'));
-
-  const firstDisablePeriodIndex = isLeft ?
-    findLastIndex(allPeriods, period => !period.enable) :
-    findIndex(allPeriods, period => !period.enable);
-
-  if (firstDisablePeriodIndex === -1) return null;
-
-  const dateIndex = floor(firstDisablePeriodIndex / (LAST_PERIOD / STEP));
-  const periodIndex = firstDisablePeriodIndex - (LAST_PERIOD / STEP) * dateIndex;
-
-  return {
-    dateIndex,
-    periodIndex,
-  };
-}
-
-/**
- * Take all available periods until hit the first disable period or does not reach the end.
- * For left and right of selected period
- * @param {Array.<Object>} periods - periods
- * @param {Number} selectedPeriod - selected period
- * @return {Object} left and right period
- * */
-function getLeftAndRightClosestEnablePeriods(periods, selectedPeriod) {
-  const periodIndex = findIndex(periods, period => period.period === selectedPeriod);
-
-  const leftPeriodsSelectedDate = slice(periods, 0, periodIndex);
-  const rightPeriodsSelectedDate = slice(periods, periodIndex, periods.length);
-
-  const closestLeftEnablePeriods = map(
-    takeRightWhile(leftPeriodsSelectedDate, 'enable'), 'period'
-  );
-  const closestRightEnablePeriods = map(
-    takeWhile(rightPeriodsSelectedDate, 'enable'), 'period'
-  );
-
-  return {
-    left: closestLeftEnablePeriods,
-    right: closestRightEnablePeriods,
-  };
-}
-
-/**
- * set isForceDisable flag for periods inside interval
- * @param {Array.<Object>} periods
- * @param {Array} range - range of periods for flag
- * @return {Array.<Object>} new periods
- * */
-function setIsForceDisable(periods, range) {
-  return map(periods, period => {
-    if (!range) return assign({}, period, { status: { isForceDisable: true } });
-
-    if (includes(range, period.period)) {
-      return assign({}, period, { status: { isForceDisable: true } });
-    }
-
-    return period;
-  });
-}
-
-/**
  * It was chosen as the fastest and more readable
  * redefine/recalculate schedule for room, considering min duration for
  * current room and the presence of prohibited periods, and start or end of orders.
@@ -347,8 +196,15 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
       const allRightPeriodsAreAvailable = last(closestEnablePeriods.right) === LAST_PERIOD;
 
       if (allLeftPeriodsAreAvailable) {
-        const firstLeftDisablePeriod =
-          findFirstOrLastDisablePeriod(splittedSchedule.available.left, 'left');
+        const firstLeftDisablePeriod = findFirstOrLastDisablePeriod(
+          splittedSchedule.available.left, 'left'
+        );
+
+        if (isNull(firstLeftDisablePeriod)) {
+          //
+        } else {
+          //
+        }
       } else {
         needFixPeriodsSelectedDate.concat(range(
           FIRST_PERIOD, head(closestEnablePeriods.left), STEP
@@ -361,8 +217,15 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
       }
 
       if (allRightPeriodsAreAvailable) {
-        const firstRightDisablePeriod =
-          findFirstOrLastDisablePeriod(splittedSchedule.available.right, 'right');
+        const firstRightDisablePeriod = findFirstOrLastDisablePeriod(
+          splittedSchedule.available.right, 'right'
+        );
+
+        if (isNull(firstRightDisablePeriod)) {
+          //
+        } else {
+          //
+        }
       } else {
         needFixPeriodsSelectedDate.concat(range(
           last(closestEnablePeriods.right), LAST_PERIOD + STEP, STEP

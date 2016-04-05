@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 
-import { isNull } from 'lodash';
+import { isNull, indexOf } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -49,17 +49,20 @@ class ScheduleRowComponent extends Component {
 
   /**
    * handle click on cell, if period is disable or has status lock, that skip clicking
-   * @param {number} period - period id
    * @param {Object} event - SyntheticEvent
    * */
-  handleClickCell(date, period, event) {
+  handleClickCell(event) {
     event.preventDefault();
 
-    const data = this.props.cells.find(cell => cell.get('period') === period);
+    const { date, cells } = this.props;
 
-    if (!data.get('enable') || data.getIn(['status', 'isForceDisable'])) return false;
+    const parentNode = event.target.parentNode;
+    const cellIndex = indexOf(parentNode.childNodes, event.target);
+    const period = cells.get(cellIndex);
 
-    return this.props.onSelectOrder(date, period);
+    if (!period.get('enable') || period.getIn(['status', 'isForceDisable'])) return false;
+
+    return this.props.onSelectOrder(date, period.get('period'));
   }
 
   /**
@@ -75,13 +78,17 @@ class ScheduleRowComponent extends Component {
 
   /**
    * handle if user mouse over cursor to cell, than set shownInterval current price interval
-   * @param {number} period - selected period
    * @param {Object} event - SyntheticEvent
    * */
-  handleMouseOverCell(period, event) {
+  handleMouseOverCell(event) {
     event.preventDefault();
 
-    const { prices } = this.props;
+    const { prices, cells } = this.props;
+
+    const parentNode = event.target.parentNode;
+    const cellIndex = indexOf(parentNode.childNodes, event.target);
+    const period = cells.getIn([cellIndex, 'period']);
+
     const interval = prices.find(
       chunk => chunk.get('startPeriod') <= period && period <= chunk.get('endPeriod')
     );
@@ -115,8 +122,8 @@ class ScheduleRowComponent extends Component {
         <div
           className={classes}
           key={index}
-          onClick={this.handleClickCell.bind(this, date, cell.get('period'))}
-          onMouseOver={this.handleMouseOverCell.bind(this, cell.get('period'))}
+          onClick={::this.handleClickCell}
+          onMouseOver={::this.handleMouseOverCell}
         >
           {cellTime}
         </div>

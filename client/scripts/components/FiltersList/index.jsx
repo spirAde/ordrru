@@ -1,5 +1,7 @@
 import { Map } from 'immutable';
 
+import { words, last } from 'lodash';
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
@@ -127,7 +129,9 @@ class FiltersListComponent extends Component {
    * handleOpenFullFilters - handle open full filters
    * @return {void}
    * */
-  handleOpenFullFilters() {
+  handleOpenFullFilters(event) {
+    event.preventDefault();
+
     Ps.initialize(this.refs.scroll, {
       suppressScrollX: true,
     });
@@ -234,9 +238,20 @@ class FiltersListComponent extends Component {
 
   /**
    * handleClickResetTag - handle reset tag
+   * @param {Object} event - SyntheticEvent
    * @return {void}
    * */
-  handleClickResetTag(tag) {
+  handleClickResetTag(event) {
+    event.preventDefault();
+
+    let element = event.target;
+
+    while (element.tagName !== 'A') {
+      element = element.parentElement;
+    }
+
+    const tag = last(words(element.classList[1]));
+
     this.props.resetRoomsByTag(tag);
   }
 
@@ -246,8 +261,17 @@ class FiltersListComponent extends Component {
    * */
   renderTags(tags) {
     return tags.map((tag, index) => {
+      const tagClasses = classNames({
+        'FiltersList-tags-anchor': true,
+        [`FiltersList-tags-anchor-${tag}`]: true,
+      });
+
       return (
-        <a className="FiltersList-tags-anchor" key={index} onClick={this.handleClickResetTag.bind(this, tag)}>
+        <a
+          className={tagClasses}
+          key={index}
+          onClick={::this.handleClickResetTag}
+        >
           <FormattedMessage id={`tags.${tag}`} />
           <IconComponent
             name="icon-cancel"

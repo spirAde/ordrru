@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
@@ -29,17 +30,27 @@ class HeaderComponent extends Component {
 
   /**
    * handleChangeMode - handle change mode of page. pass mode to parent component
-   * @param {string} mode - page mode(list or map)
-   * @param {object} event - event object
+   * @param {Object} event - SyntheticEvent
    * */
-  handleChangeMode(mode, event) {
+  handleChangeMode(event) {
     event.preventDefault();
 
-    if (mode === this.props.mode) {
+    const { mode } = this.props;
+    const listElement = ReactDOM.findDOMNode(this.refs.listMode);
+
+    let element = event.target;
+
+    while (element.tagName !== 'A') {
+      element = element.parentElement;
+    }
+
+    const selectedMode = listElement.isEqualNode(element) ? 'list' : 'map';
+
+    if (mode === selectedMode) {
       return false;
     }
 
-    return this.context.router.push(`/bathhouses?city=mgn&mode=${mode}`);
+    return this.context.router.push(`/bathhouses?city=mgn&mode=${selectedMode}`);
   }
 
   /**
@@ -78,7 +89,7 @@ class HeaderComponent extends Component {
           </div>
 
           <div className="Header-mode">
-            <a className={listButtonClasses} onClick={this.handleChangeMode.bind(this, 'list')}>
+            <a className={listButtonClasses} onClick={::this.handleChangeMode} ref="listMode">
               <IconComponent
                 name="icon-list"
                 rate={1.5}
@@ -86,7 +97,7 @@ class HeaderComponent extends Component {
               />
               <FormattedMessage id="mode.list" />
             </a>
-            <a className={mapButtonClasses} onClick={this.handleChangeMode.bind(this, 'map')}>
+            <a className={mapButtonClasses} onClick={::this.handleChangeMode} ref="mapMode">
               <IconComponent
                 name="icon-location-point-mapbox"
                 rate={1.5}

@@ -1,3 +1,5 @@
+import { indexOf } from 'lodash';
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
@@ -27,12 +29,24 @@ class FilterOptionsComponent extends Component {
 
   /**
    * handleChangeOption - handle change options. pass option and checked status to parent component
-   * @param {Object} value - option
    * @param {Object} event - event object
    * */
-  handleChangeOption(value, event) {
+  handleChangeOption(event) {
     event.preventDefault();
-    this.props.onSelect(value.set('checked', !value.get('checked')));
+
+    const { values } = this.props;
+
+    let element = event.target;
+
+    while (element.tagName !== 'DIV') {
+      element = element.parentElement;
+    }
+
+    const parentNode = element.parentNode;
+    const optionIndex = indexOf(parentNode.childNodes, element);
+    const option = values.get(optionIndex);
+
+    this.props.onSelect(option.set('checked', !option.get('checked')));
   }
 
   /**
@@ -50,7 +64,7 @@ class FilterOptionsComponent extends Component {
       return (
         <div
           className="FilterOptions-field FilterOptions-field-checkbox"
-          onClick={this.handleChangeOption.bind(this, option)}
+          onClick={::this.handleChangeOption}
           key={index}
         >
           {
@@ -103,7 +117,7 @@ class FilterOptionsComponent extends Component {
  */
 FilterOptionsComponent.propTypes = {
   values: ImmutablePropTypes.list.isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default FilterOptionsComponent;

@@ -1,9 +1,10 @@
 import util from 'util';
 import moment from 'moment';
 
-import { range, filter, map, has, difference, head, last, takeWhile, takeRightWhile,
-	assign, slice, indexOf, findIndex, min, max, includes, reduce, merge, intersection, isEmpty } from 'lodash';
-import { datesRange, isSameDate } from './date-helper';
+import { range, filter, map, has, difference, head, last, takeWhile, takeRightWhile, find, pull,
+	findLastIndex, assign, slice, indexOf, findIndex, min, max, includes, reduce, merge, intersection,
+	isEmpty, flatten, floor } from 'lodash';
+import { datesRange, isSameDate, MOMENT_FORMAT } from './date-helper';
 
 const FIRST_PERIOD = 0;
 const LAST_PERIOD = 144;
@@ -194,10 +195,10 @@ export function calculateDatetimeOrderSum(order, prices) {
 		const dayPrices = prices[dayIndex];
 
 		return sum + reduce(dayPrices, (sum, curr) => {
-				const currPeriods = range(curr.startPeriod, curr.endPeriod + 3, 3);
-				const intersect = intersection(currPeriods, chunk.periods);
-				return intersect.length ? sum + ((intersect.length - 1) * curr.price) / 2 : sum;
-			}, 0);
+			const currPeriods = range(curr.startPeriod, curr.endPeriod + 3, 3);
+			const intersect = intersection(currPeriods, chunk.periods);
+			return intersect.length ? sum + ((intersect.length - 1) * curr.price) / 2 : sum;
+		}, 0);
 	}, 0);
 }
 
@@ -226,6 +227,157 @@ export function fixOrderEndpoints(schedule) {
 
 	return map(schedule, period => {
 		return includes(fixedPeriods, period.period) ? { period: period.period, enable: true } : period;
+	});
+}
+
+/**
+ * When the user starts to choose the time of the order in the schedule it becomes available
+ * some dates. Therefore, we divide the schedule in the following way:
+ * 1) If any date is at a greater distance than the maxOrderDuration, then
+ *    this date will be unavailable
+ * 2) The dates that will lie between the selected and unavailable dates will be allocated as
+ *    the valid dates (on for them will be other checks)
+ * 3) User-selected date
+ * @param {Array.<Object>} schedule - all schedules for all dates
+ * @param {String} selectedDate - selected date
+ * @param {Number} maxOrderDuration - max duration for order, example: 1 day
+ * @return {Object.<Object>} splitted schedule, contains:
+ *  - unavailable - 100% unavailable schedule on the left and right of the selected date
+ *  - available - available schedule on the left and right of the selected date
+ *  - selected - schedule of selected date
+ * */
+export function splitScheduleByAvailability(schedule, selectedDate, maxOrderDuration) {
+	const selectedDateSchedule = find(schedule, row => isSameDate(row.date, selectedDate));
+
+	const prevDate = moment.max(
+		moment(selectedDate).subtract(1, 'days'), moment(head(schedule).date)
+	).toDate();
+	const nextDate = moment.min(
+		moment(selectedDate).add(1, 'days'), moment(last(schedule).date)
+	).toDate();
+
+	// left 100% disabled dates and schedules
+	const utmostLeftDisabledDate = moment.max(
+		moment(selectedDate).subtract(maxOrderDuration, 'days'), moment(head(schedule).date)
+	).toDate();
+	const utmostLeftDisableDateIndex = findIndex(
+		schedule, row => isSameDate(row.date, utmostLeftDisabledDate)
+	);
+	const leftDisabledSchedules = utmostLeftDisableDateIndex !== -1 ?
+		slice(schedule, 0, utmostLeftDisableDateIndex) : [];
+
+	// right 100% disabled dates and schedules
+	const utmostRightDisabledDate = moment.min(
+		moment(selectedDate).add(maxOrderDuration, 'days'), moment(last(schedule).date)
+	).toDate();
+	const utmostRightDisableDateIndex = findIndex(
+		schedule, row => isSameDate(row.date, utmostRightDisabledDate)
+	);
+	const rightDisabledSchedules = utmostRightDisableDateIndex !== -1 ?
+		slice(schedule, utmostRightDisableDateIndex + 1, schedule.length) : [];
+
+	// left intermediate dates and schedules between absolutely disabled and selected date
+	const intermediateLeftDates = pull(
+		datesRange(utmostLeftDisabledDate, prevDate), moment(selectedDate).format(MOMENT_FORMAT)
+	);
+	const intermediateLeftSchedules = filter(
+		schedule, row => includes(intermediateLeftDates, moment(row.date).format(MOMENT_FORMAT))
+	);
+
+	// right intermediate dates and schedules between absolutely disabled and selected date
+	const intermediateRightDates = pull(
+		datesRange(nextDate, utmostRightDisabledDate), moment(selectedDate).format(MOMENT_FORMAT)
+	);
+	const intermediateRightSchedules = filter(
+		schedule, row => includes(intermediateRightDates, moment(row.date).format(MOMENT_FORMAT))
+	);
+
+	return {
+		unavailable: {
+			left: leftDisabledSchedules,
+			right: rightDisabledSchedules,
+		},
+		available: {
+			left: intermediateLeftSchedules,
+			right: intermediateRightSchedules,
+		},
+		selected: selectedDateSchedule,
+	};
+}
+
+/**
+ * find last disable period for left intermediate date, and find first disable period for right
+ * intermediate dates
+ * @param {Array.<Object>} schedule
+ * @param {String} direction - left or right
+ * @returns {Object} result - row index of schedules and period index in periods
+ * */
+export function findFirstOrLastDisablePeriod(schedule, direction) {
+	if (!schedule.length) return null;
+	if (direction !== 'left' && direction !== 'right') {
+		throw new Error('set direction for searching');
+	}
+
+	const isLeft = direction === 'left';
+
+	const allPeriods = flatten(map(schedule, 'periods'));
+
+	const firstDisablePeriodIndex = isLeft ?
+		findLastIndex(allPeriods, period => !period.enable) :
+		findIndex(allPeriods, period => !period.enable);
+
+	if (firstDisablePeriodIndex === -1) return null;
+
+	const dateIndex = floor(firstDisablePeriodIndex / (LAST_PERIOD / STEP));
+	const periodIndex = firstDisablePeriodIndex - ((LAST_PERIOD / STEP) + 1) * dateIndex
+
+	return {
+		dateIndex,
+		periodIndex,
+	};
+}
+
+/**
+ * Take all available periods until hit the first disable period or does not reach the end.
+ * For left and right of selected period
+ * @param {Array.<Object>} periods - periods
+ * @param {Number} selectedPeriod - selected period
+ * @return {Object} left and right period
+ * */
+export function getLeftAndRightClosestEnablePeriods(periods, selectedPeriod) {
+	const periodIndex = findIndex(periods, period => period.period === selectedPeriod);
+
+	const leftPeriodsSelectedDate = slice(periods, 0, periodIndex);
+	const rightPeriodsSelectedDate = slice(periods, periodIndex + 1, periods.length);
+
+	const closestLeftEnablePeriods = map(
+		takeRightWhile(leftPeriodsSelectedDate, 'enable'), 'period'
+	);
+	const closestRightEnablePeriods = map(
+		takeWhile(rightPeriodsSelectedDate, 'enable'), 'period'
+	);
+
+	return {
+		left: closestLeftEnablePeriods,
+		right: closestRightEnablePeriods,
+	};
+}
+
+/**
+ * set isForceDisable flag for periods inside interval
+ * @param {Array.<Object>} periods
+ * @param {Array} range - range of periods for flag
+ * @return {Array.<Object>} new periods
+ * */
+export function setIsForceDisable(periods, range) {
+	return map(periods, period => {
+		if (!range) return assign({}, period, { status: { isForceDisable: true } });
+
+		if (includes(range, period.period)) {
+			return assign({}, period, { status: { isForceDisable: true } });
+		}
+
+		return period;
 	});
 }
 

@@ -1,4 +1,4 @@
-import { isNull } from 'lodash';
+import { isNull, indexOf } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -17,14 +17,6 @@ import './style.css';
 class FilterPrepaymentComponent extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -33,16 +25,29 @@ class FilterPrepaymentComponent extends Component {
   }
 
   /**
-   * handleClick - handle select index of prepayment types. pass checked prepayment type to parent component
+   * handleClick - handle select index of prepayment types. pass
+   *               checked prepayment type to parent component
    * @param {object} type - checked index
    * @param {object} event - event object
    * */
-  handleClick(type, event) {
+  handleClick(event) {
     event.preventDefault();
+
+    const { values } = this.props;
+
+    let element = event.target;
+
+    while (element.tagName !== 'LI') {
+      element = element.parentElement;
+    }
+
+    const parentNode = element.parentNode;
+    const typeIndex = indexOf(parentNode.childNodes, element);
+    const type = values.get(typeIndex);
 
     if (type.get('checked')) return false;
 
-    this.props.onSelect(type);
+    return this.props.onSelect(type);
   }
 
   /**
@@ -57,21 +62,21 @@ class FilterPrepaymentComponent extends Component {
 
       const labelClasses = classNames({
         'FilterPrepayment-button-label': true,
-        'FilterPrepayment-button-label--checked': type.get('checked')
+        'FilterPrepayment-button-label--checked': type.get('checked'),
       });
 
       const checkClasses = classNames({
         'FilterPrepayment-button-check': true,
-        'FilterPrepayment-button-check--checked': type.get('checked')
+        'FilterPrepayment-button-check--checked': type.get('checked'),
       });
 
       const insideClasses = classNames({
-        'FilterPrepayment-button-inside': type.get('checked')
+        'FilterPrepayment-button-inside': type.get('checked'),
       });
 
       return (
-        <li className="FilterPrepayment-button" key={index} onClick={this.handleClick.bind(this, type)}>
-          <input className="FilterPrepayment-button-input" type="checkbox"/>
+        <li className="FilterPrepayment-button" key={index} onClick={::this.handleClick}>
+          <input className="FilterPrepayment-button-input" type="checkbox" />
           <label className={labelClasses}>
             <FormattedMessage id={id} />
           </label>
@@ -113,7 +118,7 @@ class FilterPrepaymentComponent extends Component {
  */
 FilterPrepaymentComponent.propTypes = {
   values: ImmutablePropTypes.list.isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default FilterPrepaymentComponent;

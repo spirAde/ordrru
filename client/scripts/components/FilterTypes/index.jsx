@@ -1,3 +1,5 @@
+import { indexOf } from 'lodash';
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
@@ -27,12 +29,24 @@ class FilterTypeComponent extends Component {
 
   /**
    * handleChangeType - handle change indexes. pass type and checked status to parent component
-   * @param {Object} value - type object
    * @param {Object} event - event object
    * */
-  handleChangeType(value, event) {
+  handleChangeType(event) {
     event.preventDefault();
-    this.props.onSelect(value.set('checked', !value.get('checked')));
+
+    const { values } = this.props;
+
+    let element = event.target;
+
+    while (element.tagName !== 'DIV') {
+      element = element.parentElement;
+    }
+
+    const parentNode = element.parentNode;
+    const typeIndex = indexOf(parentNode.childNodes, element);
+    const type = values.get(typeIndex);
+
+    this.props.onSelect(type.set('checked', !type.get('checked')));
   }
 
   /**
@@ -50,7 +64,7 @@ class FilterTypeComponent extends Component {
       return (
         <div
           className="FilterType-field FilterType-field-checkbox"
-          onClick={this.handleChangeType.bind(this, type)}
+          onClick={::this.handleChangeType}
           key={index}
         >
           {
@@ -90,7 +104,9 @@ class FilterTypeComponent extends Component {
           <h3 className="FilterType-heading">
             <FormattedMessage id="filters.type" />
           </h3>
-          {types}
+          <div>
+            {types}
+          </div>
         </div>
       </div>
     );

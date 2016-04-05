@@ -1,10 +1,13 @@
 import chai from 'chai'
 
-import { map, find, includes, slice } from 'lodash';
+import { map, find, includes, slice, filter, range, assign } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, recalculateSchedule,
 	checkSchedulesIntersection, fixNeighboringSchedules, mergeSchedules,
-	fixOrderEndpoints } from '../../../common/utils/schedule-helper';
+	fixOrderEndpoints, splitScheduleByAvailability, findFirstOrLastDisablePeriod,
+	getLeftAndRightClosestEnablePeriods, setIsForceDisable } from '../../../common/utils/schedule-helper';
+import { isSameDate, datesRange, MOMENT_FORMAT } from '../../../common/utils/date-helper';
+
 import getSchedule from '../../fixtures/schedule';
 
 const expect = chai.expect;
@@ -16,6 +19,19 @@ function generateSchedule(schedule, busyPeriods) {
 			enable: !includes(busyPeriods, period.period) && period.enable,
 		}
 	});
+}
+
+function generateSchedules(startDate, endDate) {
+	return map(datesRange(startDate, endDate), date => {
+		return {
+			date,
+			periods: getSchedule(),
+		}
+	});
+}
+
+function getSchedulesByDates(schedule, dates) {
+	return filter(schedule, row => includes(dates, row.date));
 }
 
 describe('schedule helpers', () => {
@@ -525,7 +541,7 @@ describe('schedule helpers', () => {
 
 
 	describe('fixOrderEndpoints', () => {
-		
+
 		it('for empty schedule', () => {
 			const schedule = getSchedule();
 
@@ -578,6 +594,556 @@ describe('schedule helpers', () => {
 			const expectedSchedule = generateSchedule(schedule, [15, 18, 21, 84, 87, 90, 93, 126, 129, 132]);
 
 			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
+		});
+	});
+
+
+	describe('splitScheduleByAvailability', () => {
+
+		it('selected date is first date of schedules and maxOrderDuration = 1', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-01';
+			const maxOrderDuration = 1;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: [],
+					right: getSchedulesByDates(schedules, datesRange('2016-01-03', endDate)),
+				},
+				available: {
+					left: [],
+					right: getSchedulesByDates(schedules, ['2016-01-02']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is first date of schedules and maxOrderDuration = 2', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-01';
+			const maxOrderDuration = 2;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: [],
+					right: getSchedulesByDates(schedules, datesRange('2016-01-04', endDate)),
+				},
+				available: {
+					left: [],
+					right: getSchedulesByDates(schedules, ['2016-01-02', '2016-01-03']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is second date of schedules and maxOrderDuration = 1', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-02';
+			const maxOrderDuration = 1;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: [],
+					right: getSchedulesByDates(schedules, datesRange('2016-01-04', endDate)),
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-01']),
+					right: getSchedulesByDates(schedules, ['2016-01-03']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is second date of schedules and maxOrderDuration = 2', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-02';
+			const maxOrderDuration = 2;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: [],
+					right: getSchedulesByDates(schedules, datesRange('2016-01-05', endDate)),
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-01']),
+					right: getSchedulesByDates(schedules, ['2016-01-03', '2016-01-04']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date in middle position of schedules and maxOrderDuration = 1', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-15';
+			const maxOrderDuration = 1;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: getSchedulesByDates(schedules, datesRange(startDate, '2016-01-13')),
+					right: getSchedulesByDates(schedules, datesRange('2016-01-17', endDate)),
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-14']),
+					right: getSchedulesByDates(schedules, ['2016-01-16']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date in middle position of schedules and maxOrderDuration = 2', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-15';
+			const maxOrderDuration = 2;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: getSchedulesByDates(schedules, datesRange(startDate, '2016-01-12')),
+					right: getSchedulesByDates(schedules, datesRange('2016-01-18', endDate)),
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-13', '2016-01-14']),
+					right: getSchedulesByDates(schedules, ['2016-01-16', '2016-01-17']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is last date of schedules and maxOrderDuration = 1', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-31';
+			const maxOrderDuration = 1;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: getSchedulesByDates(schedules, datesRange(startDate, '2016-01-29')),
+					right: [],
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-30']),
+					right: [],
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is last date of schedules and maxOrderDuration = 2', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-31';
+			const maxOrderDuration = 2;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: getSchedulesByDates(schedules, datesRange(startDate, '2016-01-28')),
+					right: [],
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-29', '2016-01-30']),
+					right: [],
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is penultimate date of schedules and maxOrderDuration = 1', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-30';
+			const maxOrderDuration = 1;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: getSchedulesByDates(schedules, datesRange(startDate, '2016-01-28')),
+					right: [],
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-29']),
+					right: getSchedulesByDates(schedules, ['2016-01-31']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+
+		it('selected date is penultimate date of schedules and maxOrderDuration = 2', () => {
+			const startDate = '2016-01-01';
+			const endDate = '2016-01-31';
+			const schedules = generateSchedules(startDate, endDate);
+
+			const selectedDate = '2016-01-30';
+			const maxOrderDuration = 2;
+
+			const expectedSchedule = {
+				unavailable: {
+					left: getSchedulesByDates(schedules, datesRange(startDate, '2016-01-27')),
+					right: [],
+				},
+				available: {
+					left: getSchedulesByDates(schedules, ['2016-01-28', '2016-01-29']),
+					right: getSchedulesByDates(schedules, ['2016-01-31']),
+				},
+				selected: getSchedulesByDates(schedules, [selectedDate])[0]
+			};
+
+			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
+		});
+	});
+
+
+	describe('getLeftAndRightClosestEnablePeriods', () => {
+
+		describe('clear schedule on both sides', () => {
+			it('selected period equals 0', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 0;
+
+				const expectedPeriods = {
+					left: [],
+					right: range(3, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(schedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('selected period equals 3', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 3;
+
+				const expectedPeriods = {
+					left: [0],
+					right: range(6, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(schedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('selected period equals 99', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 99;
+
+				const expectedPeriods = {
+					left: range(0, 99, 3),
+					right: range(102, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(schedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('selected period equals last period', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 144;
+
+				const expectedPeriods = {
+					left: range(0, 144, 3),
+					right: [],
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(schedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('selected period equals penultimate period', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 141;
+
+				const expectedPeriods = {
+					left: range(0, 141, 3),
+					right: [144],
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(schedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+		});
+
+		describe('schedule has left order and right part is clear', () => {
+
+			it('order is at beginning and the selected period is followed', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 15;
+				const order = [0, 3, 6, 9, 12];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: [],
+					right: range(18, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('order is at beginning and the selected period is not followed', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 33;
+				const order = [0, 3, 6, 9, 12];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: range(15, 33, 3),
+					right: range(36, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('order is not at beginning and the selected period is followed', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 33;
+				const order = [15, 18, 21, 24, 27, 30];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: [],
+					right: range(36, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('order is not at beginning and the selected period is not followed', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 45;
+				const order = [15, 18, 21, 24, 27, 30];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: range(33, 45, 3),
+					right: range(48, 147, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+		});
+
+		describe('schedule has right order and left part is clear', () => {
+
+			it('order is at the end and the selected period is facing', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 126;
+				const order = [129, 132, 135, 138, 141, 144];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: range(0, 126, 3),
+					right: [],
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('order is at the end and the selected period is not facing', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 102;
+				const order = [129, 132, 135, 138, 141, 144];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: range(0, 102, 3),
+					right: range(105, 129, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('order is not at the end and the selected period is facing', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 117;
+				const order = [120, 123, 126, 129, 132, 135];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: range(0, 117, 3),
+					right: [],
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+
+			it('order is not at the end and the selected period is not facing', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 102;
+				const order = [120, 123, 126, 129, 132, 135];
+				const orderedSchedule = generateSchedule(schedule, order);
+
+				const expectedPeriods = {
+					left: range(0, 102, 3),
+					right: range(105, 120, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+		});
+
+		describe('orders on both sides', () => {
+			
+			it('new order between', () => {
+				const schedule = getSchedule();
+				const selectedPeriod = 87;
+				const leftOrder = [12, 15, 18, 21, 24, 27];
+				const rightOrder = [120, 123, 126, 129, 132, 135];
+				const orderedSchedule = generateSchedule(schedule, [...leftOrder, ...rightOrder]);
+
+				const expectedPeriods = {
+					left: range(30, 87, 3),
+					right: range(90, 120, 3),
+				};
+
+				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
+			});
+		});
+	});
+
+
+	describe('findFirstOrLastDisablePeriod', () => {
+
+		describe('find last period for left part', () => {
+
+			it('for empty schedules', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-03');
+
+				const expectedIndex = null;
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.be.null;
+			});
+
+			it('one order in first date', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-03');
+				const schedule = getSchedule();
+				const order = [0, 3, 6, 9, 12, 15];
+				schedules[0].periods = generateSchedule(schedule, order);
+
+				const expectedIndex = {
+					dateIndex: 0,
+					periodIndex: 5,
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
+			});
+
+			it('one order in last date', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-03');
+				const schedule = getSchedule();
+				const order = [0, 3, 6, 9, 12, 15];
+				schedules[2].periods = generateSchedule(schedule, order);
+
+				const expectedIndex = {
+					dateIndex: 2,
+					periodIndex: 5,
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
+			});
+
+			it('few orders', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-03');
+				const schedule = getSchedule();
+				const firstOrder = [0, 3, 6, 9, 12, 15];
+				const secondOrder = [48, 51, 54, 57, 60, 63];
+				schedules[1].periods = generateSchedule(schedule, firstOrder);
+				schedules[2].periods = generateSchedule(schedule, secondOrder);
+
+				const expectedIndex = {
+					dateIndex: 2,
+					periodIndex: 21,
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
+			});
+		});
+
+		describe('find first period for right part', () => {
+
+			it('for empty schedules', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-07');
+
+				const expectedIndex = null;
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.be.null;
+			});
+
+			it('one order in first date', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-07');
+				const schedule = getSchedule();
+				const order = [0, 3, 6, 9, 12, 15];
+				schedules[0].periods = generateSchedule(schedule, order);
+
+				const expectedIndex = {
+					dateIndex: 0,
+					periodIndex: 0,
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.deep.equal(expectedIndex);
+			});
+
+			it('one order in last date', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-07');
+				const schedule = getSchedule();
+				const order = [0, 3, 6, 9, 12, 15];
+				schedules[2].periods = generateSchedule(schedule, order);
+
+				const expectedIndex = {
+					dateIndex: 2,
+					periodIndex: 0,
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.deep.equal(expectedIndex);
+			});
+
+			it('few orders', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-07');
+				const schedule = getSchedule();
+				const firstOrder = [48, 51, 54, 57, 60, 63];
+				const secondOrder = [0, 3, 6, 9, 12, 15];
+				schedules[1].periods = generateSchedule(schedule, firstOrder);
+				schedules[2].periods = generateSchedule(schedule, secondOrder);
+
+				const expectedIndex = {
+					dateIndex: 1,
+					periodIndex: 16,
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.deep.equal(expectedIndex);
+			});
 		});
 	});
 });
