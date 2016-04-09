@@ -14,6 +14,16 @@ import './style.css';
 class FilterSearchNameComponent extends Component {
 
   /**
+   * constructor
+   * @param {object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  /**
    * handle debounce value from input
    * */
   handleChange(event) {
@@ -36,7 +46,7 @@ class FilterSearchNameComponent extends Component {
           </h3>
           <DebounceInput
             className="FilterSearchName-input"
-            onChange={::this.handleChange}
+            onChange={this.handleChange}
             debounceTimeout={750}
             value={value.get('text')}
           />

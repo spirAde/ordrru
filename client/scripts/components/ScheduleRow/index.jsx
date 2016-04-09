@@ -36,6 +36,10 @@ class ScheduleRowComponent extends Component {
     this.state = {
       data: Map({ shownInterval: null }),
     };
+
+    this.handleClickCell = this.handleClickCell.bind(this);
+    this.handleMouseOverCell = this.handleMouseOverCell.bind(this);
+    this.handleMouseLeaveScheduleRow = this.handleMouseLeaveScheduleRow.bind(this);
   }
 
   /**
@@ -122,8 +126,8 @@ class ScheduleRowComponent extends Component {
         <div
           className={classes}
           key={index}
-          onClick={::this.handleClickCell}
-          onMouseOver={::this.handleMouseOverCell}
+          onClick={this.handleClickCell}
+          onMouseOver={this.handleMouseOverCell}
         >
           {cellTime}
         </div>
@@ -184,7 +188,7 @@ class ScheduleRowComponent extends Component {
         </div>
         <div
           className="ScheduleRow-cells g-clear"
-          onMouseLeave={::this.handleMouseLeaveScheduleRow}
+          onMouseLeave={this.handleMouseLeaveScheduleRow}
         >
           {renderCells}
         </div>

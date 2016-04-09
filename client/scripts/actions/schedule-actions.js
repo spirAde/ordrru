@@ -6,8 +6,8 @@ import { Schedule } from '../API';
 import configs from '../../../common/data/configs.json';
 
 import { splitScheduleByAvailability, findFirstOrLastDisablePeriod,
-  getLeftAndRightClosestEnablePeriods,
-  setIsForceDisable } from '../../../common/utils/schedule-helper';
+  getLeftAndRightClosestEnablePeriods, forceDisableFor,
+  setIsForceDisable, setIsForceDisableBatch } from '../../../common/utils/schedule-helper';
 
 export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
@@ -162,111 +162,15 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
       const minDuration = settings.get('minDuration');
       const maxOrderDuration = configs.maxOrderDuration.bathhouse;
 
-      let fixedLeftIntermediateSchedules = [];
-      let fixedSelectedSchedule = [];
-      let fixedRightIntermediateSchedules = [];
-
-      const needFixPeriodsSelectedDate = [];
-
-      const splittedSchedule = splitScheduleByAvailability(schedule, date, maxOrderDuration);
-
-      const fixedLeftDisabledSchedules = map(
-        splittedSchedule.unavailable.left,
-        date => assign({}, date, { periods: setIsForceDisable(date.periods) })
-      );
-
-      const fixedRightDisabledSchedules = map(
-        splittedSchedule.unavailable.right,
-        date => assign({}, date, { periods: setIsForceDisable(date.periods) })
-      );
-
-      const closestEnablePeriods = getLeftAndRightClosestEnablePeriods(
-        splittedSchedule.selected.periods, period
-      );
-
-      const needLeftMinDurationFix = closestEnablePeriods.left.length &&
-        closestEnablePeriods.left.length < minDuration - 1 &&
-        head(closestEnablePeriods.left) !== FIRST_PERIOD;
-
-      const needRightMinDurationFix = closestEnablePeriods.right.length &&
-        closestEnablePeriods.right.length < minDuration - 1 &&
-        last(closestEnablePeriods.right) !== LAST_PERIOD;
-
-      const allLeftPeriodsAreAvailable = head(closestEnablePeriods.left) === FIRST_PERIOD;
-      const allRightPeriodsAreAvailable = last(closestEnablePeriods.right) === LAST_PERIOD;
-
-      if (allLeftPeriodsAreAvailable) {
-        const firstLeftDisablePeriod = findFirstOrLastDisablePeriod(
-          splittedSchedule.available.left, 'left'
-        );
-
-        if (isNull(firstLeftDisablePeriod)) {
-          //
-        } else {
-          //
-        }
-      } else {
-        needFixPeriodsSelectedDate.concat(range(
-          FIRST_PERIOD, head(closestEnablePeriods.left), STEP
-        ));
-
-        fixedLeftIntermediateSchedules = map(
-          splittedSchedule.available.left,
-          date => assign({}, date, { periods: setIsForceDisable(date.periods) })
-        );
-      }
-
-      if (allRightPeriodsAreAvailable) {
-        const firstRightDisablePeriod = findFirstOrLastDisablePeriod(
-          splittedSchedule.available.right, 'right'
-        );
-
-        if (isNull(firstRightDisablePeriod)) {
-          //
-        } else {
-          //
-        }
-      } else {
-        needFixPeriodsSelectedDate.concat(range(
-          last(closestEnablePeriods.right), LAST_PERIOD + STEP, STEP
-        ));
-
-        fixedRightIntermediateSchedules = map(
-          splittedSchedule.available.right,
-          date => assign({}, date, { periods: setIsForceDisable(date.periods) })
-        );
-      }
-
-      if (needLeftMinDurationFix) {
-        needFixPeriodsSelectedDate.concat(range(
-          head(closestEnablePeriods.left), period, STEP
-        ));
-      }
-      if (needRightMinDurationFix) {
-        needFixPeriodsSelectedDate.concat(range(
-          period + STEP, head(closestEnablePeriods.right) + STEP, STEP
-        ));
-      }
-
-      fixedSelectedSchedule = assign({}, splittedSchedule.selected, {
-        periods: setIsForceDisable(splittedSchedule.selected.periods, needFixPeriodsSelectedDate),
-      });
-
-      const fixedSchedule = [
-        ...fixedLeftDisabledSchedules,
-        ...fixedLeftIntermediateSchedules,
-        fixedSelectedSchedule,
-        ...fixedRightIntermediateSchedules,
-        ...fixedRightDisabledSchedules,
-      ];
+      const fixedSchedule = forceDisableFor(schedule, maxOrderDuration, minDuration, date, period);
 
       return dispatch(updateSchedule(id, fixedSchedule, 'set isForceDisable'));
     }
 
     const recoverSchedule = map(schedule, date => assign({}, date, {
-      periods: map(date.periods, period => {
-        assign({}, period, { status: omit(period.status, ['isForceDisable']) });
-      }),
+      periods: map(date.periods, period => (
+        assign({}, period, { status: omit(period.status, ['isForceDisable']) })
+      )),
     }));
 
     return dispatch(updateSchedule(id, recoverSchedule, 'remove isForceDisable'));

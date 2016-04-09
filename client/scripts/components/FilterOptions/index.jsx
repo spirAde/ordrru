@@ -20,6 +20,16 @@ import './style.css';
 class FilterOptionsComponent extends Component {
 
   /**
+   * constructor
+   * @param {object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleChangeOption = this.handleChangeOption.bind(this);
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -29,23 +39,13 @@ class FilterOptionsComponent extends Component {
 
   /**
    * handleChangeOption - handle change options. pass option and checked status to parent component
+   * @param {Object} option - option
    * @param {Object} event - event object
    * */
-  handleChangeOption(event) {
+  handleChangeOption(option, event) {
     event.preventDefault();
 
-    const { values } = this.props;
-
-    let element = event.target;
-
-    while (element.tagName !== 'DIV') {
-      element = element.parentElement;
-    }
-
-    const parentNode = element.parentNode;
-    const optionIndex = indexOf(parentNode.childNodes, element);
-    const option = values.get(optionIndex);
-
+    console.log(option.toJS());
     this.props.onSelect(option.set('checked', !option.get('checked')));
   }
 
@@ -64,7 +64,7 @@ class FilterOptionsComponent extends Component {
       return (
         <div
           className="FilterOptions-field FilterOptions-field-checkbox"
-          onClick={::this.handleChangeOption}
+          onClick={this.handleChangeOption.bind(this, option)}
           key={index}
         >
           {

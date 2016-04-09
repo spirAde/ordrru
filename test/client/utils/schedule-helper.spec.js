@@ -5,7 +5,8 @@ import { map, find, includes, slice, filter, range, assign } from 'lodash';
 import { splitOrderByDatesAndPeriods, recalculateSchedule,
 	checkSchedulesIntersection, fixNeighboringSchedules, mergeSchedules,
 	fixOrderEndpoints, splitScheduleByAvailability, findFirstOrLastDisablePeriod,
-	getLeftAndRightClosestEnablePeriods, setIsForceDisable } from '../../../common/utils/schedule-helper';
+	getLeftAndRightClosestEnablePeriods, setIsForceDisable, clog, forceDisableFor,
+	setIsForceDisableBatch } from '../../../common/utils/schedule-helper';
 import { isSameDate, datesRange, MOMENT_FORMAT } from '../../../common/utils/date-helper';
 
 import getSchedule from '../../fixtures/schedule';
@@ -70,6 +71,7 @@ describe('schedule helpers', () => {
 
 				expect(checkSchedulesIntersection(orderedSchedule, order)).to.be.true;
 			});
+			
 		});
 
 		describe('invalid intersection', () => {
@@ -113,6 +115,7 @@ describe('schedule helpers', () => {
 
 				expect(checkSchedulesIntersection(orderedSchedule, order)).to.be.false;
 			});
+			
 		});
 	});
 
@@ -194,6 +197,7 @@ describe('schedule helpers', () => {
 
 			expect(splitOrderByDatesAndPeriods(order, step)).to.deep.equal(splittedOrder);
 		});
+		
 	});
 
 
@@ -368,6 +372,7 @@ describe('schedule helpers', () => {
 
 			expect(recalculateSchedule(existedSchedule, newOrder, minDuration)).to.deep.equal(expectedSchedule);
 		});
+		
 	});
 
 
@@ -432,10 +437,12 @@ describe('schedule helpers', () => {
 
 			expect(mergeSchedules(firstSchedule, secondChunkSchedule)).to.deep.equal(expectedSchedule);
 		});
+		
 	});
 
+	
 	describe('fixNeighboringSchedules', () => {
-
+		
 		it('prev schedule is empty', () => {
 			const prevSchedule = [];
 			const nextSchedule = getSchedule();
@@ -537,10 +544,12 @@ describe('schedule helpers', () => {
 
 			expect(fixNeighboringSchedules(prevSchedule, nextSchedule, minDuration)).to.deep.equal(expectedSchedules);
 		});
+		
 	});
 
 
 	describe('fixOrderEndpoints', () => {
+
 
 		it('for empty schedule', () => {
 			const schedule = getSchedule();
@@ -595,6 +604,8 @@ describe('schedule helpers', () => {
 
 			expect(fixOrderEndpoints(orderedSchedule)).to.deep.equal(expectedSchedule);
 		});
+
+
 	});
 
 
@@ -829,12 +840,14 @@ describe('schedule helpers', () => {
 
 			expect(splitScheduleByAvailability(schedules, selectedDate, maxOrderDuration)).to.deep.equal(expectedSchedule);
 		});
+		
 	});
 
 
 	describe('getLeftAndRightClosestEnablePeriods', () => {
 
 		describe('clear schedule on both sides', () => {
+			
 			it('selected period equals 0', () => {
 				const schedule = getSchedule();
 				const selectedPeriod = 0;
@@ -894,6 +907,7 @@ describe('schedule helpers', () => {
 
 				expect(getLeftAndRightClosestEnablePeriods(schedule, selectedPeriod)).to.deep.equal(expectedPeriods);
 			});
+			
 		});
 
 		describe('schedule has left order and right part is clear', () => {
@@ -953,6 +967,7 @@ describe('schedule helpers', () => {
 
 				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
 			});
+			
 		});
 
 		describe('schedule has right order and left part is clear', () => {
@@ -1012,6 +1027,7 @@ describe('schedule helpers', () => {
 
 				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
 			});
+			
 		});
 
 		describe('orders on both sides', () => {
@@ -1030,6 +1046,7 @@ describe('schedule helpers', () => {
 
 				expect(getLeftAndRightClosestEnablePeriods(orderedSchedule, selectedPeriod)).to.deep.equal(expectedPeriods);
 			});
+			
 		});
 	});
 
@@ -1055,6 +1072,7 @@ describe('schedule helpers', () => {
 				const expectedIndex = {
 					dateIndex: 0,
 					periodIndex: 5,
+					direction: 'left',
 				};
 
 				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
@@ -1069,6 +1087,7 @@ describe('schedule helpers', () => {
 				const expectedIndex = {
 					dateIndex: 2,
 					periodIndex: 5,
+					direction: 'left',
 				};
 
 				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
@@ -1085,10 +1104,29 @@ describe('schedule helpers', () => {
 				const expectedIndex = {
 					dateIndex: 2,
 					periodIndex: 21,
+					direction: 'left',
 				};
 
 				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
 			});
+
+			it('order in last date and last has last period in row', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-03');
+				const schedule = getSchedule();
+				const firstOrder = [0, 3, 6, 9, 12, 15];
+				const secondOrder = [126, 129, 132, 135, 138, 141, 144];
+				schedules[1].periods = generateSchedule(schedule, firstOrder);
+				schedules[2].periods = generateSchedule(schedule, secondOrder);
+
+				const expectedIndex = {
+					dateIndex: 2,
+					periodIndex: 48,
+					direction: 'left',
+				};
+
+				expect(findFirstOrLastDisablePeriod(schedules, 'left')).to.deep.equal(expectedIndex);
+			});
+			
 		});
 
 		describe('find first period for right part', () => {
@@ -1110,6 +1148,7 @@ describe('schedule helpers', () => {
 				const expectedIndex = {
 					dateIndex: 0,
 					periodIndex: 0,
+					direction: 'right',
 				};
 
 				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.deep.equal(expectedIndex);
@@ -1124,6 +1163,7 @@ describe('schedule helpers', () => {
 				const expectedIndex = {
 					dateIndex: 2,
 					periodIndex: 0,
+					direction: 'right',
 				};
 
 				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.deep.equal(expectedIndex);
@@ -1140,9 +1180,1392 @@ describe('schedule helpers', () => {
 				const expectedIndex = {
 					dateIndex: 1,
 					periodIndex: 16,
+					direction: 'right',
 				};
 
 				expect(findFirstOrLastDisablePeriod(schedules, 'right')).to.deep.equal(expectedIndex);
+			});
+			
+		});
+	});
+
+
+	describe('setIsForceDisable', () => {
+		
+		it('for empty range', () => {
+			const schedule = getSchedule();
+			
+			const expectedSchedule = map(schedule, period => assign({}, period, { status: { isForceDisable: true } }));
+
+			expect(setIsForceDisable(schedule)).to.deep.equal(expectedSchedule);
+		});
+
+		it('range has length equals 1', () => {
+			const schedule = getSchedule();
+			const disabledPeriods = range(0, 3, 3);
+			const expectedSchedule = getSchedule();
+			expectedSchedule[0].status = { isForceDisable: true };
+
+			expect(setIsForceDisable(schedule, disabledPeriods)).to.deep.equal(expectedSchedule);
+		});
+
+		it('range has length equals max', () => {
+			const schedule = getSchedule();
+			const disabledPeriods = range(0, 147, 3);
+
+			const expectedSchedule = map(schedule, period => {
+				return assign({}, period, { status: { isForceDisable: true } })
+			});
+
+			expect(setIsForceDisable(schedule, disabledPeriods)).to.deep.equal(expectedSchedule);
+		});
+
+		it('range has length equals more then 1 and less max', () => {
+			const schedule = getSchedule();
+			const disabledPeriods = range(12, 57, 3);
+			const expectedSchedule = map(schedule, period => {
+				if (includes(disabledPeriods, period.period)) {
+					return assign({}, period, { status: { isForceDisable: true } })
+				}
+
+				return period;
+			});
+
+			expect(setIsForceDisable(schedule, disabledPeriods)).to.deep.equal(expectedSchedule);
+		});
+		
+	});
+
+
+	describe('setIsForceDisableBatch', () => {
+
+
+		it('threshold is empty', () => {
+			const schedules = generateSchedules('2016-01-05', '2016-01-06');
+			
+			const expectedSchedules = map(schedules, schedule => {
+				return assign({}, schedule, { periods: map(schedule.periods, period => assign({}, period, { status: { isForceDisable: true } }))});
+			});
+
+			expect(setIsForceDisableBatch(schedules)).to.deep.equal(expectedSchedules);
+		});
+
+
+		describe('direction left', () => {
+			
+			it('threshold is not empty, dateIndex equals 0, periodIndex equals 0', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 0, periodIndex: 0, direction: 'left' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods[0].status = { isForceDisable: true };
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 0, periodIndex equals max', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 0, periodIndex: 48, direction: 'left' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods, range(0, 49 * 3, 3));
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 0, periodIndex equals not 0 and not max', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 0, periodIndex: 24, direction: 'left' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods, range(0, 25 * 3, 3));
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 1, periodIndex equals 0', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 1, periodIndex: 0, direction: 'left' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods);
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods, range(0, 3, 3));
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 1, periodIndex equals max', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 1, periodIndex: 48, direction: 'left' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods);
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods, range(0, 49 * 3, 3));
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 1, periodIndex not equals max or zero', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 1, periodIndex: 24, direction: 'left' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods);
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods, range(0, 25 * 3, 3));
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+			
+		});
+
+		describe('direction right', () => {
+
+			it('threshold is not empty, dateIndex equals 0, periodIndex equals 0', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 0, periodIndex: 0, direction: 'right' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods);
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods);
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 0, periodIndex equals max', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 0, periodIndex: 48, direction: 'right' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods, [144]);
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods);
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 0, periodIndex equals not 0 and not max', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 0, periodIndex: 24, direction: 'right' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[0].periods = setIsForceDisable(expectedSchedules[0].periods, range(24 * 3, 147, 3));
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods);
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 1, periodIndex equals 0', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 1, periodIndex: 0, direction: 'right' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods);
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 1, periodIndex equals max', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 1, periodIndex: 48, direction: 'right' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods, [144]);
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+
+			it('threshold is not empty, dateIndex equals 1, periodIndex not equals max or zero', () => {
+				const schedules = generateSchedules('2016-01-05', '2016-01-06');
+				const indexes = { dateIndex: 1, periodIndex: 24, direction: 'right' };
+
+				const expectedSchedules = generateSchedules('2016-01-05', '2016-01-06');
+				expectedSchedules[1].periods = setIsForceDisable(expectedSchedules[1].periods, range(24 * 3, 147, 3));
+
+				expect(setIsForceDisableBatch(schedules, indexes)).to.deep.equal(expectedSchedules);
+			});
+			
+		});
+	});
+
+
+	describe('forceDisableFor', () => {
+
+		describe('empty schedule', () => {
+			
+			it('selected date is first and selected period is first too', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-01';
+				const period = 0;
+
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const unavailableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+				availableSchedules[0].periods = setIsForceDisable(availableSchedules[0].periods, range(3, 147, 3));
+
+				const expectedSchedules = [
+					...selectedSchedule,
+					...availableSchedules,
+					...setIsForceDisableBatch(unavailableSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is first and selected period is in the middle', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-01';
+				const period = 72;
+
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const unavailableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+				availableSchedules[0].periods = setIsForceDisable(availableSchedules[0].periods, range(75, 147, 3));
+
+				const expectedSchedules = [
+					...selectedSchedule,
+					...availableSchedules,
+					...setIsForceDisableBatch(unavailableSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is first and selected period is in the end', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-01';
+				const period = 144;
+
+				const unavailableLeftSchedules = [];
+				const availableLeftSchedules = [];
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+				const expectedSchedules = [
+					...unavailableLeftSchedules,
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+		});
+
+			it('selected date is second and selected period is first', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-02';
+				const period = 0;
+
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const unavailableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+				availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(3, 147, 3));
+
+				const expectedSchedules = [
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is second and selected period is in the middle', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-02';
+				const period = 72;
+
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const unavailableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+				availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(75, 147, 3));
+
+				const expectedSchedules = [
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is second and selected period is in the end', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-02';
+				const period = 144;
+
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const unavailableSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 144, 3));
+
+				const expectedSchedules = [
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is in the middle and selected period is in the middle to', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-03';
+				const period = 72;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+				availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(75, 147, 3));
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is penultimate and selected period is first', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-04';
+				const period = 0;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+				const unavailableRightSchedules = [];
+
+				availableRightSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(3, 147, 3));
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is penultimate and selected period is in the middle', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-04';
+				const period = 72;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+				const unavailableRightSchedules = [];
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+				availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(75, 147, 3));
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...unavailableRightSchedules,
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is penultimate and selected period is in the end', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-04';
+				const period = 144;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+				const unavailableRightSchedules = [];
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 144, 3));
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is last and selected period is first', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-05';
+				const period = 0;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+				const availableRightSchedules = [];
+				const unavailableRightSchedules = [];
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is last and selected period is in the middle', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-05';
+				const period = 72;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+				const availableRightSchedules = [];
+				const unavailableRightSchedules = [];
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+
+			it('selected date is last and selected period is in the end', () => {
+				const schedules = generateSchedules('2016-01-01', '2016-01-05');
+				const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+				const minDuration = 4;
+				const maxOrderDuration = 1;
+				const date = '2016-01-05';
+				const period = 144;
+
+				const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+				const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+				const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+				const availableRightSchedules = [];
+				const unavailableRightSchedules = [];
+
+				availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 144, 3));
+
+				const expectedSchedules = [
+					...setIsForceDisableBatch(unavailableLeftSchedules),
+					...availableLeftSchedules,
+					...selectedSchedule,
+					...availableRightSchedules,
+					...setIsForceDisableBatch(unavailableRightSchedules),
+				];
+
+				expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+			});
+			
+		});
+
+		describe('not empty schedule', () => {
+			
+			describe('orders to the left of selected period', () => {
+
+				describe('orders in the selected date', () => {
+
+					it('selected date is first and order in the beginning of schedule and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-01';
+						const period = 72;
+
+						const order = [0, 3, 6, 9, 12, 15];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order, minDuration);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = [];
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, order);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(75, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected date is first and order in the middle of schedule and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-01';
+						const period = 123;
+
+						const order = [72, 75, 78, 81, 84, 87, 90];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order, minDuration);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = [];
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(0, 93, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(126, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected date is first and has 2 orders and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-01';
+						const period = 123;
+
+						const firstOrder = [12, 15, 18, 21];
+						const secondOrder = [72, 75, 78, 81, 84, 87, 90];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, [...firstOrder, ...secondOrder], minDuration);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = [];
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, [...firstOrder, ...secondOrder], minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(0, 93, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(126, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected date is first and order in the middle of schedule and including minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-01';
+						const period = 123;
+
+						const order = [102, 105, 108, 111, 114];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order, minDuration);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = [];
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(0, 123, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(126, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+					
+					it('selected period is close to the order', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-01';
+						const period = 117;
+
+						const order = [102, 105, 108, 111, 114];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order, minDuration);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = [];
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03', '2016-01-04', '2016-01-05']);
+
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(0, 117, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(120, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+					
+				});
+
+				describe('orders in the available dates', () => {
+
+					it('selected period in the beginning and order in the beginning too', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 0;
+
+						const order = [0, 3, 6, 9, 12];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, order);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, order);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(3, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the beginning and order in the middle', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 0;
+
+						const order = [72, 75, 78, 81, 84, 87, 90];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, order);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 93, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(3, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the beginning and order in the end', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 0;
+
+						const order = [129, 132, 135, 138, 141, 144];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, order);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 147, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(3, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the end and order in the beginning', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 138;
+
+						const order = [0, 3, 6, 9, 12, 15];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, order);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 138, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(141, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the beginning and orders in the middle and end', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 0;
+
+						const firstOrder = [72, 75, 78, 81, 84, 87, 90];
+						const secondOrder = [129, 132, 135, 138, 141, 144];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, [...firstOrder, ...secondOrder]);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, [...firstOrder, ...secondOrder]);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 147, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(3, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+ 
+					it('check minDuration between selected period and last disable period for last date in available date', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 12;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 6;
+
+						const order = [129, 132, 135, 138, 141];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, order);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, order);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 147, 3));
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(0, 6, 3));
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(9, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+ 
+				});
+
+				describe('orders in the available dates and selected date', () => {
+
+					it('order in the beginning of selected date and in the beginning for available', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-02';
+						const period = 72;
+
+						const firstOrder = [0, 3, 6, 9, 12, 15, 18];
+						const secondOrder = [0, 3, 6, 9, 12, 15, 18, 21, 24];
+
+						schedules[0].periods = recalculateSchedule(schedules[0].periods, firstOrder);
+						schedules[1].periods = recalculateSchedule(schedules[1].periods, secondOrder);
+
+						const unavailableLeftSchedules = [];
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-02']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const unavailableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04', '2016-01-05']);
+
+						availableLeftSchedules[0].periods = recalculateSchedule(availableLeftSchedules[0].periods, firstOrder);
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 147, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, secondOrder);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, secondOrder);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(75, 147, 3));
+
+						const expectedSchedules = [
+							...unavailableLeftSchedules,
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...setIsForceDisableBatch(unavailableRightSchedules),
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+					
+				});
+			});
+
+			describe('orders to the right of selected period', () => {
+				
+				describe('orders in the selected date', () => {
+
+					it('selected period in the middle and order in the end of schedule and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-05';
+						const period = 72;
+
+						const order = [132, 135, 138, 141, 144];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const availableRightSchedules = []
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, order);
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the middle and order in the middle of schedule and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-05';
+						const period = 39;
+
+						const order = [72, 75, 78, 81, 84, 87];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const availableRightSchedules = []
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 39, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(72, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the beginning and order in the middle of schedule and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-05';
+						const period = 0;
+
+						const order = [72, 75, 78, 81, 84, 87];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const availableRightSchedules = []
+						const unavailableRightSchedules = [];
+
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(72, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected date is first and has 2 orders and excluding minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-05';
+						const period = 36;
+
+						const firstOrder = [72, 75, 78, 81, 84, 87];
+						const secondOrder = [120, 123, 126, 129, 132, 135];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, [...firstOrder, ...secondOrder], minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const availableRightSchedules = []
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 36, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, [...firstOrder, ...secondOrder], minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(72, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the beginning and order in the middle of schedule and including minDuration', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-05';
+						const period = 60;
+
+						const order = [69, 72, 75, 78, 81, 84, 87];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const availableRightSchedules = []
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 60, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(63, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period is close to the order', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-05';
+						const period = 66;
+
+						const order = [69, 72, 75, 78, 81, 84, 87];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02', '2016-01-03']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const availableRightSchedules = []
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 66, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, order, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(69, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+					
+				});
+
+				describe('orders in the available dates', () => {
+
+					it('selected period in the beginning and order in the beginning too', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-04';
+						const period = 0;
+
+						const order = [0, 3, 6, 9, 12, 15, 18, 21];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const unavailableRightSchedules = [];
+
+						availableRightSchedules[0].periods = recalculateSchedule(availableRightSchedules[0].periods, order, minDuration);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(0, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the beginning and order in the middle', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-04';
+						const period = 0;
+
+						const order = [39, 42, 45, 48, 51, 54];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const unavailableRightSchedules = [];
+
+						availableRightSchedules[0].periods = recalculateSchedule(availableRightSchedules[0].periods, order, minDuration);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(3, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the end and order in the beginning', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-04';
+						const period = 123;
+
+						const order = [0, 3, 6, 9, 12, 15, 18, 21];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 123, 3));
+						availableRightSchedules[0].periods = recalculateSchedule(availableRightSchedules[0].periods, order, minDuration);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(0, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('selected period in the middle and orders in the beginning and end', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-04';
+						const period = 72;
+
+						const firstOrder = [0, 3, 6, 9, 12, 15, 18, 21];
+						const secondOrder = [123, 126, 129, 132];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, [...firstOrder, ...secondOrder], minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+						availableRightSchedules[0].periods = recalculateSchedule(availableRightSchedules[0].periods, [...firstOrder, ...secondOrder], minDuration);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(0, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+					it('check minDuration between selected period and last disable period for last date in available date', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 12;
+						const maxOrderDuration = 1;
+						const date = '2016-01-04';
+						const period = 138;
+
+						const order = [3, 6, 9, 12, 15, 18];
+
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, order, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 138, 3));
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(141, 147, 3));
+						availableRightSchedules[0].periods = recalculateSchedule(availableRightSchedules[0].periods, order, minDuration);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(0, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+				});
+
+				describe('orders in the available dates and selected date', () => {
+
+					it('order in the beginning of selected date and in the beginning for available', () => {
+						const schedules = generateSchedules('2016-01-01', '2016-01-05');
+						const dirtySchedules = generateSchedules('2016-01-01', '2016-01-05');
+						const minDuration = 4;
+						const maxOrderDuration = 1;
+						const date = '2016-01-04';
+						const period = 72;
+
+						const firstOrder = [123, 126, 129, 132];
+						const secondOrder = [21, 24, 27, 30, 33, 36, 39];
+
+						schedules[3].periods = recalculateSchedule(schedules[3].periods, firstOrder, minDuration);
+						schedules[4].periods = recalculateSchedule(schedules[4].periods, secondOrder, minDuration);
+
+						const unavailableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-01', '2016-01-02']);
+						const availableLeftSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-03']);
+						const selectedSchedule = getSchedulesByDates(dirtySchedules, ['2016-01-04']);
+						const availableRightSchedules = getSchedulesByDates(dirtySchedules, ['2016-01-05']);
+						const unavailableRightSchedules = [];
+
+						availableLeftSchedules[0].periods = setIsForceDisable(availableLeftSchedules[0].periods, range(0, 72, 3));
+						selectedSchedule[0].periods = recalculateSchedule(selectedSchedule[0].periods, firstOrder, minDuration);
+						selectedSchedule[0].periods = setIsForceDisable(selectedSchedule[0].periods, range(123, 147, 3));
+						availableRightSchedules[0].periods = recalculateSchedule(availableRightSchedules[0].periods, secondOrder, minDuration);
+						availableRightSchedules[0].periods = setIsForceDisable(availableRightSchedules[0].periods, range(0, 147, 3));
+
+						const expectedSchedules = [
+							...setIsForceDisableBatch(unavailableLeftSchedules),
+							...availableLeftSchedules,
+							...selectedSchedule,
+							...availableRightSchedules,
+							...unavailableRightSchedules,
+						];
+
+						expect(forceDisableFor(schedules, maxOrderDuration, minDuration, date, period)).to.deep.equal(expectedSchedules);
+					});
+
+				});
+			});
+
+			describe('orders on either side of selected period', () => {
+				
 			});
 		});
 	});

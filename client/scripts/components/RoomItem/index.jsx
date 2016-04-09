@@ -52,6 +52,9 @@ class RoomItemComponent extends Component {
     };
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
+    this.handleOpenDescription = this.handleOpenDescription.bind(this);
+    this.handleOpenSchedule = this.handleOpenSchedule.bind(this);
+    this.handleClickCheckOrder = this.handleClickCheckOrder.bind(this);
   }
 
   /**
@@ -127,7 +130,9 @@ class RoomItemComponent extends Component {
   /**
    * handle open|close schedule for room
    * */
-  handleOpenSchedule() {
+  handleOpenSchedule(event) {
+    event.preventDefault();
+
     this.setState(({ data }) => ({
       data: data.set('scheduleIsOpen', !data.get('scheduleIsOpen')),
     }));
@@ -277,7 +282,7 @@ class RoomItemComponent extends Component {
                 </a>
               </div>
               <div className="RoomItem-more-info">
-                <a className="RoomItem-details-button" onClick={::this.handleOpenDescription}>
+                <a className="RoomItem-details-button" onClick={this.handleOpenDescription}>
                   <span className="RoomItem-details-price">
                     <FormattedMessage
                       id="priceFrom"
@@ -322,7 +327,7 @@ class RoomItemComponent extends Component {
                           <input
                             className="RoomItem-field-date-time-input"
                             placeholder={formatMessage({ id: 'selectTime' })}
-                            onClick={::this.handleOpenSchedule}
+                            onClick={this.handleOpenSchedule}
                             value={orderDatetimeValue}
                           />
                           {
@@ -361,7 +366,7 @@ class RoomItemComponent extends Component {
                         <div className="RoomItem-next-step">
                           <a
                             className="RoomItem-next-step-button"
-                            onClick={::this.handleClickCheckOrder}
+                            onClick={this.handleClickCheckOrder}
                           >
                             {
                               steps.getIn(['choice', 'loading']) ?
@@ -416,12 +421,12 @@ RoomItemComponent.propTypes = {
   steps: ImmutablePropTypes.map,
   isClosable: PropTypes.bool.isRequired,
   intl: intlShape.isRequired,
-  onChangeActiveRoom: PropTypes.func.isRequired,
+  onChangeActiveRoom: PropTypes.func,
   onCloseRoom: PropTypes.func,
-  onSelectOrder: PropTypes.func.isRequired,
-  onCheckOrder: PropTypes.func.isRequired,
-  onSendOrder: PropTypes.func.isRequired,
-  onResetDatetimeOrder: PropTypes.func.isRequired,
+  onSelectOrder: PropTypes.func,
+  onCheckOrder: PropTypes.func,
+  onSendOrder: PropTypes.func,
+  onResetDatetimeOrder: PropTypes.func,
 };
 
 RoomItemComponent.defaultProps = {

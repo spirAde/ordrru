@@ -35,6 +35,7 @@ class RoomsListComponent extends Component {
 
     this.handleChangeActiveRoom = this.handleChangeActiveRoom.bind(this);
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
+    this.handleResetDatetimeOrder = this.handleResetDatetimeOrder.bind(this);
   }
 
   componentDidMount() {
@@ -142,7 +143,7 @@ class RoomsListComponent extends Component {
           onSelectOrder={this.props.selectOrder}
           onCheckOrder={this.props.checkOrder}
           onSendOrder={this.props.sendOrder}
-          onResetDatetimeOrder={::this.handleResetDatetimeOrder}
+          onResetDatetimeOrder={this.handleResetDatetimeOrder}
           key={room.get('id')}
           ref={activeRoomId === room.get('id') ? 'activeRoom' : null}
         />

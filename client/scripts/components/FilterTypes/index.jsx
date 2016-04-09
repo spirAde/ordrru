@@ -20,6 +20,16 @@ import './style.css';
 class FilterTypeComponent extends Component {
 
   /**
+   * constructor
+   * @param {object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleChangeType = this.handleChangeType.bind(this);
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -64,7 +74,7 @@ class FilterTypeComponent extends Component {
       return (
         <div
           className="FilterType-field FilterType-field-checkbox"
-          onClick={::this.handleChangeType}
+          onClick={this.handleChangeType}
           key={index}
         >
           {

@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { range, filter, map, has, difference, head, last, takeWhile, takeRightWhile, find, pull,
 	findLastIndex, assign, slice, indexOf, findIndex, min, max, includes, reduce, merge, intersection,
-	isEmpty, flatten, floor } from 'lodash';
+	isEmpty, flatten, floor, isNull, tail } from 'lodash';
 import { datesRange, isSameDate, MOMENT_FORMAT } from './date-helper';
 
 const FIRST_PERIOD = 0;
@@ -62,7 +62,7 @@ export function checkSchedulesIntersection(schedule, order) {
 }
 
 /**
- * Recalculate schedule after creating order
+ * Recalculate schedule after creating order. Set enable false.
  * @param {Array.<Object>} schedule
  * @param {Array.<Number>} order - order periods
  * @param {Number} minDuration - minimal order duration
@@ -328,12 +328,15 @@ export function findFirstOrLastDisablePeriod(schedule, direction) {
 
 	if (firstDisablePeriodIndex === -1) return null;
 
-	const dateIndex = floor(firstDisablePeriodIndex / (LAST_PERIOD / STEP));
-	const periodIndex = firstDisablePeriodIndex - ((LAST_PERIOD / STEP) + 1) * dateIndex
+	const lastPeriodIndex = LAST_PERIOD / STEP;
+	
+	const dateIndex = Math.min(floor(firstDisablePeriodIndex / lastPeriodIndex), schedule.length - 1);
+	const periodIndex = firstDisablePeriodIndex - (lastPeriodIndex + 1) * dateIndex
 
 	return {
 		dateIndex,
 		periodIndex,
+		direction,
 	};
 }
 
@@ -379,6 +382,227 @@ export function setIsForceDisable(periods, range) {
 
 		return period;
 	});
+}
+
+/**
+ * set isForceDisable flag for batch of schedules
+ * @param {Array.<Object>} schedules
+ * @param {Object} threshold
+ * @param {Number} threshold.dateIndex - index of row in all schedules
+ * @param {Number} threshold.periodIndex - index of period for selected dateIndex
+ * @param {String} threshold.direction - direction, set to the left or to the right of the threshold
+ * @return {Array.<Object>} new schedules
+ * */
+export function setIsForceDisableBatch(schedules, threshold) {
+	if (!threshold) {
+		return map(schedules, date => assign({}, date, { periods: setIsForceDisable(date.periods) }));
+	}
+
+	const { dateIndex, periodIndex, direction } = threshold;
+
+	if (direction !== 'left' && direction !== 'right') {
+		throw new Error('set left or right direction');
+	}
+
+	const isLeft = direction === 'left';
+	
+	const thresholdSchedule = schedules[dateIndex];
+
+	let fixedBeforeThresholdSchedules = [];
+	let fixedThresholdSchedule = [];
+	let fixedAfterThresholdSchedules = [];
+
+	if (isLeft) {
+		const fixedPeriodsRange = range(FIRST_PERIOD, periodIndex * STEP + STEP, STEP);
+
+		if (dateIndex !== 0) {
+			const beforeThresholdSchedules = slice(schedules, 0, dateIndex);
+			fixedBeforeThresholdSchedules = map(
+				beforeThresholdSchedules, date => assign({}, date, { periods: setIsForceDisable(date.periods) })
+			);
+		}
+
+		fixedThresholdSchedule = assign(
+			{}, thresholdSchedule, { periods: setIsForceDisable(thresholdSchedule.periods, fixedPeriodsRange) }
+		);
+		
+		fixedAfterThresholdSchedules = slice(schedules, dateIndex + 1);
+	} else {
+		const fixedPeriodsRange = range(periodIndex * STEP, LAST_PERIOD + STEP, STEP);
+
+		if (dateIndex !== schedules.length - 1) {
+			const afterThresholdSchedules = slice(schedules, dateIndex + 1);
+			fixedAfterThresholdSchedules = map(
+				afterThresholdSchedules, date => assign({}, date, { periods: setIsForceDisable(date.periods) })
+			);
+		}
+
+		fixedThresholdSchedule = assign(
+			{}, thresholdSchedule, { periods: setIsForceDisable(thresholdSchedule.periods, fixedPeriodsRange) }
+		);
+
+		fixedBeforeThresholdSchedules = slice(schedules, 0, dateIndex);
+	}
+
+	return [
+		...fixedBeforeThresholdSchedules,
+		fixedThresholdSchedule,
+		...fixedAfterThresholdSchedules,
+	];
+}
+
+export function forceDisableFor(schedule, maxOrderDuration, minDuration, date, period) {
+	const splittedSchedule = splitScheduleByAvailability(schedule, date, maxOrderDuration);
+
+	let fixedLeftUnavailableSchedules = [];
+	let fixedLeftIntermediateSchedules = [];
+	let fixedSelectedSchedule = splittedSchedule.selected;
+	let fixedRightIntermediateSchedules = [];
+	let fixedRightUnavailableSchedules = [];
+
+	const closestEnablePeriods = getLeftAndRightClosestEnablePeriods(
+		splittedSchedule.selected.periods, period
+	);
+
+	const allLeftPeriodsAreAvailable = period === FIRST_PERIOD ||
+		(head(closestEnablePeriods.left) === FIRST_PERIOD && closestEnablePeriods.left.length);
+	const allRightPeriodsAreAvailable = period === LAST_PERIOD ||
+		(last(closestEnablePeriods.right) === LAST_PERIOD && closestEnablePeriods.right.length);
+
+	if (allLeftPeriodsAreAvailable) {
+		const leftDisableDateAndPeriod = findFirstOrLastDisablePeriod(
+			splittedSchedule.available.left, 'left'
+		);
+
+		if (isNull(leftDisableDateAndPeriod) && splittedSchedule.available.left.length) {
+			fixedLeftIntermediateSchedules = setIsForceDisableBatch(
+				splittedSchedule.available.left,
+				{ dateIndex: 0, periodIndex: (period / STEP) - 1, direction: 'left' }
+			);
+		} else if (!isNull(leftDisableDateAndPeriod)) {
+			const disablePeriodInLastDate =
+				leftDisableDateAndPeriod.dateIndex === splittedSchedule.available.left.length - 1;
+			const durationBetweenPeriodAndLastDisablePeriodIntermediate =
+				LAST_PERIOD - leftDisableDateAndPeriod.periodIndex * STEP + period;
+			const needDisableBetweenSelectedAndIntermediate = disablePeriodInLastDate &&
+				durationBetweenPeriodAndLastDisablePeriodIntermediate &&
+				durationBetweenPeriodAndLastDisablePeriodIntermediate <= minDuration;
+
+			if (needDisableBetweenSelectedAndIntermediate) {
+				fixedLeftIntermediateSchedules = setIsForceDisableBatch(
+					splittedSchedule.available.left
+				);
+				fixedSelectedSchedule.periods = setIsForceDisable(
+					fixedSelectedSchedule.periods, range(FIRST_PERIOD, period, STEP)
+				);
+			} else {
+				fixedLeftIntermediateSchedules = setIsForceDisableBatch(
+					splittedSchedule.available.left, {
+						dateIndex: leftDisableDateAndPeriod.dateIndex,
+						periodIndex: Math.max(leftDisableDateAndPeriod.periodIndex, (period / STEP) - 1),
+						direction: leftDisableDateAndPeriod.direction,
+					}
+				);
+			}
+		}
+	} else {
+		if (splittedSchedule.available.left.length) {
+			fixedLeftIntermediateSchedules = setIsForceDisableBatch(
+				splittedSchedule.available.left
+			);	
+		}
+
+		const fixedRange = closestEnablePeriods.left.length ?
+			range(FIRST_PERIOD, head(closestEnablePeriods.left), STEP) :
+			range(FIRST_PERIOD, period, STEP);
+
+		fixedSelectedSchedule.periods = setIsForceDisable(
+			splittedSchedule.selected.periods, fixedRange
+		);
+	}
+
+	if (allRightPeriodsAreAvailable) {
+		const rightDisableDateAndPeriod = findFirstOrLastDisablePeriod(
+			splittedSchedule.available.right, 'right'
+		);
+
+		if (isNull(rightDisableDateAndPeriod) && splittedSchedule.available.right.length) {
+			const availableRightLastIndex = splittedSchedule.available.right.length - 1;
+			fixedRightIntermediateSchedules = setIsForceDisableBatch(
+				splittedSchedule.available.right,
+				{ dateIndex: availableRightLastIndex, periodIndex: (period / STEP) + 1, direction: 'right' }
+			);
+		} else if (!isNull(rightDisableDateAndPeriod)) {
+			const disablePeriodInFirstDate = rightDisableDateAndPeriod.dateIndex === 0;
+			const durationBetweenPeriodAndFirstDisablePeriodIntermediate =
+				LAST_PERIOD - period + rightDisableDateAndPeriod.periodIndex * STEP;
+			const needDisableBetweenSelectedAndIntermediate = disablePeriodInFirstDate &&
+				durationBetweenPeriodAndFirstDisablePeriodIntermediate &&
+				durationBetweenPeriodAndFirstDisablePeriodIntermediate <= minDuration;
+
+			if (needDisableBetweenSelectedAndIntermediate) {
+				fixedRightIntermediateSchedules = setIsForceDisableBatch(
+					splittedSchedule.available.right
+				);
+				fixedSelectedSchedule.periods = setIsForceDisable(
+					fixedSelectedSchedule.periods, range(period + STEP, LAST_PERIOD + STEP, STEP)
+				);
+			} else {
+				fixedRightIntermediateSchedules = setIsForceDisableBatch(
+					splittedSchedule.available.right, {
+						dateIndex: rightDisableDateAndPeriod.dateIndex,
+						periodIndex: Math.min(rightDisableDateAndPeriod.periodIndex, (period / STEP) + 1),
+						direction: rightDisableDateAndPeriod.direction,
+					}
+				);
+			}
+		}
+	} else {
+		if (splittedSchedule.available.right.length) {
+			fixedRightIntermediateSchedules = setIsForceDisableBatch(
+				splittedSchedule.available.right
+			);
+		}
+
+		const fixedRange = closestEnablePeriods.right.length ?
+			range(last(closestEnablePeriods.right) + STEP, LAST_PERIOD + STEP, STEP) :
+			range(period + STEP, LAST_PERIOD + STEP, STEP);
+
+		fixedSelectedSchedule.periods = setIsForceDisable(
+			fixedSelectedSchedule.periods, fixedRange
+		);
+	}
+
+	fixedLeftUnavailableSchedules = setIsForceDisableBatch(splittedSchedule.unavailable.left);
+	fixedRightUnavailableSchedules = setIsForceDisableBatch(splittedSchedule.unavailable.right);
+
+	const needLeftMinDurationFix = closestEnablePeriods.left.length &&
+		closestEnablePeriods.left.length < minDuration - 1 &&
+		head(closestEnablePeriods.left) !== FIRST_PERIOD;
+
+	const needRightMinDurationFix = closestEnablePeriods.right.length &&
+		closestEnablePeriods.right.length < minDuration - 1 &&
+		last(closestEnablePeriods.right) !== LAST_PERIOD;
+
+	if (needLeftMinDurationFix) {
+		fixedSelectedSchedule.periods = setIsForceDisable(
+			fixedSelectedSchedule.periods, range(head(closestEnablePeriods.left), period, STEP)
+		);
+	}
+
+	if (needRightMinDurationFix) {
+		fixedSelectedSchedule.periods = setIsForceDisable(
+			fixedSelectedSchedule.periods, range(period + STEP, last(closestEnablePeriods.right) + STEP, STEP)
+		);
+	}
+
+	return [
+		...fixedLeftUnavailableSchedules,
+		...fixedLeftIntermediateSchedules,
+		fixedSelectedSchedule,
+		...fixedRightIntermediateSchedules,
+		...fixedRightUnavailableSchedules,
+	];
 }
 
 /**

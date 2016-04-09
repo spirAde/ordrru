@@ -21,6 +21,16 @@ import logoImg from '../../../images/logo.png';
 class HeaderComponent extends Component {
 
   /**
+   * constructor
+   * @param {object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleChangeMode = this.handleChangeMode.bind(this);
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -30,21 +40,13 @@ class HeaderComponent extends Component {
 
   /**
    * handleChangeMode - handle change mode of page. pass mode to parent component
+   * @param {String} selectedMode - mode
    * @param {Object} event - SyntheticEvent
    * */
-  handleChangeMode(event) {
+  handleChangeMode(selectedMode, event) {
     event.preventDefault();
 
     const { mode } = this.props;
-    const listElement = ReactDOM.findDOMNode(this.refs.listMode);
-
-    let element = event.target;
-
-    while (element.tagName !== 'A') {
-      element = element.parentElement;
-    }
-
-    const selectedMode = listElement.isEqualNode(element) ? 'list' : 'map';
 
     if (mode === selectedMode) {
       return false;
@@ -89,7 +91,7 @@ class HeaderComponent extends Component {
           </div>
 
           <div className="Header-mode">
-            <a className={listButtonClasses} onClick={::this.handleChangeMode} ref="listMode">
+            <a className={listButtonClasses} onClick={this.handleChangeMode.bind(this, 'list')}>
               <IconComponent
                 name="icon-list"
                 rate={1.5}
@@ -97,7 +99,7 @@ class HeaderComponent extends Component {
               />
               <FormattedMessage id="mode.list" />
             </a>
-            <a className={mapButtonClasses} onClick={::this.handleChangeMode} ref="mapMode">
+            <a className={mapButtonClasses} onClick={this.handleChangeMode.bind(this, 'map')}>
               <IconComponent
                 name="icon-location-point-mapbox"
                 rate={1.5}

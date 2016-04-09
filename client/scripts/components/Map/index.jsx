@@ -51,6 +51,8 @@ class MapComponent extends Component {
     this.state = {
       data: Map({ selectedRoomId: null }),
     };
+
+    this.handleCloseRoom = this.handleCloseRoom.bind(this);
   }
 
   /**
@@ -265,7 +267,7 @@ class MapComponent extends Component {
           isClosable={true}
           room={room}
           bathhouse={bathhouse}
-          onCloseRoom={::this.handleCloseRoom}
+          onCloseRoom={this.handleCloseRoom}
           order={order}
           steps={steps}
         />

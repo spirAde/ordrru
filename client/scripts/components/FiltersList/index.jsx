@@ -1,7 +1,5 @@
 import { Map } from 'immutable';
 
-import { words, last } from 'lodash';
-
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
@@ -84,6 +82,8 @@ class FiltersListComponent extends Component {
     this.handlePriceFilter = this.handlePriceFilter.bind(this);
     this.handleSortingFilter = this.handleSortingFilter.bind(this);
     this.handleClickResetTag = this.handleClickResetTag.bind(this);
+    this.handleOpenFullFilters = this.handleOpenFullFilters.bind(this);
+    this.handleShowOffers = this.handleShowOffers.bind(this);
   }
 
   /**
@@ -238,19 +238,12 @@ class FiltersListComponent extends Component {
 
   /**
    * handleClickResetTag - handle reset tag
+   * @param {String} tag - tag name
    * @param {Object} event - SyntheticEvent
    * @return {void}
    * */
-  handleClickResetTag(event) {
+  handleClickResetTag(tag, event) {
     event.preventDefault();
-
-    let element = event.target;
-
-    while (element.tagName !== 'A') {
-      element = element.parentElement;
-    }
-
-    const tag = last(words(element.classList[1]));
 
     this.props.resetRoomsByTag(tag);
   }
@@ -260,27 +253,20 @@ class FiltersListComponent extends Component {
    * @return {Array.<Element>} - tag elements
    * */
   renderTags(tags) {
-    return tags.map((tag, index) => {
-      const tagClasses = classNames({
-        'FiltersList-tags-anchor': true,
-        [`FiltersList-tags-anchor-${tag}`]: true,
-      });
-
-      return (
-        <a
-          className={tagClasses}
-          key={index}
-          onClick={::this.handleClickResetTag}
-        >
-          <FormattedMessage id={`tags.${tag}`} />
-          <IconComponent
-            name="icon-cancel"
-            rate={2}
-            style={{ margin: '-5px -30px', float: 'right' }}
-          />
-        </a>
-      );
-    });
+    return tags.map((tag, index) => (
+      <a
+        className="FiltersList-tags-anchor"
+        key={index}
+        onClick={this.handleClickResetTag.bind(this, tag)}
+      >
+        <FormattedMessage id={`tags.${tag}`} />
+        <IconComponent
+          name="icon-cancel"
+          rate={2}
+          style={{ margin: '-5px -30px', float: 'right' }}
+        />
+      </a>
+    ));
   }
 
   /**
@@ -369,7 +355,7 @@ class FiltersListComponent extends Component {
         </div>
         <div className={optionsClasses} ref="box">
           <div className="FiltersList-more">
-            <a className="FiltersList-more-anchor" onClick={::this.handleOpenFullFilters}>
+            <a className="FiltersList-more-anchor" onClick={this.handleOpenFullFilters}>
               {
                 data.get('isSticked') ?
                   <FormattedMessage id="showFilters" /> :
@@ -390,7 +376,7 @@ class FiltersListComponent extends Component {
           </div>
         </div>
         <div className={showContentClasses}>
-          <a className="FiltersList-show-offers-anchor" onClick={::this.handleShowOffers}>
+          <a className="FiltersList-show-offers-anchor" onClick={this.handleShowOffers}>
             <FormattedMessage id="showOffers" />
           </a>
         </div>

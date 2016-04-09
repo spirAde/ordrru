@@ -17,6 +17,16 @@ import './style.css';
 class FilterPrepaymentComponent extends Component {
 
   /**
+   * constructor
+   * @param {object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -75,7 +85,7 @@ class FilterPrepaymentComponent extends Component {
       });
 
       return (
-        <li className="FilterPrepayment-button" key={index} onClick={::this.handleClick}>
+        <li className="FilterPrepayment-button" key={index} onClick={this.handleClick}>
           <input className="FilterPrepayment-button-input" type="checkbox" />
           <label className={labelClasses}>
             <FormattedMessage id={id} />

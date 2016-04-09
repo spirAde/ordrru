@@ -20,6 +20,16 @@ import './style.css';
 class FilterSortingComponent extends Component {
 
   /**
+   * constructor
+   * @param {object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleClickSortingType = this.handleClickSortingType.bind(this);
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
@@ -90,7 +100,7 @@ class FilterSortingComponent extends Component {
       }
 
       return (
-        <div className="FilterSorting-field" key={index} onClick={::this.handleClickSortingType}>
+        <div className="FilterSorting-field" key={index} onClick={this.handleClickSortingType}>
           <a className={classes}>
             {icon}
             <FormattedMessage id={`sorting.${type.get('name')}`} />
