@@ -48,7 +48,7 @@ class FilterSearchNameComponent extends Component {
             className="FilterSearchName-input"
             onChange={this.handleChange}
             debounceTimeout={750}
-            value={value.get('text')}
+            value={value.get('text') || ''}
           />
         </div>
       </div>

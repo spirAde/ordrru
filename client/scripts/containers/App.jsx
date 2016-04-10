@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import { changeUserViewport } from '../actions/user-actions';
-import { setCurrentDate, setCurrentPeriod } from '../actions/application-actions';
+import { initGlobalCurrentDateAndPeriod } from '../actions/application-actions';
 
 /**
  * App - smart component, container, root
@@ -16,7 +16,7 @@ class App extends Component {
 
   componentDidMount() {
     this.initServiceWorker();
-    this.initCurrentDateAndPeriod();
+    this.initGlobalCurrentDateAndPeriod();
 
     this.props.changeUserViewport(this.getViewPort());
     window.addEventListener('resize', this.getViewPort);
@@ -35,15 +35,8 @@ class App extends Component {
     }
   }
 
-  initCurrentDateAndPeriod() {
-    const currentMoment = moment();
-    const currentDate = currentMoment.format('YYYY-MM-DD');
-    const currentHour = currentMoment.format('HH');
-    const currentMinutes = currentMoment.format('mm');
-    const currentPeriod = (currentHour * 2 + (currentMinutes >= 30 ? 1 : 0)) * 3;
-
-    this.props.setCurrentDate(currentDate);
-    this.props.setCurrentPeriod(currentPeriod);
+  initGlobalCurrentDateAndPeriod() {
+    this.props.initGlobalCurrentDateAndPeriod(window.__REFERENCE_DATETIME__);
   }
 
   /**
@@ -61,8 +54,7 @@ class App extends Component {
 
 App.propTypes = {
   children: PropTypes.object.isRequired,
-  setCurrentDate: PropTypes.func.isRequired,
-  setCurrentPeriod: PropTypes.func.isRequired,
+  initGlobalCurrentDateAndPeriod: PropTypes.func.isRequired,
   changeUserViewport: PropTypes.func.isRequired,
 };
 
@@ -73,8 +65,8 @@ App.propTypes = {
  * */
 function mapDispatchToProps(dispatch) {
   return {
-    setCurrentDate: (date) => dispatch(setCurrentDate(date)),
-    setCurrentPeriod: (period) => dispatch(setCurrentPeriod(period)),
+    initGlobalCurrentDateAndPeriod: (datetime) =>
+      dispatch(initGlobalCurrentDateAndPeriod(datetime)),
     changeUserViewport: (viewport) => dispatch(changeUserViewport(viewport)),
   };
 }

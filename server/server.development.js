@@ -3,6 +3,8 @@ import path from 'path';
 import loopback from 'loopback';
 import boot from 'loopback-boot';
 
+import moment from 'moment';
+
 import { createServer } from 'http';
 import io from 'socket.io';
 
@@ -52,10 +54,16 @@ app.use((req, res, next) => {
   const store = configureStore(memoryHistory);
   const history = syncHistoryWithStore(memoryHistory, store);
 
+  const referenceDatetime = moment().toDate();
+
   function hydrateOnClient() {
     res.send('<!doctype html>\n' +
       ReactDOMServer.renderToString(
-        <Root assets={isomorphicTools.assets()} store={store} />
+        <Root
+          assets={isomorphicTools.assets()}
+          store={store}
+          referenceDatetime={referenceDatetime}
+        />
       )
     );
   }
@@ -93,6 +101,7 @@ app.use((req, res, next) => {
               component={component}
               store={store}
               locale={locale}
+              referenceDatetime = {referenceDatetime}
             />
           )
         );

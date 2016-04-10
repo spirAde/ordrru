@@ -51,7 +51,8 @@ export const reducer = createReducer({
           options.findIndex(
             option => option.get('name') === action.payload.value.get('name')
           ),
-          option => action.payload.value)
+          option => action.payload.value
+        )
       );
   },
   [CHANGE_PREPAYMENT_FILTER_VALUE](state, action) {

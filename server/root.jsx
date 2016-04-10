@@ -19,7 +19,7 @@ class Root extends Component {
   }
 
   render() {
-    const {assets, component, store, locale} = this.props;
+    const {assets, component, store, locale, referenceDatetime} = this.props;
     const content = component ? ReactDOMServer.renderToString(component) : '';
 
     return (
@@ -192,6 +192,7 @@ class Root extends Component {
       </svg>
         <div id="root" dangerouslySetInnerHTML={{__html: content}}></div>
         <script dangerouslySetInnerHTML={{__html: `window.__INITIAL_STATE__=${serialize(store.getState())};`}} charSet="UTF-8"></script>
+        <script dangerouslySetInnerHTML={{__html: `window.__REFERENCE_DATETIME__=${serialize(referenceDatetime)};`}} charSet="UTF-8"></script>
         <script src={assets.javascript.main}></script>
       </body>
       </html>
@@ -203,7 +204,8 @@ React.propTypes = {
   assets: PropTypes.object,
   component: PropTypes.node,
   store: PropTypes.object,
-  locale: PropTypes.string
+  locale: PropTypes.string,
+  referenceDatetime: PropTypes.object,
 };
 
 export default Root;

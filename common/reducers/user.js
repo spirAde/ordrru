@@ -7,7 +7,9 @@ import { CHANGE_CITY, CHANGE_ORGANIZATION_TYPE,
   RESET_FULL_ORDER, RESET_DATETIME_ORDER,
   UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END, UPDATE_ORDER_SUM,
   CHECK_ORDER_REQUEST, CHECK_ORDER_SUCCESS, CHECK_ORDER_FAILURE,
-  CHANGE_ORDER_STEP } from '../../client/scripts/actions/user-actions';
+  CHANGE_ORDER_STEP,
+  LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE,
+  LOGOUT_REQUEST, LOGOUT_SUCCESS, LOGOUT_FAILURE } from '../../client/scripts/actions/user-actions';
 
 export const initialState = fromJS({
   cityId: null,
@@ -38,6 +40,13 @@ export const initialState = fromJS({
       height: null,
       width: null
     },
+  },
+  auth: {
+    isFetching: false,
+    isAuthenticated: false,
+    error: false,
+    phone: null,
+    token: null,
   }
 });
 
@@ -98,5 +107,27 @@ export const reducer = createReducer({
       .setIn(['steps', 'choice', 'loading'], false)
       .setIn(['steps', 'choice', 'valid'], false)
       .setIn(['steps', 'choice', 'error'], action.payload.error);
+  },
+  [LOGIN_REQUEST](state) {
+    return state
+      .setIn(['auth', 'isFetching'], true);
+  },
+  [LOGIN_SUCCESS](state, action) {
+    return state
+      .setIn(['auth', 'isFetching'], false)
+      .setIn(['auth', 'token'], action.payload.token);
+  },
+  [LOGIN_FAILURE](state, action) {
+    return state;
+  },
+  [LOGOUT_REQUEST](state) {
+    return state
+      .setIn(['auth', 'isFetching'], true);
+  },
+  [LOGOUT_SUCCESS](state, action) {
+    return state;
+  },
+  [LOGOUT_FAILURE](state, action) {
+    return state;
   },
 }, initialState);

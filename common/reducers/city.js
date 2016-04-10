@@ -1,5 +1,4 @@
 import { fromJS } from 'immutable';
-import isNull from 'lodash/isNull';
 
 import createReducer from '../utils/create-reducer';
 

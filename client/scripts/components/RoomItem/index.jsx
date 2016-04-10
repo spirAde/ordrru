@@ -218,6 +218,8 @@ class RoomItemComponent extends Component {
     const options = this.renderOptions(room.get('options').concat(bathhouse.get('options')));
     const stars = this.renderStars(room.get('rating'));
 
+    const needResetOrderedPeriods = !order.get('roomId') && !order.getIn(['datetime', 'startDate']);
+
     const infoClasses = classNames({
       'RoomItem-info': true,
       'RoomItem-info--opened': isOpen,
@@ -326,9 +328,9 @@ class RoomItemComponent extends Component {
                         <div className="RoomItem-field-date-time g-field-date">
                           <input
                             className="RoomItem-field-date-time-input"
-                            placeholder={formatMessage({ id: 'selectTime' })}
                             onClick={this.handleOpenSchedule}
                             value={orderDatetimeValue}
+                            placeholder={formatMessage({ id: 'selectTime' })}
                           />
                           {
                             order.getIn(['datetime', 'startDate']) ?
@@ -387,6 +389,7 @@ class RoomItemComponent extends Component {
                     schedule={schedule}
                     prices={room.getIn(['price', 'chunks'])}
                     isOpen={data.get('scheduleIsOpen')}
+                    needResetOrderedPeriods={needResetOrderedPeriods}
                     onSelectOrder={this.handleSelectOrder}
                   />
                 </div>

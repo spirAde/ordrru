@@ -112,13 +112,19 @@ class ScheduleRowComponent extends Component {
    * @param {Array.<Object>} cells - cells
    * @return {Array.<Element>} rendered cells
    * */
-  renderCells(date, cells) {
+  renderCells(date, cells, orderedCells) {
     return cells.map((cell, index) => {
+      const cellIsFree = cell.get('enable') && !cell.getIn(['status', 'isForceDisable']) &&
+        !orderedCells.includes(cell.get('period'));
+      const cellIsBusy = !cell.get('enable') || cell.getIn(['status', 'isForceDisable']);
+      const cellIsOrdered = orderedCells.includes(cell.get('period'));
+
       const classes = classNames({
         'ScheduleRow-cell': true,
         'ScheduleRow-cell--odd': index % 2 === 1,
-        'ScheduleRow-cell--free': cell.get('enable') && !cell.getIn(['status', 'isForceDisable']),
-        'ScheduleRow-cell--busy': !cell.get('enable') || cell.getIn(['status', 'isForceDisable']),
+        'ScheduleRow-cell--free': cellIsFree,
+        'ScheduleRow-cell--busy': cellIsBusy,
+        'ScheduleRow-cell--ordered': cellIsOrdered,
       });
       const cellTime = configs.periods[cell.get('period')];
 
@@ -140,10 +146,10 @@ class ScheduleRowComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { cells, date, isLast } = this.props;
+    const { cells, orderedCells, date, isLast } = this.props;
 
     const { data } = this.state;
-    const renderCells = this.renderCells(date, cells);
+    const renderCells = this.renderCells(date, cells, orderedCells);
 
     const classes = classNames({
       ScheduleRow: true,
@@ -200,6 +206,7 @@ class ScheduleRowComponent extends Component {
 /**
  * propTypes
  * @property {Array.<Object>} cells - cells of schedule for dates
+ * @property {Array.<Object>} orderedCells - ordered cells in current date
  * @property {Array.<Object>} prices - prices for current day splitted by intervals
  * @property {string} date - date
  * @property {boolean} isLast - last row or not
@@ -207,6 +214,7 @@ class ScheduleRowComponent extends Component {
  * */
 ScheduleRowComponent.propTypes = {
   cells: ImmutablePropTypes.list.isRequired,
+  orderedCells: ImmutablePropTypes.list.isRequired,
   prices: ImmutablePropTypes.list.isRequired,
   date: PropTypes.string.isRequired,
   isLast: PropTypes.bool.isRequired,

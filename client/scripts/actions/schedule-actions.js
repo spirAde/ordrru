@@ -1,23 +1,23 @@
 import moment from 'moment';
-import { last, head, map, assign, range, omit, isNull } from 'lodash';
+import { map, assign, omit } from 'lodash';
 
 import { Schedule } from '../API';
 
 import configs from '../../../common/data/configs.json';
 
-import { splitScheduleByAvailability, findFirstOrLastDisablePeriod,
-  getLeftAndRightClosestEnablePeriods, forceDisableFor,
-  setIsForceDisable, setIsForceDisableBatch } from '../../../common/utils/schedule-helper';
+import { forceDisableFor, FIRST_PERIOD, LAST_PERIOD, STEP } from '../../../common/utils/schedule-helper';
+import { isSameDate, MOMENT_FORMAT } from '../../../common/utils/date-helper';
 
 export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
 export const FIND_ROOM_SCHEDULE_FAILURE = 'FIND_ROOM_SCHEDULE_FAILURE';
 
 export const UPDATE_SCHEDULE = 'UPDATE_SCHEDULE';
+export const UPDATE_SCHEDULES_BATCH = 'UPDATE_SCHEDULES_BATCH';
 
-const FIRST_PERIOD = 0;
-const LAST_PERIOD = 144;
-const STEP = 3;
+export const REMOVE_SCHEDULES = 'REMOVE_SCHEDULES';
+
+export const SET_DISABLE_PERIOD = 'SET_DISABLE_PERIOD';
 
 /**
  * Request fetching schedule
@@ -106,6 +106,23 @@ function updateSchedule(roomId, schedule, reason) {
 }
 
 /**
+ * update all schedules for all rooms
+ * @param {Object} schedules
+ * @param {String} reason
+ * */
+function updateSchedulesBatch(schedules, reason) {
+  return {
+    type: UPDATE_SCHEDULES_BATCH,
+    payload: {
+      schedules,
+    },
+    meta: {
+      reason,
+    },
+  };
+}
+
+/**
  * reset schedule which is obtained by the user of the order
  * return {void}
  * */
@@ -174,5 +191,38 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
     }));
 
     return dispatch(updateSchedule(id, recoverSchedule, 'remove isForceDisable'));
+  };
+}
+
+export function removeAllFirstSchedules() {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (!state.schedule.get('schedules').size) return false;
+
+    const newSchedules = state.schedule.get('schedules').withMutations(schedules => {
+      schedules.forEach((schedule, roomId) => {
+        schedules.set(roomId, schedule.shift());
+      });
+    });
+
+    return dispatch(updateSchedulesBatch(newSchedules, 'remove all first schedules'));
+  };
+}
+
+export function setDisablePeriod(date, period) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (!state.schedule.get('schedules').size) return false;
+
+    const newSchedules = state.schedule.get('schedules').withMutations(schedules => {
+      schedules.forEach((roomSchedules, roomId) => {
+        const disabledPeriodIndex = period / STEP;
+        schedules.setIn([roomId, 0, 'periods', disabledPeriodIndex, 'enable'], false);
+      });
+    });
+
+    return dispatch(updateSchedulesBatch(newSchedules, 'set new disable global period'));
   };
 }

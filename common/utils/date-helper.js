@@ -2,6 +2,8 @@ import moment from 'moment';
 
 export const MOMENT_FORMAT = 'YYYY-MM-DD';
 
+const LAST_PERIOD = 144;
+
 /**
  * Returns all dates between start and end.
  * @param {String} start - start of date interval
@@ -37,4 +39,14 @@ export function isSameDate(start, end) {
 	end = moment.isMoment(end) ? end.format(MOMENT_FORMAT) : moment(end).format(MOMENT_FORMAT);
 
 	return moment(start).isSame(end);
+}
+
+export function timeToPeriod(time) {
+	const currentHour = moment(time).format('HH');
+	const currentMinutes = moment(time).format('mm');
+	return (currentHour * 2 + (currentMinutes >= 30 ? 1 : 0)) * 3;
+}
+
+export function periodToTime(period) {
+	return period * 24 / LAST_PERIOD;
 }

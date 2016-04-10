@@ -6,9 +6,9 @@ import { range, filter, map, has, difference, head, last, takeWhile, takeRightWh
 	isEmpty, flatten, floor, isNull, tail } from 'lodash';
 import { datesRange, isSameDate, MOMENT_FORMAT } from './date-helper';
 
-const FIRST_PERIOD = 0;
-const LAST_PERIOD = 144;
-const STEP = 3;
+export const FIRST_PERIOD = 0;
+export const LAST_PERIOD = 144;
+export const STEP = 3;
 
 /**
  * Use for server and client
