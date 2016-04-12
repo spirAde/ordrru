@@ -91,6 +91,8 @@ class RoomItemComponent extends Component {
    * @param {Object} order - selected user order
    * @return {string} - humanize view of datetime
    * */
+  // TODO: check if user click on last period for date, then need change date
+  // TODO: and period to next date and first period
   getDatetimeValue(id, order) {
     let value = '';
 
@@ -407,6 +409,7 @@ class RoomItemComponent extends Component {
                   <SchedulePanelComponent
                     schedule={schedule}
                     prices={room.getIn(['price', 'chunks'])}
+                    order={order}
                     isOpen={data.get('scheduleIsOpen')}
                     needResetOrderedPeriods={data.get('needResetOrderedPeriods')}
                     onSelectOrder={this.handleSelectOrder}

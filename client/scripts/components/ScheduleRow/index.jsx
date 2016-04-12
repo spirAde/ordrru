@@ -8,6 +8,8 @@ import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import classNames from 'classnames';
 
+import { LAST_PERIOD, STEP } from '../../../../common/utils/schedule-helper';
+
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import configs from '../../../../common/data/configs.json';
@@ -38,7 +40,6 @@ class ScheduleRowComponent extends Component {
     };
 
     this.handleClickCell = this.handleClickCell.bind(this);
-    this.handleMouseOverCell = this.handleMouseOverCell.bind(this);
     this.handleMouseLeaveScheduleRow = this.handleMouseLeaveScheduleRow.bind(this);
   }
 
@@ -84,17 +85,16 @@ class ScheduleRowComponent extends Component {
    * handle if user mouse over cursor to cell, than set shownInterval current price interval
    * @param {Object} event - SyntheticEvent
    * */
-  handleMouseOverCell(event) {
+  handleMouseOverCell(period, event) {
     event.preventDefault();
 
-    const { prices, cells, date } = this.props;
+    const { prices, date, orderIsStarted } = this.props;
 
-    const parentNode = event.target.parentNode;
-    const cellIndex = indexOf(parentNode.childNodes, event.target);
-    const period = cells.getIn([cellIndex, 'period']);
+    const fixedPeriod = !orderIsStarted && period !== LAST_PERIOD ?
+      period + STEP : period;
 
     const interval = prices.find(
-      chunk => chunk.get('startPeriod') <= period && period <= chunk.get('endPeriod')
+      chunk => chunk.get('startPeriod') <= fixedPeriod && fixedPeriod <= chunk.get('endPeriod')
     );
 
     this.setState(({ data }) => ({
@@ -135,7 +135,7 @@ class ScheduleRowComponent extends Component {
           className={classes}
           key={index}
           onClick={this.handleClickCell}
-          onMouseOver={this.handleMouseOverCell}
+          onMouseOver={this.handleMouseOverCell.bind(this, cell.get('period'))}
         >
           {cellTime}
         </div>
@@ -209,6 +209,7 @@ class ScheduleRowComponent extends Component {
  * propTypes
  * @property {Array.<Object>} cells - cells of schedule for dates
  * @property {Array.<Object>} orderedCells - ordered cells in current date
+ * @property {Boolean} orderIsStarted - if user select start date and period
  * @property {Array.<Object>} prices - prices for current day splitted by intervals
  * @property {string} date - date
  * @property {boolean} isLast - last row or not
@@ -218,6 +219,7 @@ class ScheduleRowComponent extends Component {
 ScheduleRowComponent.propTypes = {
   cells: ImmutablePropTypes.list.isRequired,
   orderedCells: ImmutablePropTypes.list.isRequired,
+  orderIsStarted: PropTypes.bool.isRequired,
   prices: ImmutablePropTypes.list.isRequired,
   date: PropTypes.string.isRequired,
   isLast: PropTypes.bool.isRequired,

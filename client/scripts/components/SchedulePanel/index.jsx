@@ -1,5 +1,5 @@
-import { fromJS, List, Map } from 'immutable';
-import { range } from 'lodash';
+import { fromJS, List } from 'immutable';
+import { range, isNull } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -34,9 +34,7 @@ class SchedulePanelComponent extends Component {
 
     this.state = {
       data: fromJS({
-        startOrderedDatePeriod: {},
         orderedPeriods: {},
-        endOrderedDatePeriod: {},
       }),
     };
 
@@ -90,19 +88,18 @@ class SchedulePanelComponent extends Component {
    * @return {void}
    * */
   handleMouseOverCell(date, period) {
-    const { data } = this.state;
-    const { schedule } = this.props;
+    const { schedule, order } = this.props;
 
-    const orderIsComplete = data.get('startOrderedDatePeriod').size &&
-      data.get('endOrderedDatePeriod').size;
+    const orderIsComplete = order.getIn(['datetime', 'startDate']) &&
+      order.getIn(['datetime', 'endDate']);
 
-    if (!data.get('startOrderedDatePeriod').size || orderIsComplete) return false;
+    if (!order.getIn(['datetime', 'startDate']) || orderIsComplete) return false;
 
     const selectedRow = schedule.find(row => moment(row.get('date')).isSame(date));
     const selectedPeriod = selectedRow.getIn(['periods', period / STEP]);
 
-    const startDate = data.getIn(['startOrderedDatePeriod', 'date']);
-    const startPeriod = data.getIn(['startOrderedDatePeriod', 'period']);
+    const startDate = order.getIn(['datetime', 'startDate']);
+    const startPeriod = order.getIn(['datetime', 'startPeriod']);
 
     if (!selectedPeriod.get('enable') || selectedPeriod.getIn(['status', 'isForceDisable'])) {
       this.setState(({ data }) => ({
@@ -160,16 +157,9 @@ class SchedulePanelComponent extends Component {
       orderedPeriods.update(date, periods => periods.push(period)) :
       orderedPeriods.merge(fromJS({ [date]: [period] }));
 
-    const newStateData = fromJS({
-      startOrderedDatePeriod: data.get('startOrderedDatePeriod').size ?
-        data.get('startOrderedDatePeriod') : Map({ date, period }),
-      orderedPeriods: newOrderedPeriods,
-      endOrderedDatePeriod: data.get('startOrderedDatePeriod').size ? Map({ date, period }) : Map(),
-    });
-
-    this.setState({
-      data: newStateData,
-    });
+    this.setState(({ data }) => ({
+      data: data.set('orderedPeriods', fromJS(newOrderedPeriods)),
+    }));
   }
 
   /**
@@ -177,14 +167,8 @@ class SchedulePanelComponent extends Component {
    * @return {void}
    * */
   resetOrderedPeriods() {
-    const newStateData = fromJS({
-      startOrderedDatePeriod: {},
-      orderedPeriods: {},
-      endOrderedDatePeriod: {},
-    });
-
     this.setState({
-      data: newStateData,
+      data: fromJS({ orderedPeriods: {} }),
     });
 
     this.props.onResetOrderedPeriods();
@@ -194,9 +178,10 @@ class SchedulePanelComponent extends Component {
    * render schedule rows for all retrieved dates
    * @param {Array.<Object>} schedules - schedules for room
    * @param {Array.<Object>} prices - prices by chunks
+   * @param {Boolean} orderIsStarted - if user select start date and period
    * @return {Array.<Element>} - schedule rows element
    * */
-  renderScheduleRows(schedule, prices) {
+  renderScheduleRows(schedule, prices, orderIsStarted) {
     const { data } = this.state;
 
     return schedule.map((row, index) => {
@@ -205,6 +190,7 @@ class SchedulePanelComponent extends Component {
         <ScheduleRowComponent
           cells={row.get('periods')}
           orderedCells={orderedCells}
+          orderIsStarted={orderIsStarted}
           prices={prices.get(moment(row.get('date')).day())}
           date={row.get('date')}
           isLast={index === schedule.size - 1}
@@ -221,9 +207,11 @@ class SchedulePanelComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { schedule, prices, isOpen } = this.props;
+    const { schedule, prices, isOpen, order } = this.props;
 
-    const rows = schedule ? this.renderScheduleRows(schedule, prices) : null;
+    const orderIsStarted = !isNull(order.getIn(['datetime', 'startDate'])) &&
+      !isNull(order.getIn(['datetime', 'startPeriod']));
+    const rows = schedule ? this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
 
     const classes = classNames({
       SchedulePanel: true,
@@ -246,6 +234,7 @@ class SchedulePanelComponent extends Component {
  * propTypes
  * @property {Array.<Object>} schedules - room schedules
  * @property {Array.<Object>} prices - prices for current day splitted by intervals
+ * @property {Object} order - selected user order
  * @property {boolean} isOpen - opened or not
  * @property {Function} onSelectOrder - select date and period of order
  * @property {Function} onResetOrderedPeriods - schedule send parent event, that periods were reset
@@ -253,6 +242,7 @@ class SchedulePanelComponent extends Component {
 SchedulePanelComponent.propTypes = {
   schedule: ImmutablePropTypes.list,
   prices: ImmutablePropTypes.list,
+  order: ImmutablePropTypes.map,
   isOpen: PropTypes.bool.isRequired,
   onSelectOrder: PropTypes.func.isRequired,
   onResetOrderedPeriods: PropTypes.func.isRequired,
