@@ -48,6 +48,7 @@ class RoomItemComponent extends Component {
     this.state = {
       data: Map({
         scheduleIsOpen: false,
+        needResetOrderedPeriods: false,
       }),
     };
 
@@ -55,6 +56,8 @@ class RoomItemComponent extends Component {
     this.handleOpenDescription = this.handleOpenDescription.bind(this);
     this.handleOpenSchedule = this.handleOpenSchedule.bind(this);
     this.handleClickCheckOrder = this.handleClickCheckOrder.bind(this);
+    this.handleResetDatetimeOrder = this.handleResetDatetimeOrder.bind(this);
+    this.handleResetOrderedPeriods = this.handleResetOrderedPeriods.bind(this);
   }
 
   /**
@@ -138,6 +141,22 @@ class RoomItemComponent extends Component {
     }));
   }
 
+  handleResetDatetimeOrder(event) {
+    event.preventDefault();
+
+    this.props.onResetDatetimeOrder();
+
+    this.setState(({ data }) => ({
+      data: data.set('needResetOrderedPeriods', true),
+    }));
+  }
+
+  handleResetOrderedPeriods() {
+    this.setState(({ data }) => ({
+      data: data.set('needResetOrderedPeriods', false),
+    }));
+  }
+
   /**
    * handle selected order
    * @param {Date} date - date of start or end of order
@@ -218,8 +237,6 @@ class RoomItemComponent extends Component {
     const options = this.renderOptions(room.get('options').concat(bathhouse.get('options')));
     const stars = this.renderStars(room.get('rating'));
 
-    const needResetOrderedPeriods = !order.get('roomId') && !order.getIn(['datetime', 'startDate']);
-
     const infoClasses = classNames({
       'RoomItem-info': true,
       'RoomItem-info--opened': isOpen,
@@ -274,13 +291,13 @@ class RoomItemComponent extends Component {
             <div className="RoomItem-preview-bottom g-clear">
               <div className="RoomItem-photos">
                 <a className="RoomItem-photo">
-                  <img width="234" height="140" src={bathhouseImg} />
+                  <img width="234" height="140" alt="" src={bathhouseImg} />
                 </a>
                 <a className="RoomItem-photo">
-                  <img width="234" height="140" src={bathhouseImg1} />
+                  <img width="234" height="140" alt="" src={bathhouseImg1} />
                 </a>
                 <a className="RoomItem-photo">
-                  <img width="234" height="140" src={bathhouseImg3} />
+                  <img width="234" height="140" alt="" src={bathhouseImg3} />
                 </a>
               </div>
               <div className="RoomItem-more-info">
@@ -334,7 +351,7 @@ class RoomItemComponent extends Component {
                           />
                           {
                             order.getIn(['datetime', 'startDate']) ?
-                              <span onClick={this.props.onResetDatetimeOrder}>
+                              <span onClick={this.handleResetDatetimeOrder}>
                                 <IconComponent
                                   name="icon-cancel"
                                   rate={1.5}
@@ -389,8 +406,9 @@ class RoomItemComponent extends Component {
                     schedule={schedule}
                     prices={room.getIn(['price', 'chunks'])}
                     isOpen={data.get('scheduleIsOpen')}
-                    needResetOrderedPeriods={needResetOrderedPeriods}
+                    needResetOrderedPeriods={data.get('needResetOrderedPeriods')}
                     onSelectOrder={this.handleSelectOrder}
+                    onResetOrderedPeriods={this.handleResetOrderedPeriods}
                   />
                 </div>
             }

@@ -87,7 +87,7 @@ class ScheduleRowComponent extends Component {
   handleMouseOverCell(event) {
     event.preventDefault();
 
-    const { prices, cells } = this.props;
+    const { prices, cells, date } = this.props;
 
     const parentNode = event.target.parentNode;
     const cellIndex = indexOf(parentNode.childNodes, event.target);
@@ -104,6 +104,8 @@ class ScheduleRowComponent extends Component {
         price: interval.get('price'),
       })),
     }));
+
+    this.props.onMouseOverCell(date, period);
   }
 
   /**
@@ -211,6 +213,7 @@ class ScheduleRowComponent extends Component {
  * @property {string} date - date
  * @property {boolean} isLast - last row or not
  * @property {Function} onSelectOrder - select date and period of order
+ * @property {Function} onMouseOverCell - pass to parent date and period mouseover cell
  * */
 ScheduleRowComponent.propTypes = {
   cells: ImmutablePropTypes.list.isRequired,
@@ -219,6 +222,7 @@ ScheduleRowComponent.propTypes = {
   date: PropTypes.string.isRequired,
   isLast: PropTypes.bool.isRequired,
   onSelectOrder: PropTypes.func.isRequired,
+  onMouseOverCell: PropTypes.func.isRequired,
 };
 
 export default ScheduleRowComponent;

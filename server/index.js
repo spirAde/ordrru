@@ -1,13 +1,20 @@
 var environment = process.env.NODE_ENV || 'development';
 
 require('dotenv').config({path: 'envs/.env.' + environment});
+
+var plugins = [
+  'transform-runtime',
+  'add-module-exports',
+  'transform-decorators-legacy',
+  'transform-react-display-name'
+];
+
 require('babel-core/register')({
-  plugins: [
-    'transform-runtime',
-    'add-module-exports',
-    'transform-decorators-legacy',
-    'transform-react-display-name'
-  ],
+  plugins: environment === 'development' ? plugins : plugins.concat([
+    'transform-react-remove-prop-types',
+    'transform-react-constant-elements',
+    'transform-react-inline-elements'
+  ]),
   presets: ['es2015', 'stage-0', 'react']
 });
 //require('css-modules-require-hook')();

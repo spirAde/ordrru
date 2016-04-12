@@ -1,4 +1,5 @@
 import { fromJS, List } from 'immutable';
+import { isNull } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -31,13 +32,14 @@ class SchedulePanelComponent extends Component {
 
     this.state = {
       data: fromJS({
-        orderedPeriods: {},
         startOrderedPeriod: null,
+        orderedPeriods: {},
         endOrderedPeriod: null,
       }),
     };
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
+    this.handleMouseOverCell = this.handleMouseOverCell.bind(this);
   }
 
   /**
@@ -52,11 +54,21 @@ class SchedulePanelComponent extends Component {
   }
 
   /**
+   * componentWillReceiveProps
+   * check if need to reset ordered periods
+   * @return {void}
+   * */
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.needResetOrderedPeriods) this.resetOrderedPeriods();
+  }
+
+  /**
    * shouldComponentUpdate
    * @return {boolean}
    * */
-  shouldComponentUpdate(nextProps) {
-    return !shallowEqualImmutable(this.props, nextProps);
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -68,20 +80,64 @@ class SchedulePanelComponent extends Component {
   }
 
   /**
+   * handle mouse over cell from rows
+   * @param {String} date - date of schedule row to which the period
+   * @param {Number} period - selected period
+   * @return {void}
+   * */
+  handleMouseOverCell(date, period) {
+    const { data } = this.state;
+
+    if (!data.get('startOrderedPeriod')) return false;
+
+    // TODO: find all available periods between startOrderedPeriod and mouseover period
+  }
+
+  /**
    * handleSelectOrder - pass date and period of order to parent. And add ordered period to state
    * @param {String} date - selected date
    * @param {Number} period - selected period
    * @return {void}
    * */
   handleSelectOrder(date, period) {
+    const { data } = this.state;
+
     this.props.onSelectOrder(date, period);
 
-    this.setState(({ data }) => ({
-      data: data
-        .set('startOrderedPeriod', data.get('startOrderedPeriod') || date)
-        .set('endOrderedPeriod', data.get('startOrderedPeriod') ? date : null)
-        .set('orderedPeriods', fromJS({ [date]: [period] })),
-    }));
+    const orderedPeriods = data.get('orderedPeriods');
+
+    const newOrderedPeriods = orderedPeriods.has(date) ?
+      orderedPeriods.update(date, periods => periods.push(period)) :
+      orderedPeriods.merge(fromJS({ [date]: [period] }));
+
+    const newStateData = fromJS({
+      startOrderedPeriod: !isNull(data.get('startOrderedPeriod')) ?
+        data.get('startOrderedPeriod') : period,
+      orderedPeriods: newOrderedPeriods,
+      endOrderedPeriod: !isNull(data.get('startOrderedPeriod')) ? period : null,
+    });
+
+    this.setState({
+      data: newStateData,
+    });
+  }
+
+  /**
+   * reset all state for ordered periods
+   * @return {void}
+   * */
+  resetOrderedPeriods() {
+    const newStateData = fromJS({
+      startOrderedPeriod: null,
+      orderedPeriods: {},
+      endOrderedPeriod: null,
+    });
+
+    this.setState({
+      data: newStateData,
+    });
+
+    this.props.onResetOrderedPeriods();
   }
 
   /**
@@ -104,6 +160,7 @@ class SchedulePanelComponent extends Component {
           isLast={index === schedule.size - 1}
           key={row.get('id')}
           onSelectOrder={this.handleSelectOrder}
+          onMouseOverCell={this.handleMouseOverCell}
         />
       );
     });
@@ -138,19 +195,19 @@ class SchedulePanelComponent extends Component {
 /**
  * propTypes
  * @property {Array.<Object>} schedules - room schedules
- * @property {Boolean} needResetOrderedPeriods - if order was canceled, then reset ordered periods
  * @property {Array.<Object>} prices - prices for current day splitted by intervals
  * @property {boolean} isOpen - opened or not
  * @property {string} notifier - notify text, if order was cancel or reserve
  * @property {Function} onSelectOrder - select date and period of order
+ * @property {Function} onResetOrderedPeriods - schedule send parent event, that periods were reset
  * */
 SchedulePanelComponent.propTypes = {
   schedule: ImmutablePropTypes.list,
-  needResetOrderedPeriods: PropTypes.bool.isRequired,
   prices: ImmutablePropTypes.list,
   isOpen: PropTypes.bool.isRequired,
   notifier: PropTypes.string,
   onSelectOrder: PropTypes.func.isRequired,
+  onResetOrderedPeriods: PropTypes.func.isRequired,
 };
 
 export default SchedulePanelComponent;

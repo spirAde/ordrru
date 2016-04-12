@@ -57,7 +57,7 @@ module.exports = {
         test: /\.(js|jsx)$/,
         loader: 'babel',
         include: [path.join(__dirname, '..', 'client'), path.join(__dirname, '..', 'common')],
-        exclude: path.join(__dirname, '..', 'client', 'models')
+        exclude: path.join(__dirname, '..', 'client', 'models'),
       },
       {
         test: /\.json/,

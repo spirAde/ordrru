@@ -43,7 +43,8 @@ class RoomsListComponent extends Component {
 
     if (window.__FIRST_RENDER__) {
       if (activeRoomId) {
-        const activeRoomComponent = this.refs.activeRoom;
+        const activeRoomRef = `room-${activeRoomId}`;
+        const activeRoomComponent = this.refs[activeRoomRef];
 
         if (activeRoomComponent) {
           const domNode = ReactDOM.findDOMNode(activeRoomComponent);
@@ -93,9 +94,7 @@ class RoomsListComponent extends Component {
    * handle click reset datetime order
    * @return {void}
    * */
-  handleResetDatetimeOrder(event) {
-    event.preventDefault();
-
+  handleResetDatetimeOrder() {
     this.props.resetDatetimeOrder();
     this.props.resetOrderSchedule();
   }
@@ -132,6 +131,7 @@ class RoomsListComponent extends Component {
 
       return (
         <RoomItemComponent
+          ref={`room-${room.get('id')}`}
           isOpen={activeRoomId === room.get('id')}
           room={room}
           bathhouse={bathhouse}
@@ -145,7 +145,6 @@ class RoomsListComponent extends Component {
           onSendOrder={this.props.sendOrder}
           onResetDatetimeOrder={this.handleResetDatetimeOrder}
           key={room.get('id')}
-          ref={activeRoomId === room.get('id') ? 'activeRoom' : null}
         />
       );
     });
