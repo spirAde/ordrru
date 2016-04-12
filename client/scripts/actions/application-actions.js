@@ -80,7 +80,7 @@ export function changeGlobalCurrentDateAndPeriod(cityId) {
       const timezone = currentCity.get('timezone');
 
       const currentTime = periodToTime(currentPeriod);
-      const currentDatetime = `${currentDate} ${currentTime}:00:00`;
+      const currentDatetime = new Date(`${currentDate} ${currentTime}:00:00`);
       const currentMomentDatetimeOffset = moment(currentDatetime).tz(timezone);
 
       const newDate = currentMomentDatetimeOffset.format(MOMENT_FORMAT);

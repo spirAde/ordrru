@@ -1,5 +1,5 @@
-import { fromJS, List } from 'immutable';
-import { isNull } from 'lodash';
+import { fromJS, List, Map } from 'immutable';
+import { range } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -7,6 +7,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 
 import moment from 'moment';
+
+import { STEP, FIRST_PERIOD, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -32,9 +34,9 @@ class SchedulePanelComponent extends Component {
 
     this.state = {
       data: fromJS({
-        startOrderedPeriod: null,
+        startOrderedDatePeriod: {},
         orderedPeriods: {},
-        endOrderedPeriod: null,
+        endOrderedDatePeriod: {},
       }),
     };
 
@@ -80,17 +82,65 @@ class SchedulePanelComponent extends Component {
   }
 
   /**
-   * handle mouse over cell from rows
+   * handle mouse over cell from rows. Paint ordered periods.
+   * Skip if order wasn't begin. Skip if order complete.
+   * If the mouse cursor is over a busy or unavailable periods, then restore the original state
    * @param {String} date - date of schedule row to which the period
    * @param {Number} period - selected period
    * @return {void}
    * */
   handleMouseOverCell(date, period) {
     const { data } = this.state;
+    const { schedule } = this.props;
 
-    if (!data.get('startOrderedPeriod')) return false;
+    const orderIsComplete = data.get('startOrderedDatePeriod').size &&
+      data.get('endOrderedDatePeriod').size;
 
-    // TODO: find all available periods between startOrderedPeriod and mouseover period
+    if (!data.get('startOrderedDatePeriod').size || orderIsComplete) return false;
+
+    const selectedRow = schedule.find(row => moment(row.get('date')).isSame(date));
+    const selectedPeriod = selectedRow.getIn(['periods', period / STEP]);
+
+    const startDate = data.getIn(['startOrderedDatePeriod', 'date']);
+    const startPeriod = data.getIn(['startOrderedDatePeriod', 'period']);
+
+    if (!selectedPeriod.get('enable') || selectedPeriod.getIn(['status', 'isForceDisable'])) {
+      this.setState(({ data }) => ({
+        data: data.set('orderedPeriods', fromJS({ [startDate]: [startPeriod] })),
+      }));
+
+      return false;
+    }
+
+    let newRangeOrderedPeriods = {};
+
+    if (moment(startDate).isSame(date)) {
+      if (startPeriod < period) {
+        newRangeOrderedPeriods = { [date]: range(startPeriod, period + STEP, STEP) };
+      } else {
+        newRangeOrderedPeriods = { [date]: range(period, startPeriod + STEP, STEP) };
+      }
+    } else if (moment(startDate).isBefore(date)) {
+      const startDatePeriodsRange = range(startPeriod, LAST_PERIOD + STEP, STEP);
+      const newDatePeriodsRange = range(FIRST_PERIOD, period + STEP, STEP);
+
+      newRangeOrderedPeriods = {
+        [startDate]: startDatePeriodsRange,
+        [date]: newDatePeriodsRange,
+      };
+    } else {
+      const startDatePeriodsRange = range(FIRST_PERIOD, startPeriod + STEP, STEP);
+      const newDatePeriodsRange = range(period, LAST_PERIOD + STEP, STEP);
+
+      newRangeOrderedPeriods = {
+        [startDate]: startDatePeriodsRange,
+        [date]: newDatePeriodsRange,
+      };
+    }
+
+    return this.setState(({ data }) => ({
+      data: data.set('orderedPeriods', fromJS(newRangeOrderedPeriods)),
+    }));
   }
 
   /**
@@ -111,10 +161,10 @@ class SchedulePanelComponent extends Component {
       orderedPeriods.merge(fromJS({ [date]: [period] }));
 
     const newStateData = fromJS({
-      startOrderedPeriod: !isNull(data.get('startOrderedPeriod')) ?
-        data.get('startOrderedPeriod') : period,
+      startOrderedDatePeriod: data.get('startOrderedDatePeriod').size ?
+        data.get('startOrderedDatePeriod') : Map({ date, period }),
       orderedPeriods: newOrderedPeriods,
-      endOrderedPeriod: !isNull(data.get('startOrderedPeriod')) ? period : null,
+      endOrderedDatePeriod: data.get('startOrderedDatePeriod').size ? Map({ date, period }) : Map(),
     });
 
     this.setState({
@@ -128,9 +178,9 @@ class SchedulePanelComponent extends Component {
    * */
   resetOrderedPeriods() {
     const newStateData = fromJS({
-      startOrderedPeriod: null,
+      startOrderedDatePeriod: {},
       orderedPeriods: {},
-      endOrderedPeriod: null,
+      endOrderedDatePeriod: {},
     });
 
     this.setState({
@@ -197,7 +247,6 @@ class SchedulePanelComponent extends Component {
  * @property {Array.<Object>} schedules - room schedules
  * @property {Array.<Object>} prices - prices for current day splitted by intervals
  * @property {boolean} isOpen - opened or not
- * @property {string} notifier - notify text, if order was cancel or reserve
  * @property {Function} onSelectOrder - select date and period of order
  * @property {Function} onResetOrderedPeriods - schedule send parent event, that periods were reset
  * */
@@ -205,7 +254,6 @@ SchedulePanelComponent.propTypes = {
   schedule: ImmutablePropTypes.list,
   prices: ImmutablePropTypes.list,
   isOpen: PropTypes.bool.isRequired,
-  notifier: PropTypes.string,
   onSelectOrder: PropTypes.func.isRequired,
   onResetOrderedPeriods: PropTypes.func.isRequired,
 };

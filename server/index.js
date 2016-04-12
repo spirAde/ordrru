@@ -17,7 +17,9 @@ require('babel-core/register')({
   ]),
   presets: ['es2015', 'stage-0', 'react']
 });
-//require('css-modules-require-hook')();
+require('css-modules-require-hook')({
+  devMode: environment === 'development'
+});
 
 global.__CLIENT__ = false;
 global.__SERVER__ = true;

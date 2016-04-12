@@ -1,8 +1,7 @@
 import React, { Component, PropTypes } from 'react';
+import Helmet from 'react-helmet';
 
 import { connect } from 'react-redux';
-
-import moment from 'moment';
 
 import { changeUserViewport } from '../actions/user-actions';
 import { initGlobalCurrentDateAndPeriod } from '../actions/application-actions';
@@ -46,6 +45,10 @@ class App extends Component {
   render() {
     return (
       <div>
+        <Helmet
+          title="Ordr.ru"
+          titleTemplate="%s | Ordr.ru"
+        />
         {this.props.children}
       </div>
     );

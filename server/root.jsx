@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import serialize from 'serialize-javascript';
-import DocumentMeta from 'react-document-meta';
+import Helmet from 'react-helmet';
 
 /**
  * Wrapper component containing HTML metadata and boilerplate tags.
@@ -21,13 +21,22 @@ class Root extends Component {
   render() {
     const {assets, component, store, locale, referenceDatetime} = this.props;
     const content = component ? ReactDOMServer.renderToString(component) : '';
+    const head = Helmet.rewind();
 
     return (
       <html lang={locale}>
       <head>
-        {DocumentMeta.renderAsReact()}
+        {head.base.toComponent()}
+        {head.title.toComponent()}
+        {head.meta.toComponent()}
+        {head.link.toComponent()}
+        {head.script.toComponent()}
 
-        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="shortcut icon" sizes="16x16 32x32 96x96" href="icons/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="57x57" href="icons/apple-touch-icon-57-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="icons/apple-touch-icon-72-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="icons/apple-touch-icon-114-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="icons/apple-touch-icon-144-precomposed.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {

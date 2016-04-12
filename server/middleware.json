@@ -5,7 +5,9 @@
         "enableHttpContext": true
       }
     },
-    "loopback#favicon": {},
+    "loopback#favicon": {
+      "params": "client/images/icons/favicon.ico"
+    },
     "./middleware/logging": {},
     "./middleware/request-logging": {}
   },

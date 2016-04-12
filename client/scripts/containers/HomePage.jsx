@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Helmet from 'react-helmet';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { connect } from 'react-redux';
@@ -60,15 +61,16 @@ class HomePage extends Component {
   render() {
     return (
       <div>
+        <Helmet title="Home" />
         <FaceComponent />
         <HowUseItComponent />
         <TestimonialsComponent />
         {/*<InterestingComponent
-          onChangeCity={this.handleChangeCity}
-          onChangeOrganizationType={this.handleChangeOrganizationType}
-          cities={this.props.cities}
-          types={this.props.types}
-        />*/}
+         onChangeCity={this.handleChangeCity}
+         onChangeOrganizationType={this.handleChangeOrganizationType}
+         cities={this.props.cities}
+         types={this.props.types}
+         />*/}
         <FooterComponent />
       </div>
     );
@@ -97,7 +99,7 @@ HomePage.propTypes = {
 function mapStateToProps(state) {
   return {
     cities: state.city.get('cities').toJS(),
-    types: configs.organizationType
+    types: configs.organizationType,
   };
 }
 

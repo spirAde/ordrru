@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { asyncConnect } from 'redux-async-connect';
 
@@ -70,7 +71,7 @@ class BathhouseListPage extends Component {
   componentDidMount() {
     const { activeCityId } = this.props;
 
-    if (window.__FIRST_RENDER__) {
+    //if (window.__FIRST_RENDER__) {
       this.props.addToSocketRoom(activeCityId);
       this.props.changeGlobalCurrentDateAndPeriod(activeCityId);
 
@@ -79,7 +80,7 @@ class BathhouseListPage extends Component {
       globalCheckCurrentPeriodInterval = later.setInterval(() => {
         this.props.changeGlobalCurrentDateAndPeriod();
       }, globalCheckCurrentPeriod);
-    }
+    //}
   }
 
   /**
@@ -109,6 +110,7 @@ class BathhouseListPage extends Component {
 
     return (
       <div>
+        <Helmet title="Bathhouses" />
         <HeaderComponent mode={mode} />
         <FiltersListComponent />
         <RoomsListComponent isActive={isListMode} />

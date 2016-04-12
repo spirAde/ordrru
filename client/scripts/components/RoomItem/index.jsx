@@ -7,7 +7,7 @@ import moment from 'moment';
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Link } from 'react-router';
-import { injectIntl, intlShape, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -62,13 +62,16 @@ class RoomItemComponent extends Component {
 
   /**
    * componentWillReceiveProps - if activeRoomId was change,
-   * then close schedule for previous active room
+   * then close schedule for previous active room, and reset ordered periods
    * @return {void}
    * */
   componentWillReceiveProps(nextProps) {
-    if (this.props.isOpen && !nextProps.isOpen) {
+    const { isOpen } = this.props;
+    if (isOpen && !nextProps.isOpen) {
       this.setState(({ data }) => ({
-        data: data.set('scheduleIsOpen', false),
+        data: data
+          .set('scheduleIsOpen', false)
+          .set('needResetOrderedPeriods', true),
       }));
     }
   }
@@ -227,7 +230,6 @@ class RoomItemComponent extends Component {
    * */
   render() {
     const { isOpen, room, bathhouse, schedule, isClosable, order, steps } = this.props;
-    const { formatMessage } = this.props.intl;
 
     const { data } = this.state;
 
@@ -344,10 +346,10 @@ class RoomItemComponent extends Component {
                       <div className="RoomItem-booking-left-fields">
                         <div className="RoomItem-field-date-time g-field-date">
                           <input
+                            type="text"
                             className="RoomItem-field-date-time-input"
-                            onClick={this.handleOpenSchedule}
                             value={orderDatetimeValue}
-                            placeholder={formatMessage({ id: 'selectTime' })}
+                            onClick={this.handleOpenSchedule}
                           />
                           {
                             order.getIn(['datetime', 'startDate']) ?
@@ -419,6 +421,10 @@ class RoomItemComponent extends Component {
   }
 }
 
+RoomItemComponent.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
+
 /**
  * propTypes
  * @property {boolean} isOpen - box is opened or not
@@ -427,7 +433,6 @@ class RoomItemComponent extends Component {
  * @property {Array} schedule - room schedule
  * @property {Object} order - selected user order
  * @property {boolean} isClosable - if closable, then room box has close icon in right-top angle
- * @property {Object} intl - intl shape
  * @property {Function} onChangeActiveRoom - change data about active room
  * @property {Function} onCloseRoom - close room by clicked on cancel icon
  * @property {Function} onSelectOrder - select date and period of order
@@ -441,7 +446,6 @@ RoomItemComponent.propTypes = {
   order: ImmutablePropTypes.map,
   steps: ImmutablePropTypes.map,
   isClosable: PropTypes.bool.isRequired,
-  intl: intlShape.isRequired,
   onChangeActiveRoom: PropTypes.func,
   onCloseRoom: PropTypes.func,
   onSelectOrder: PropTypes.func,
@@ -454,4 +458,4 @@ RoomItemComponent.defaultProps = {
   isClosable: false,
 };
 
-export default injectIntl(RoomItemComponent);
+export default RoomItemComponent;
