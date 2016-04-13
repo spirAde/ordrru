@@ -8,13 +8,13 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
-
 import classNames from 'classnames';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import SchedulePanelComponent from '../SchedulePanel/index.jsx';
 import IconComponent from '../Icon/index.jsx';
+import TooltipComponent from '../Tooltip/index.jsx';
 import LoaderComponent from '../Loader/index.jsx';
 import OrderComponent from '../Order/index.jsx';
 
@@ -49,6 +49,7 @@ class RoomItemComponent extends Component {
       data: Map({
         scheduleIsOpen: false,
         needResetOrderedPeriods: false,
+        tooltipIsActive: false,
       }),
     };
 
@@ -58,6 +59,8 @@ class RoomItemComponent extends Component {
     this.handleClickCheckOrder = this.handleClickCheckOrder.bind(this);
     this.handleResetDatetimeOrder = this.handleResetDatetimeOrder.bind(this);
     this.handleResetOrderedPeriods = this.handleResetOrderedPeriods.bind(this);
+    this.handleMouseOverTooltip = this.handleMouseOverTooltip.bind(this);
+    this.handleMouseLeaveTooltip = this.handleMouseLeaveTooltip.bind(this);
   }
 
   /**
@@ -100,7 +103,7 @@ class RoomItemComponent extends Component {
       if (order.getIn(['datetime', 'startDate'])) {
         const startDate = order.getIn(['datetime', 'startDate']);
         const startPeriod = order.getIn(['datetime', 'startPeriod']);
-        value += `${moment(startDate).format('Do MMMM')} ${configs.periods[startPeriod]} - `;
+        value += `${moment(startDate).format('Do MMMM')} ${configs.periods[startPeriod]} — `;
       }
       if (order.getIn(['datetime', 'endDate'])) {
         const endDate = order.getIn(['datetime', 'endDate']);
@@ -127,6 +130,28 @@ class RoomItemComponent extends Component {
   }
 
   /**
+   * handle mouse over on question mark and open tooltip(development only)
+   * */
+  handleMouseOverTooltip(event) {
+    event.preventDefault();
+
+    this.setState(({ data }) => ({
+      data: data.set('tooltipIsActive', true),
+    }));
+  }
+
+  /**
+   * handle mouse leave on question mark and open tooltip(development only)
+   * */
+  handleMouseLeaveTooltip(event) {
+    event.preventDefault();
+
+    this.setState(({ data }) => ({
+      data: data.set('tooltipIsActive', false),
+    }));
+  }
+
+  /**
    * handleOpenDescription - handle open|close room box.
    * @return {void}
    * */
@@ -146,6 +171,9 @@ class RoomItemComponent extends Component {
     }));
   }
 
+  /**
+   * handle click on cancel datetime order and reset ordered periods in child
+   * */
   handleResetDatetimeOrder(event) {
     event.preventDefault();
 
@@ -156,6 +184,9 @@ class RoomItemComponent extends Component {
     }));
   }
 
+  /**
+   * handle that child was reset the ordered periods
+   * */
   handleResetOrderedPeriods() {
     this.setState(({ data }) => ({
       data: data.set('needResetOrderedPeriods', false),
@@ -256,10 +287,36 @@ class RoomItemComponent extends Component {
         <div className="RoomItem-inner">
           <div className="RoomItem-preview">
             <div className="RoomItem-preview-top g-clear">
-              <h2 className={`RoomItem-name RoomItem-type-${typesClasses}`}>
+              <h2 className={`RoomItem-name RoomItem-type-${typesClasses}`} >
                 {room.get('name')}
-                { __DEVELOPMENT__ ? <span> - {room.get('id')}</span> : null}
               </h2>
+              {
+                __DEVELOPMENT__ ?
+                  <div style={{ float: 'left' }}>
+                    <IconComponent
+                      id={room.get('id')}
+                      name="icon-question"
+                      rate={1.5}
+                      style={{
+                        marginTop: '4px',
+                        marginLeft: '-5px',
+                        marginRight: '5px',
+                      }}
+                      onMouseOver={this.handleMouseOverTooltip}
+                      onMouseLeave={this.handleMouseLeaveTooltip}
+                    />
+                    {
+                      data.get('tooltipIsActive') ?
+                        <TooltipComponent>
+                          <div>ID room: {room.get('id')}</div>
+                          <div>ID bathhouse: {room.get('bathhouseId')}</div>
+                          <div>
+                            Minimal order duration: {room.getIn(['settings', 'minOrderDuration'])}
+                          </div>
+                        </TooltipComponent> : null
+                    }
+                  </div> : null
+              }
               <div className="RoomItem-stars g-clear">
                 {stars}
               </div>

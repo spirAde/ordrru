@@ -65,9 +65,9 @@ export function checkSchedulesIntersection(schedule, order) {
  * Recalculate schedule after creating order. Set enable false.
  * @param {Array.<Object>} schedule
  * @param {Array.<Number>} order - order periods
- * @param {Number} minDuration - minimal order duration
+ * @param {Number} minOrderDuration - minimal order duration
  * */
-export function recalculateSchedule(schedule, order, minDuration) {
+export function recalculateSchedule(schedule, order, minOrderDuration) {
 
 	const allSchedulePeriods = map(schedule, period => parseInt(period.period, 10));
 
@@ -88,9 +88,9 @@ export function recalculateSchedule(schedule, order, minDuration) {
 	const closestLeftPeriods = map(takeRightWhile(leftChunkSchedule, 'enable'), 'period');
 	const closestRightPeriods = map(takeWhile(rightChunkSchedule, 'enable'), 'period');
 
-	const needLeftFix = closestLeftPeriods.length && closestLeftPeriods.length < minDuration - 1 &&
+	const needLeftFix = closestLeftPeriods.length && closestLeftPeriods.length < minOrderDuration - 1 &&
 		head(closestLeftPeriods) !== FIRST_PERIOD;
-	const needRightFix = closestRightPeriods.length && closestRightPeriods.length < minDuration - 1 &&
+	const needRightFix = closestRightPeriods.length && closestRightPeriods.length < minOrderDuration - 1 &&
 		last(closestRightPeriods) !== LAST_PERIOD;
 
 	const leftFix = needLeftFix ? closestLeftPeriods : [];
@@ -112,14 +112,14 @@ export function recalculateSchedule(schedule, order, minDuration) {
 
 /**
  * Fix neighboring schedules. It means, that if previous schedule has last disable period 141,
- * and next schedule has first disable period 3, then subtract between them will be 6, and for example minDuration = 9
+ * and next schedule has first disable period 3, then subtract between them will be 6, and for example minOrderDuration = 9
  * Then make period 144 and 0 disabled(enable = false)
  * @param {Array.<Object>} prev - previous schedule
  * @param {Array.<Object>} next - next schedule
- * @param {Number} minDuration - minimal order duration
+ * @param {Number} minOrderDuration - minimal order duration
  * @return {Array.<Object>}
  * */
-export function fixNeighboringSchedules(prev, next, minDuration) {
+export function fixNeighboringSchedules(prev, next, minOrderDuration) {
 
 	if (isEmpty(prev)) throw new Error('previous schedule is empty');
 	if (isEmpty(next)) throw new Error('next schedule is empty');
@@ -129,7 +129,7 @@ export function fixNeighboringSchedules(prev, next, minDuration) {
 
 	const between = [...lastEnablePeriods, ...firstEnablePeriods];
 
-	if (!between.length || between.length > minDuration - 1) return { prev, next };
+	if (!between.length || between.length > minOrderDuration - 1) return { prev, next };
 
 	const fixedPrev = map(lastEnablePeriods, period => {
 		return {
@@ -367,6 +367,24 @@ export function getLeftAndRightClosestEnablePeriods(periods, selectedPeriod) {
 }
 
 /**
+ * set enable false for periods inside interval
+ * @param {Array.<Object>} periods
+ * @param {Array} range - range of periods for flag
+ * @return {Array.<Object>} new periods
+ * */
+export function setDisable(periods, range) {
+	return map(periods, period => {
+		if (!range) return assign({}, period, { enable: false });
+
+		if (includes(range, period.period)) {
+			return assign({}, period, { enable: false });
+		}
+
+		return period;
+	});
+}
+
+/**
  * set isForceDisable flag for periods inside interval
  * @param {Array.<Object>} periods
  * @param {Array} range - range of periods for flag
@@ -451,7 +469,7 @@ export function setIsForceDisableBatch(schedules, threshold) {
 	];
 }
 
-export function forceDisableFor(schedule, maxOrderDuration, minDuration, date, period) {
+export function forceDisableFor(schedule, maxOrderDuration, minOrderDuration, date, period) {
 	const splittedSchedule = splitScheduleByAvailability(schedule, date, maxOrderDuration);
 
 	let fixedLeftUnavailableSchedules = [];
@@ -486,7 +504,7 @@ export function forceDisableFor(schedule, maxOrderDuration, minDuration, date, p
 				LAST_PERIOD - leftDisableDateAndPeriod.periodIndex * STEP + period;
 			const needDisableBetweenSelectedAndIntermediate = disablePeriodInLastDate &&
 				durationBetweenPeriodAndLastDisablePeriodIntermediate &&
-				durationBetweenPeriodAndLastDisablePeriodIntermediate <= minDuration;
+				durationBetweenPeriodAndLastDisablePeriodIntermediate <= minOrderDuration;
 
 			if (needDisableBetweenSelectedAndIntermediate) {
 				fixedLeftIntermediateSchedules = setIsForceDisableBatch(
@@ -538,7 +556,7 @@ export function forceDisableFor(schedule, maxOrderDuration, minDuration, date, p
 				LAST_PERIOD - period + rightDisableDateAndPeriod.periodIndex * STEP;
 			const needDisableBetweenSelectedAndIntermediate = disablePeriodInFirstDate &&
 				durationBetweenPeriodAndFirstDisablePeriodIntermediate &&
-				durationBetweenPeriodAndFirstDisablePeriodIntermediate <= minDuration;
+				durationBetweenPeriodAndFirstDisablePeriodIntermediate <= minOrderDuration;
 
 			if (needDisableBetweenSelectedAndIntermediate) {
 				fixedRightIntermediateSchedules = setIsForceDisableBatch(
@@ -576,21 +594,21 @@ export function forceDisableFor(schedule, maxOrderDuration, minDuration, date, p
 	fixedLeftUnavailableSchedules = setIsForceDisableBatch(splittedSchedule.unavailable.left);
 	fixedRightUnavailableSchedules = setIsForceDisableBatch(splittedSchedule.unavailable.right);
 
-	const needLeftMinDurationFix = closestEnablePeriods.left.length &&
-		closestEnablePeriods.left.length < minDuration - 1 &&
+	const needLeftMinOrderDurationFix = closestEnablePeriods.left.length &&
+		closestEnablePeriods.left.length < minOrderDuration - 1 &&
 		head(closestEnablePeriods.left) !== FIRST_PERIOD;
 
-	const needRightMinDurationFix = closestEnablePeriods.right.length &&
-		closestEnablePeriods.right.length < minDuration - 1 &&
+	const needRightMinOrderDurationFix = closestEnablePeriods.right.length &&
+		closestEnablePeriods.right.length < minOrderDuration - 1 &&
 		last(closestEnablePeriods.right) !== LAST_PERIOD;
 
-	if (needLeftMinDurationFix) {
+	if (needLeftMinOrderDurationFix) {
 		fixedSelectedSchedule.periods = setIsForceDisable(
 			fixedSelectedSchedule.periods, range(head(closestEnablePeriods.left), period, STEP)
 		);
 	}
 
-	if (needRightMinDurationFix) {
+	if (needRightMinOrderDurationFix) {
 		fixedSelectedSchedule.periods = setIsForceDisable(
 			fixedSelectedSchedule.periods, range(period + STEP, last(closestEnablePeriods.right) + STEP, STEP)
 		);

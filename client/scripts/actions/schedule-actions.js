@@ -5,8 +5,7 @@ import { Schedule } from '../API';
 
 import configs from '../../../common/data/configs.json';
 
-import { forceDisableFor, FIRST_PERIOD, LAST_PERIOD, STEP } from '../../../common/utils/schedule-helper';
-import { isSameDate, MOMENT_FORMAT } from '../../../common/utils/date-helper';
+import { forceDisableFor, STEP } from '../../../common/utils/schedule-helper';
 
 export const FIND_ROOM_SCHEDULE_REQUEST = 'FIND_ROOM_SCHEDULE_REQUEST';
 export const FIND_ROOM_SCHEDULE_SUCCESS = 'FIND_ROOM_SCHEDULE_SUCCESS';
@@ -69,7 +68,8 @@ function fetchRoomScheduleFailure(error) {
 export function findRoomScheduleIfNeed(roomId) {
   return (dispatch, getState) => {
     const state = getState();
-    const currentDate = moment().toDate();
+    const currentDate = state.application.get('date');
+    const currentPeriod = state.application.get('period');
 
     if (state.schedule.get('schedules').has(roomId) || state.schedule.get('isFetching')) {
       return false;
@@ -77,7 +77,11 @@ export function findRoomScheduleIfNeed(roomId) {
 
     dispatch(fetchRoomScheduleRequest());
 
-    return Schedule.find({ where: { roomId, date: { gte: currentDate } }, order: 'date ASC' })
+    return Schedule.find({
+      where: { roomId, date: { gte: currentDate } },
+      order: 'date ASC',
+      data: { period: currentPeriod },
+    })
       .then(schedule => {
         dispatch(fetchRoomScheduleSuccess(roomId, schedule));
       })
@@ -160,7 +164,7 @@ export function resetOrderSchedule() {
  *      absolutely all the cells to the left or right for the current day, and previous or next
  *    - if the current day no orders left or right of the selected cell, we still have to check
  *      that the distance from the selected cell to the last / first cell in the previous / next day
- *      less than the minimum duration of the order. minDuration
+ *      less than the minimum duration of the order. minOrderDuration
  *
  * @param {string} id - room id
  * @param {Date} date - start or end date of order
@@ -176,10 +180,12 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
     if (isStartOrder) {
       const settings = state.bathhouse.get('rooms')
         .find(room => room.get('id') === id).get('settings');
-      const minDuration = settings.get('minDuration');
+      const minOrderDuration = settings.get('minOrderDuration');
       const maxOrderDuration = configs.maxOrderDuration.bathhouse;
 
-      const fixedSchedule = forceDisableFor(schedule, maxOrderDuration, minDuration, date, period);
+      const fixedSchedule = forceDisableFor(
+        schedule, maxOrderDuration, minOrderDuration / STEP, date, period
+      );
 
       return dispatch(updateSchedule(id, fixedSchedule, 'set isForceDisable'));
     }

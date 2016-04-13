@@ -46,7 +46,7 @@ const generators = {
 			types: sampleSize(config.types, random(1, config.types.length)),
 			options: sampleSize(config.options.room, random(1, config.options.room.length)),
 			settings: {
-				minDuration: head(shuffle(config.duration)),
+				minOrderDuration: head(shuffle(config.duration)),
 				cleaningTime: 0,
 				prepayment: Math.random() < 0.5,
 				holdTime: 0

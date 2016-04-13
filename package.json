@@ -30,9 +30,9 @@
     "intl-locales-supported": "^1.0.0",
     "isomorphic-fetch": "^2.2.1",
     "later": "^1.2.0",
-    "lodash": "^4.10.0",
+    "lodash": "^4.11.0",
     "loopback": "^2.27.0",
-    "loopback-boot": "^2.18.0",
+    "loopback-boot": "^2.18.1",
     "loopback-component-oauth2": "^2.3.6",
     "loopback-connector-rethinkdb": "git://github.com/fuwaneko/loopback-connector-rethinkdb",
     "loopback-datasource-juggler": "^2.46.0",
@@ -52,7 +52,7 @@
     "react-intl": "^2.0.1",
     "react-key-handler": "^0.1.0",
     "react-nouislider": "^1.9.1",
-    "react-redux": "^4.4.2",
+    "react-redux": "^4.4.4",
     "react-router": "^2.1.1",
     "react-router-redux": "^4.0.2",
     "redux": "^3.4.0",
@@ -66,8 +66,8 @@
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5",
     "strong-express-metrics": "^2.0.1",
-    "uuid": "^2.0.1",
-    "webpack-isomorphic-tools": "^2.2.44"
+    "uuid": "^2.0.2",
+    "webpack-isomorphic-tools": "^2.2.45"
   },
   "devDependencies": {
     "async": "^1.5.2",

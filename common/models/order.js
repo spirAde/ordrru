@@ -100,12 +100,13 @@ export default (Order) => {
       Room.findById(roomId)
     ]).then(data => {
       const [ schedules, room ] = data;
-      const minDuration = room.settings.minDuration / step;
+      const minOrderDuration = room.settings.minOrderDuration / step;
 
+      //clog(schedules);
       // get recalculated schedule for each chunk of splitted order
       const newSchedules = map(splittedOrder, chunkOrder => {
         const schedule = find(schedules, schedule => isSameDate(schedule.date, chunkOrder.date));
-        return recalculateSchedule(schedule.periods, chunkOrder.periods, minDuration);
+        return recalculateSchedule(schedule.periods, chunkOrder.periods, minOrderDuration);
       });
 
       const prevSchedule = head(schedules);
@@ -113,8 +114,8 @@ export default (Order) => {
 
       let fixedNewPeriodsPacks = [];
 
-      const leftFix = fixNeighboringSchedules(prevSchedule.periods, head(newSchedules), minDuration);
-      const rightFix = fixNeighboringSchedules(last(newSchedules), nextSchedule.periods, minDuration);
+      const leftFix = fixNeighboringSchedules(prevSchedule.periods, head(newSchedules), minOrderDuration);
+      const rightFix = fixNeighboringSchedules(last(newSchedules), nextSchedule.periods, minOrderDuration);
 
       if (isOneDayOrder) {
         // TODO: need fix, because if order has fixNeighboringSchedules for both sides, then right overwrites left fix
@@ -149,7 +150,7 @@ export default (Order) => {
 
       return Promise.all(updateSchedulePromises)
         .then(schedules => {
-          app.io.in('01f13c1a-1481-4ea0-869d-901d74bebde4').emit('action', {
+          /*app.io.in('01f13c1a-1481-4ea0-869d-901d74bebde4').emit('action', {
             type: 'UPDATE_SCHEDULE',
             payload: {
               roomId: room.id,
@@ -160,11 +161,11 @@ export default (Order) => {
             meta: {
               reason: 'socket',
             }
-          });
+          });*/
 
           logger('afterSave').info({
             roomId: room.id,
-            minDuration: minDuration,
+            minOrderDuration: minOrderDuration,
             order: ctx.instance,
             oldSchedule: schedules,
             newSchedule: fixedNewSchedules,
@@ -250,7 +251,7 @@ export default (Order) => {
       Room.findById(roomId)
     ]).then(data => {
       const [ schedules, room ] = data;
-      const minDuration = room.settings.minDuration / step;
+      const minOrderDuration = room.settings.minOrderDuration / step;
 
       if (moment(startDate).isSame(endDate)) {
         if (startPeriod > endPeriod) {
@@ -261,7 +262,7 @@ export default (Order) => {
 
           return callback(error);
         }
-        if (endPeriod - startPeriod < minDuration) {
+        if (endPeriod - startPeriod < minOrderDuration) {
           const error = new Error();
           error.statusCode = 422;
           error.message = 'Order has incorrect period value';
@@ -272,7 +273,7 @@ export default (Order) => {
       }
 
       if (!moment(startDate).isSame(endDate)) {
-        if (lastPeriod - startPeriod + endPeriod < minDuration) {
+        if (lastPeriod - startPeriod + endPeriod < minOrderDuration) {
           const error = new Error();
           error.statusCode = 422;
           error.message = 'Order has incorrect period value';

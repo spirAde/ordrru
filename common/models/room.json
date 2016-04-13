@@ -34,7 +34,7 @@
       "type": "object",
       "required": true,
       "default": {
-        "minDuration": 3,
+        "minOrderDuration": 3,
         "cleaningTime": 0,
         "prepayment": false,
         "holdTime": 0

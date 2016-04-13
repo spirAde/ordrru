@@ -14,20 +14,20 @@ class IconComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const height = this.props.rate;
-    const width = this.props.rate;
+    const { rate, name, style, color, ...otherProps } = this.props;
 
     return (
       <svg
         className="Icon"
         style={{
-          fill: this.props.color,
-          height: `${height}em`,
-          width: `${width}em`,
-          ...this.props.style,
+          fill: color,
+          height: `${rate}em`,
+          width: `${rate}em`,
+          ...style,
         }}
+        {...otherProps}
       >
-        <use xlinkHref={`#${this.props.name}`}></use>
+        <use xlinkHref={`#${name}`} />
       </svg>
     );
   }

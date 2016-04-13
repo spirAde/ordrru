@@ -324,16 +324,6 @@
   ],
   "cities": [
     {
-      "name": "Magnitogorsk",
-      "slug": "mgn",
-      "center": {
-        "lat": 58.98441315,
-        "lng": 53.41167831
-      },
-      "timezone": "Asia/Yekaterinburg",
-      "id": "01f13c1a-1481-4ea0-869d-901d74bebde4"
-    },
-    {
       "name": "Saint Petersburg",
       "slug": "spb",
       "center": {
@@ -341,7 +331,7 @@
         "lng": 30.3350986
       },
       "timezone": "Europe/Moscow",
-      "id": "50a2de0a-2f1b-4fac-8cdf-1254f3d5e033"
+      "id": "13ca0eec-f752-4eb2-9aa3-1b391d2e46e8"
     },
     {
       "name": "Chelyabinsk",
@@ -351,17 +341,17 @@
         "lng": 61.435837
       },
       "timezone": "Asia/Yekaterinburg",
-      "id": "850d6953-c8ec-4b23-a2ed-f77b6cb5a346"
+      "id": "1e2a707f-40d5-4111-9717-e23fdf42f4f3"
     },
     {
-      "name": "Moscow",
-      "slug": "msk",
+      "name": "Magnitogorsk",
+      "slug": "mgn",
       "center": {
-        "lat": 55.751244,
-        "lng": 37.618423
+        "lat": 58.98441315,
+        "lng": 53.41167831
       },
-      "timezone": "Europe/Moscow",
-      "id": "d4aee0e1-03da-499e-a2fa-2b92d446f3c0"
+      "timezone": "Asia/Yekaterinburg",
+      "id": "4ac714a7-890d-49ae-a1f0-eccc3412dc95"
     },
     {
       "name": "Yekaterinburg",
@@ -371,22 +361,252 @@
         "lng": 60.628636
       },
       "timezone": "Asia/Yekaterinburg",
-      "id": "f80bb2ef-b70e-4615-899d-8caddf6d7c9a"
+      "id": "9b59223e-ea70-46be-9c84-e13f425ce96e"
+    },
+    {
+      "name": "Moscow",
+      "slug": "msk",
+      "center": {
+        "lat": 55.751244,
+        "lng": 37.618423
+      },
+      "timezone": "Europe/Moscow",
+      "id": "b84df5b8-bfd0-4dcb-a128-a13256941b6b"
     }
   ],
   "filters": {
-    "01f13c1a-1481-4ea0-869d-901d74bebde4": {
+    "13ca0eec-f752-4eb2-9aa3-1b391d2e46e8": {
       "datetime": {
-        "min": "2016-04-12",
-        "max": "2016-05-12"
+        "min": "2016-04-14",
+        "max": "2016-05-14"
       },
       "distance": {
-        "min": 1.5,
-        "max": 4.2,
-        "current": 4.2
+        "min": 3,
+        "max": 3.7,
+        "current": 3.7
       },
       "guest": {
-        "min": 21,
+        "min": 22,
+        "max": 27,
+        "current": 27
+      },
+      "prepayment": [
+        {
+          "isRequired": null,
+          "checked": true
+        },
+        {
+          "isRequired": true,
+          "checked": false
+        },
+        {
+          "isRequired": false,
+          "checked": false
+        }
+      ],
+      "price": {
+        "min": 800,
+        "max": 2300,
+        "current": {
+          "start": 800,
+          "end": 2300
+        }
+      },
+      "searchName": {
+        "text": ""
+      },
+      "sorting": [
+        {
+          "name": "popularity",
+          "checked": true,
+          "isDesc": true
+        },
+        {
+          "name": "distance",
+          "checked": false,
+          "isDesc": true
+        },
+        {
+          "name": "price",
+          "checked": false,
+          "isDesc": true
+        }
+      ],
+      "options": [
+        {
+          "name": "bar",
+          "checked": false
+        },
+        {
+          "name": "icehole",
+          "checked": false
+        },
+        {
+          "name": "internet",
+          "checked": false
+        },
+        {
+          "name": "kitchen",
+          "checked": false
+        },
+        {
+          "name": "parking",
+          "checked": false
+        },
+        {
+          "name": "smoking",
+          "checked": false
+        },
+        {
+          "name": "billiards",
+          "checked": false
+        },
+        {
+          "name": "karaoke",
+          "checked": false
+        },
+        {
+          "name": "pool",
+          "checked": false
+        }
+      ],
+      "types": [
+        {
+          "name": "bathhouse",
+          "checked": false
+        },
+        {
+          "name": "sauna",
+          "checked": false
+        },
+        {
+          "name": "hammam",
+          "checked": false
+        }
+      ]
+    },
+    "1e2a707f-40d5-4111-9717-e23fdf42f4f3": {
+      "datetime": {
+        "min": "2016-04-14",
+        "max": "2016-05-14"
+      },
+      "distance": {
+        "min": 1.4,
+        "max": 4.7,
+        "current": 4.7
+      },
+      "guest": {
+        "min": 22,
+        "max": 26,
+        "current": 26
+      },
+      "prepayment": [
+        {
+          "isRequired": null,
+          "checked": true
+        },
+        {
+          "isRequired": true,
+          "checked": false
+        },
+        {
+          "isRequired": false,
+          "checked": false
+        }
+      ],
+      "price": {
+        "min": 900,
+        "max": 2300,
+        "current": {
+          "start": 900,
+          "end": 2300
+        }
+      },
+      "searchName": {
+        "text": ""
+      },
+      "sorting": [
+        {
+          "name": "popularity",
+          "checked": true,
+          "isDesc": true
+        },
+        {
+          "name": "distance",
+          "checked": false,
+          "isDesc": true
+        },
+        {
+          "name": "price",
+          "checked": false,
+          "isDesc": true
+        }
+      ],
+      "options": [
+        {
+          "name": "bar",
+          "checked": false
+        },
+        {
+          "name": "icehole",
+          "checked": false
+        },
+        {
+          "name": "internet",
+          "checked": false
+        },
+        {
+          "name": "kitchen",
+          "checked": false
+        },
+        {
+          "name": "parking",
+          "checked": false
+        },
+        {
+          "name": "smoking",
+          "checked": false
+        },
+        {
+          "name": "billiards",
+          "checked": false
+        },
+        {
+          "name": "karaoke",
+          "checked": false
+        },
+        {
+          "name": "pool",
+          "checked": false
+        }
+      ],
+      "types": [
+        {
+          "name": "bathhouse",
+          "checked": false
+        },
+        {
+          "name": "sauna",
+          "checked": false
+        },
+        {
+          "name": "hammam",
+          "checked": false
+        }
+      ]
+    },
+    "4ac714a7-890d-49ae-a1f0-eccc3412dc95": {
+      "datetime": {
+        "min": "2016-04-14",
+        "max": "2016-05-14"
+      },
+      "distance": {
+        "min": 2.2,
+        "max": 3.4,
+        "current": 3.4
+      },
+      "guest": {
+        "min": 20,
         "max": 28,
         "current": 28
       },
@@ -405,10 +625,10 @@
         }
       ],
       "price": {
-        "min": 800,
+        "min": 1400,
         "max": 2800,
         "current": {
-          "start": 800,
+          "start": 1400,
           "end": 2800
         }
       },
@@ -485,20 +705,20 @@
         }
       ]
     },
-    "50a2de0a-2f1b-4fac-8cdf-1254f3d5e033": {
+    "9b59223e-ea70-46be-9c84-e13f425ce96e": {
       "datetime": {
-        "min": "2016-04-12",
-        "max": "2016-05-12"
+        "min": "2016-04-14",
+        "max": "2016-05-14"
       },
       "distance": {
-        "min": 3.7,
-        "max": 4.1,
-        "current": 4.1
+        "min": 0.8,
+        "max": 2.1,
+        "current": 2.1
       },
       "guest": {
-        "min": 21,
-        "max": 24,
-        "current": 24
+        "min": 20,
+        "max": 27,
+        "current": 27
       },
       "prepayment": [
         {
@@ -515,10 +735,10 @@
         }
       ],
       "price": {
-        "min": 700,
+        "min": 800,
         "max": 2600,
         "current": {
-          "start": 700,
+          "start": 800,
           "end": 2600
         }
       },
@@ -595,125 +815,15 @@
         }
       ]
     },
-    "850d6953-c8ec-4b23-a2ed-f77b6cb5a346": {
+    "b84df5b8-bfd0-4dcb-a128-a13256941b6b": {
       "datetime": {
-        "min": "2016-04-12",
-        "max": "2016-05-12"
+        "min": "2016-04-14",
+        "max": "2016-05-14"
       },
       "distance": {
-        "min": 3.2,
-        "max": 8,
-        "current": 8
-      },
-      "guest": {
-        "min": 22,
-        "max": 28,
-        "current": 28
-      },
-      "prepayment": [
-        {
-          "isRequired": null,
-          "checked": true
-        },
-        {
-          "isRequired": true,
-          "checked": false
-        },
-        {
-          "isRequired": false,
-          "checked": false
-        }
-      ],
-      "price": {
-        "min": 800,
-        "max": 2700,
-        "current": {
-          "start": 800,
-          "end": 2700
-        }
-      },
-      "searchName": {
-        "text": ""
-      },
-      "sorting": [
-        {
-          "name": "popularity",
-          "checked": true,
-          "isDesc": true
-        },
-        {
-          "name": "distance",
-          "checked": false,
-          "isDesc": true
-        },
-        {
-          "name": "price",
-          "checked": false,
-          "isDesc": true
-        }
-      ],
-      "options": [
-        {
-          "name": "bar",
-          "checked": false
-        },
-        {
-          "name": "icehole",
-          "checked": false
-        },
-        {
-          "name": "internet",
-          "checked": false
-        },
-        {
-          "name": "kitchen",
-          "checked": false
-        },
-        {
-          "name": "parking",
-          "checked": false
-        },
-        {
-          "name": "smoking",
-          "checked": false
-        },
-        {
-          "name": "billiards",
-          "checked": false
-        },
-        {
-          "name": "karaoke",
-          "checked": false
-        },
-        {
-          "name": "pool",
-          "checked": false
-        }
-      ],
-      "types": [
-        {
-          "name": "bathhouse",
-          "checked": false
-        },
-        {
-          "name": "sauna",
-          "checked": false
-        },
-        {
-          "name": "hammam",
-          "checked": false
-        }
-      ]
-    },
-    "d4aee0e1-03da-499e-a2fa-2b92d446f3c0": {
-      "datetime": {
-        "min": "2016-04-12",
-        "max": "2016-05-12"
-      },
-      "distance": {
-        "min": 1.7,
-        "max": 3.2,
-        "current": 3.2
+        "min": 2,
+        "max": 2.3,
+        "current": 2.3
       },
       "guest": {
         "min": 22,
@@ -735,121 +845,11 @@
         }
       ],
       "price": {
-        "min": 700,
-        "max": 2400,
+        "min": 900,
+        "max": 2900,
         "current": {
-          "start": 700,
-          "end": 2400
-        }
-      },
-      "searchName": {
-        "text": ""
-      },
-      "sorting": [
-        {
-          "name": "popularity",
-          "checked": true,
-          "isDesc": true
-        },
-        {
-          "name": "distance",
-          "checked": false,
-          "isDesc": true
-        },
-        {
-          "name": "price",
-          "checked": false,
-          "isDesc": true
-        }
-      ],
-      "options": [
-        {
-          "name": "bar",
-          "checked": false
-        },
-        {
-          "name": "icehole",
-          "checked": false
-        },
-        {
-          "name": "internet",
-          "checked": false
-        },
-        {
-          "name": "kitchen",
-          "checked": false
-        },
-        {
-          "name": "parking",
-          "checked": false
-        },
-        {
-          "name": "smoking",
-          "checked": false
-        },
-        {
-          "name": "billiards",
-          "checked": false
-        },
-        {
-          "name": "karaoke",
-          "checked": false
-        },
-        {
-          "name": "pool",
-          "checked": false
-        }
-      ],
-      "types": [
-        {
-          "name": "bathhouse",
-          "checked": false
-        },
-        {
-          "name": "sauna",
-          "checked": false
-        },
-        {
-          "name": "hammam",
-          "checked": false
-        }
-      ]
-    },
-    "f80bb2ef-b70e-4615-899d-8caddf6d7c9a": {
-      "datetime": {
-        "min": "2016-04-12",
-        "max": "2016-05-12"
-      },
-      "distance": {
-        "min": 2.3,
-        "max": 3.2,
-        "current": 3.2
-      },
-      "guest": {
-        "min": 20,
-        "max": 27,
-        "current": 27
-      },
-      "prepayment": [
-        {
-          "isRequired": null,
-          "checked": true
-        },
-        {
-          "isRequired": true,
-          "checked": false
-        },
-        {
-          "isRequired": false,
-          "checked": false
-        }
-      ],
-      "price": {
-        "min": 1200,
-        "max": 2500,
-        "current": {
-          "start": 1200,
-          "end": 2500
+          "start": 900,
+          "end": 2900
         }
       },
       "searchName": {

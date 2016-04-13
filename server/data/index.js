@@ -43,7 +43,7 @@ const questions = [
 	}
 ];
 
-inquirer.prompt(questions, answers => {
+inquirer.prompt(questions).then(answers => {
 	const { type, models } = answers;
 
 	if (type === 'data') {

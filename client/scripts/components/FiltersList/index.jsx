@@ -110,6 +110,7 @@ class FiltersListComponent extends Component {
    * @return {void}
    * */
   componentWillUnmount() {
+    Ps.destroy(this.refs.scroll);
     window.removeEventListener('scroll', this.handleScroll, false);
   }
 
