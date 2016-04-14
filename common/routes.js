@@ -8,7 +8,17 @@ import BathhouseItemPage from '../client/scripts/containers/BathhouseItemPage.js
 import NotFoundPage from '../client/scripts/containers/NotFoundPage.jsx';
 
 export default function getRoutes(store) {
-  const requireLogin = (nextState, replace, cb) => {
+  const requireManagerBathhouseLogin = (nextState, replace, cb) => {
+    function checkAuth() {
+      const { auth: { user }} = store.getState();
+      if (!user) {
+        replace('/');
+      }
+      cb();
+    }
+  };
+
+  const requireManagerCarwashLogin = (nextState, replace, cb) => {
     function checkAuth() {
       const { auth: { user }} = store.getState();
       if (!user) {

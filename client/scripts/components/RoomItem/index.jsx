@@ -325,11 +325,11 @@ class RoomItemComponent extends Component {
                   isClosable ?
                     <IconComponent
                       name="icon-cancel"
-                      rate={3}
+                      rate={2}
                       style={{
-                        margin: '-7px',
                         fillOpacity: '.5',
                         float: 'right',
+                        cursor: 'pointer',
                       }}
                     /> :
                     null
