@@ -29,7 +29,7 @@ class App extends Component {
   }
 
   initServiceWorker() {
-    if ('serviceWorker' in navigator && window.__FIRST_RENDER__) {
+    if ('serviceWorker' in navigator) {
       console.log('service worker detect');
     }
   }

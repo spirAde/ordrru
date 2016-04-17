@@ -20,9 +20,11 @@ import configs from '../../../../common/data/configs.json';
 import './style.css';
 
 let Ps;
+let L;
 
 if (__CLIENT__) {
   Ps = require('perfect-scrollbar');
+  L = require('mapbox.js');
 }
 
 let map = {};
@@ -276,7 +278,17 @@ class MapComponent extends Component {
 
     return (
       <div>
-        <div className="Map" id="Map"></div>
+        <div
+          className="Map"
+          id="Map"
+          style={{
+            bottom: 0,
+            position: 'fixed',
+            top: 0,
+            width: '100%',
+            height: '100%',
+          }}
+        ></div>
         <div style={{ position: 'relative', maxWidth: '1024px', zIndex: 12 }}>
           {roomItem}
         </div>

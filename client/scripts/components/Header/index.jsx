@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
@@ -8,9 +7,10 @@ import classNames from 'classnames';
 
 import { HeaderSelectors } from '../../selectors/HeaderSelectors';
 
+import './style.css';
+
 import IconComponent from '../Icon/index.jsx';
 
-import './style.css';
 import logoImg from '../../../images/logo.png';
 
 /**

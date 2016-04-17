@@ -13,8 +13,8 @@ import ReactDOMServer from 'react-dom/server';
 
 import { IntlProvider } from 'react-intl';
 
-import { match, createMemoryHistory } from 'react-router';
-import { ReduxAsyncConnect, loadOnServer } from 'redux-async-connect';
+import { match, createMemoryHistory, RouterContext } from 'react-router';
+import { trigger } from 'redial';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import { Provider } from 'react-redux';
@@ -22,8 +22,8 @@ import { Provider } from 'react-redux';
 import PrettyError from 'pretty-error';
 
 import Root from './root.jsx';
-import configureStore from '../common/configure-store';
-import getRoutes from '../common/routes';
+import { configureStore } from '../common/configure-store';
+import createRoutes from '../common/routes';
 
 import messages from '../common/data/messages/index';
 
@@ -52,6 +52,8 @@ app.use((req, res, next) => {
 
   const memoryHistory = createMemoryHistory(req.originalUrl);
   const store = configureStore(memoryHistory);
+  const { dispatch, getState } = store;
+
   const history = syncHistoryWithStore(memoryHistory, store);
 
   const referenceDatetime = moment().toDate();
@@ -73,7 +75,7 @@ app.use((req, res, next) => {
     return;
   }
 
-  match({ history, routes: getRoutes(store), location: req.originalUrl },
+  match({ history, routes: createRoutes(store), location: req.originalUrl },
     (error, redirectLocation, renderProps) => {
     if (redirectLocation) {
       res.redirect(redirectLocation.pathname + redirectLocation.search);
@@ -82,30 +84,45 @@ app.use((req, res, next) => {
       res.status(500);
       hydrateOnClient();
     } else if (renderProps) {
-      loadOnServer({...renderProps, store}).then(() => {
-        const component = (
-          <IntlProvider locale={locale} messages={messages[locale]} >
-            <Provider store={store} key="provider">
-              <ReduxAsyncConnect {...renderProps} />
-            </Provider>
-          </IntlProvider>
-        );
+      const { components } = renderProps;
 
-        global.navigator = { userAgent: req.headers['user-agent'] };
+      // Define locals to be provided to all lifecycle hooks:
+      const locals = {
+        path: renderProps.location.pathname,
+        query: renderProps.location.query,
+        params: renderProps.params,
 
-        res.status(200);
-        res.send('<!doctype html>\n' +
-          ReactDOMServer.renderToString(
-            <Root
-              assets={ isomorphicTools.assets() }
-              component={component}
-              store={store}
-              locale={locale}
-              referenceDatetime = {referenceDatetime}
-            />
-          )
-        );
-      });
+        // Allow lifecycle hooks to dispatch Redux actions:
+        dispatch,
+        getState
+      };
+
+      trigger('fetch', components, locals)
+        .then(() => {
+          const component = (
+            <IntlProvider locale={locale} messages={messages[locale]} >
+              <Provider store={store} key="provider">
+                <RouterContext {...renderProps} />
+              </Provider>
+            </IntlProvider>
+          );
+
+          global.navigator = { userAgent: req.headers['user-agent'] };
+
+          res.status(200);
+          res.send('<!doctype html>\n' +
+            ReactDOMServer.renderToString(
+              <Root
+                assets={ isomorphicTools.assets() }
+                component={component}
+                store={store}
+                locale={locale}
+                referenceDatetime = {referenceDatetime}
+              />
+            )
+          );
+        })
+        .catch(error => pretty.render(error));
     } else {
       res.status(404).send('Not found');
     }

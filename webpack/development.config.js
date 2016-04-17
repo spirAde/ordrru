@@ -49,7 +49,7 @@ module.exports = {
       {
         test: /\.css$/,
         loaders: ['style', 'css?modules&importLoaders=1&localIdentName=[local]&sourceMap!postcss'],
-        include: path.join(__dirname, '..', 'client')
+        include: [path.join(__dirname, '..', 'client'), path.join(__dirname, '..', 'node_modules')]
       },
       {
         test: /\.(js|jsx)$/,

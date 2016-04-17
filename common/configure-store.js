@@ -1,3 +1,5 @@
+import { has, map, filter, keys, assign, forEach } from 'lodash';
+
 import { createStore, applyMiddleware, compose } from 'redux';
 import { routerMiddleware } from 'react-router-redux';
 
@@ -6,9 +8,10 @@ import thunk from 'redux-thunk';
 
 import { Iterable } from 'immutable';
 
+import configureReducers from './reducers/index';
 import createSocketMiddleware from './middlewares/socket-middleware';
 
-export default function configureStore(history, initialState = {}) {
+export function configureStore(history, initialState = {}) {
 
   const middleware = [thunk, routerMiddleware(history)];
 
@@ -22,7 +25,7 @@ export default function configureStore(history, initialState = {}) {
   }
   if (__DEVELOPMENT__ && __CLIENT__ && __DEVTOOLS__) {
     const { persistState } = require('redux-devtools');
-    const DevTools = require('../client/scripts/containers/DevTools.jsx');
+    const DevTools = require('../client/scripts/components/DevTools/index.jsx');
     const createLogger = require('redux-logger');
 
     // Immutable to plain JS
@@ -35,15 +38,17 @@ export default function configureStore(history, initialState = {}) {
 
     finalCreateStore = compose(
       applyMiddleware(...middleware, logger),
-      DevTools.instrument(),
+      window.devToolsExtension ? window.devToolsExtension() : f => f,
       persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
     )(createStore);
   } else {
     finalCreateStore = applyMiddleware(...middleware)(createStore);
   }
 
-  const reducers = require('./reducers/index');
+  const reducers = configureReducers();
   const store = finalCreateStore(reducers, initialState);
+
+  store.asyncReducers = {};
 
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./reducers/index', () => {
@@ -52,4 +57,20 @@ export default function configureStore(history, initialState = {}) {
   }
 
   return store;
+}
+
+export function injectAsyncReducers(store, asyncReducers) {
+  console.log('injectAsyncReducers', __SERVER__);
+
+  const state = store.getState();
+
+  forEach(
+    filter(keys(asyncReducers), name => !has(state, name)),
+    name => {
+      store.asyncReducers[name] = asyncReducers[name];
+    }
+  );
+
+  // TODO: add module hot accept
+  store.replaceReducer(configureReducers(store.asyncReducers));
 }

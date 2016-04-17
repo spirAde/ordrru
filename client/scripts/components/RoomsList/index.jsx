@@ -41,24 +41,22 @@ class RoomsListComponent extends Component {
   componentDidMount() {
     const { activeRoomId } = this.props;
 
-    if (window.__FIRST_RENDER__) {
-      if (activeRoomId) {
-        const activeRoomRef = `room-${activeRoomId}`;
-        const activeRoomComponent = this.refs[activeRoomRef];
+    if (activeRoomId) {
+      const activeRoomRef = `room-${activeRoomId}`;
+      const activeRoomComponent = this.refs[activeRoomRef];
 
-        if (activeRoomComponent) {
-          const domNode = ReactDOM.findDOMNode(activeRoomComponent);
-          const parentNode = ReactDOM.findDOMNode(this);
+      if (activeRoomComponent) {
+        const domNode = ReactDOM.findDOMNode(activeRoomComponent);
+        const parentNode = ReactDOM.findDOMNode(this);
 
-          const rectObject = domNode.getBoundingClientRect();
+        const rectObject = domNode.getBoundingClientRect();
 
-          const domNodeIndex = indexOf(parentNode.childNodes, domNode);
-          const domNodeOffsetY = (domNodeIndex - 1) * rectObject.height;
+        const domNodeIndex = indexOf(parentNode.childNodes, domNode);
+        const domNodeOffsetY = (domNodeIndex - 1) * rectObject.height;
 
-          console.log(domNodeOffsetY);
+        console.log(domNodeOffsetY);
 
-          window.scrollTo(0, domNodeOffsetY);
-        }
+        window.scrollTo(0, domNodeOffsetY);
       }
     }
   }

@@ -1,3 +1,4 @@
+import { isInteger, toInteger } from 'lodash';
 import moment from 'moment';
 
 export const MOMENT_FORMAT = 'YYYY-MM-DD';
@@ -48,5 +49,15 @@ export function timeToPeriod(time) {
 }
 
 export function periodToTime(period) {
-	return period * 24 / LAST_PERIOD;
+	const rate = period * 24 / LAST_PERIOD;
+
+	if (isInteger(rate)) {
+		const time = rate < 10 ? `0${rate}` : `${rate}`;
+		return `${time}:00`;
+	}
+
+	const fixedRate = toInteger(rate);
+	const time = fixedRate < 10 ? `0${fixedRate}` : `${fixedRate}`;
+
+	return `${time}:30`;
 }

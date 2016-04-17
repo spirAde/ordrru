@@ -4,6 +4,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { connect } from 'react-redux';
 
+import { HomeSelectors } from '../selectors/HomeSelectors';
+
 import { changeCity, changeOrganizationType } from '../actions/user-actions';
 
 import FaceComponent from '../components/Face/index.jsx';
@@ -29,30 +31,30 @@ class HomePage extends Component {
   constructor(props) {
     super(props);
 
-    this.handleChangeCity = this.handleChangeCity.bind(this);
-    this.handleChangeOrganizationType = this.handleChangeOrganizationType.bind(this);
+    //this.handleChangeCity = this.handleChangeCity.bind(this);
+    //this.handleChangeOrganizationType = this.handleChangeOrganizationType.bind(this);
   }
 
   componentDidMount() {
-    this.props.changeCity(this.props.cities[0].id);
-    this.props.changeOrganizationType(this.props.types[0].id);
+    //this.props.changeCity(this.props.cities[0].id);
+    //this.props.changeOrganizationType(this.props.types[0].id);
   }
 
   /**
    * handle change selected city
    * @param {number} index - index of cities array
    */
-  handleChangeCity(index) {
+  /*handleChangeCity(index) {
     this.props.changeCity(this.props.cities[index].id);
-  }
+  }*/
 
   /**
    * handle change selected organization type(bathhouse or carwash)
    * @param {number} index - index of organization types array
    */
-  handleChangeOrganizationType(index) {
+  /*handleChangeOrganizationType(index) {
     this.props.changeOrganizationType(this.props.types[index].id);
-  }
+  }*/
 
   /**
    * render
@@ -85,23 +87,10 @@ class HomePage extends Component {
  * @property {Function} changeOrganizationType - change selected organization type
  */
 HomePage.propTypes = {
-  cities: PropTypes.arrayOf(PropTypes.object).isRequired,
-  types: PropTypes.arrayOf(PropTypes.object).isRequired,
+  cities: ImmutablePropTypes.list.isRequired,
   changeCity: PropTypes.func.isRequired,
-  changeOrganizationType: PropTypes.func.isRequired
+  changeOrganizationType: PropTypes.func.isRequired,
 };
-
-/**
- * pass state to props
- * @param {Object} state - current redux state
- * @return {Object} props - list of params
- * */
-function mapStateToProps(state) {
-  return {
-    cities: state.city.get('cities').toJS(),
-    types: configs.organizationType,
-  };
-}
 
 /**
  * pass method to props
@@ -111,8 +100,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     changeCity: (city) => dispatch(changeCity(city)),
-    changeOrganizationType: (type) => dispatch(changeOrganizationType(type))
+    changeOrganizationType: (type) => dispatch(changeOrganizationType(type)),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(HomeSelectors, mapDispatchToProps)(HomePage);

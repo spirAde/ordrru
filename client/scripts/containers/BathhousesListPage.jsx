@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
-import { asyncConnect } from 'redux-async-connect';
+import { provideHooks } from 'redial';
 
 import { trim, escape } from 'lodash';
 import moment from 'moment-timezone';
@@ -26,13 +26,8 @@ import MapComponent from '../components/Map/index.jsx';
 
 let globalCheckCurrentPeriodInterval = null;
 
-/**
- * BathhouseListPage - smart component, container of rooms and bathhouses, map and filters
- * Smart components - none
- * Dumb components - HeaderComponent, FiltersListComponent, RoomsListComponent, MapComponent
- * */
-@asyncConnect([{
-  promise: ({ store: { dispatch, getState } }) => {
+const hooks = {
+  fetch: ({ dispatch, getState }) => {
     const promises = [];
     const state = getState();
     const params = state.routing.locationBeforeTransitions.query;
@@ -60,7 +55,13 @@ let globalCheckCurrentPeriodInterval = null;
 
     return Promise.all(promises);
   },
-}])
+};
+
+/**
+ * BathhouseListPage - smart component, container of rooms and bathhouses, map and filters
+ * Smart components - none
+ * Dumb components - HeaderComponent, FiltersListComponent, RoomsListComponent, MapComponent
+ * */
 class BathhouseListPage extends Component {
 
   /**
@@ -71,16 +72,14 @@ class BathhouseListPage extends Component {
   componentDidMount() {
     const { activeCityId } = this.props;
 
-    //if (window.__FIRST_RENDER__) {
-      this.props.addToSocketRoom(activeCityId);
-      this.props.changeGlobalCurrentDateAndPeriod(activeCityId);
+    this.props.addToSocketRoom(activeCityId);
+    this.props.changeGlobalCurrentDateAndPeriod(activeCityId);
 
-      const globalCheckCurrentPeriod = later.parse.text('every 30 minutes');
+    const globalCheckCurrentPeriod = later.parse.text('every 30 minutes');
 
-      globalCheckCurrentPeriodInterval = later.setInterval(() => {
-        this.props.changeGlobalCurrentDateAndPeriod();
-      }, globalCheckCurrentPeriod);
-    //}
+    globalCheckCurrentPeriodInterval = later.setInterval(() => {
+      this.props.changeGlobalCurrentDateAndPeriod();
+    }, globalCheckCurrentPeriod);
   }
 
   /**
@@ -147,4 +146,6 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(BathhousesListSelectors, mapDispatchToProps)(BathhouseListPage);
+export default provideHooks(hooks)(connect(
+  BathhousesListSelectors, mapDispatchToProps
+)(BathhouseListPage));

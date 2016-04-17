@@ -25,7 +25,7 @@ class FaceComponent extends Component {
           <div className="Face-header">
             <div className="Face-logo">
               <IndexLink to="/">
-                <img src={logoImage} />
+                <img src={logoImage} alt="" />
               </IndexLink>
             </div>
           </div>

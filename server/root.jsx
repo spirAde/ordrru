@@ -44,9 +44,6 @@ class Root extends Component {
             <link href={assets.styles[style]} key={key} media="screen, projection"
                 rel="stylesheet" type="text/css" charSet="UTF-8"/>)
         }
-
-        <script src="https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.js"></script>
-        <link href="https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.css" rel="stylesheet" />
       </head>
       <body>
         <svg style={{ position: 'absolute', width: 0, height: 0 }}>
