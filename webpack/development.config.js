@@ -49,7 +49,7 @@ module.exports = {
       {
         test: /\.css$/,
         loaders: ['style', 'css?modules&importLoaders=1&localIdentName=[local]&sourceMap!postcss'],
-        include: [path.join(__dirname, '..', 'client'), path.join(__dirname, '..', 'node_modules')]
+        include: path.join(__dirname, '..', 'client'),
       },
       {
         test: /\.(js|jsx)$/,
@@ -65,6 +65,13 @@ module.exports = {
       { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml' },
       { test: isomorphicTools.regular_expression('images'), loader: 'url-loader?limit=10240' },
     ]
+  },
+  node: {
+    net: 'empty',
+    tls: 'empty',
+    dns: 'empty',
+    tap: 'empty',
+    module: 'empty',
   },
 
   postcss: postcss,

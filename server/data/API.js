@@ -144,7 +144,7 @@ function _fetch(url, options) {
 			}
 
 			if (response.status >= 200 && response.status < 300) {
-				throw new Error('Something wrong, response has error status code, but hasn\'t error object');
+				throw new Error('Something wrong, response has error status code, but hasn\\'t error object');
 			}
 
 			return response;

@@ -3,12 +3,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { trigger } from 'redial';
-import { Router, browserHistory, useRouterHistory, match } from 'react-router';
+import { Router, browserHistory, match } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { IntlProvider } from 'react-intl';
 
-import useScroll from 'scroll-behavior/lib/useStandardScroll';
-import createBrowserHistory from 'history/lib/createBrowserHistory';
 import createLocation from 'history/lib/createLocation';
 
 import moment from 'moment';
@@ -26,9 +24,7 @@ import '../styles/globals.css';
 const store = configureStore(browserHistory, window.__INITIAL_STATE__);
 const { dispatch, getState } = store;
 
-const createScrollHistory = useScroll(createBrowserHistory);
-const appHistory = useRouterHistory(createScrollHistory)();
-const history = syncHistoryWithStore(appHistory, store);
+const history = syncHistoryWithStore(browserHistory, store);
 
 const reactRoot = document.getElementById('root');
 

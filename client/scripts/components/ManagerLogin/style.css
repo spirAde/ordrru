@@ -1,0 +1,95 @@
+.ManagerLogin {
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: auto;
+  background: #4A5060;
+
+  &-form {
+    padding: 100px;
+    max-width: 600px;
+    margin: 40px auto;
+  }
+
+  &-logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+  }
+
+  &-heading {
+    text-align: center;
+    color: #ffffff;
+    font-weight: 300;
+    margin: 0 0 40px;
+  }
+
+  &-field {
+    position: relative;
+    margin-bottom: 60px;
+  }
+
+  &-label {
+    position: absolute;
+    transform: translateY(15px);
+    left: 13px;
+    color: #ffffff;
+    transition: all 0.25s ease;
+    -webkit-backface-visibility: hidden;
+    pointer-events: none;
+    font-size: 26px;
+
+    &--active {
+      transform: translateY(-25px);
+      left: 2px;
+      font-size: 18px;
+    }
+  }
+
+  &-input {
+    font-size: 22px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 17px 17px 17px 12px;
+    background: none;
+    background-image: none;
+    box-sizing : border-box;
+    border: 1px solid #a0b3b0;
+    color: #ffffff;
+    border-radius: 0;
+    transition: border-color .25s ease, box-shadow .25s ease;
+  }
+
+  &-field-error {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #DB0000;
+  }
+
+  &-submit {
+    cursor: pointer;
+    border: 0;
+    outline: none;
+    border-radius: 0;
+    padding: 15px 0;
+    font-size: 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    background: #18B2AE;
+    color: #FFFFFF;
+    transition: all.5s ease;
+    -webkit-appearance: none;
+    display: block;
+    width: 100%;
+
+    &--disabled {
+      background: #BBC7D3
+    }
+  }
+}

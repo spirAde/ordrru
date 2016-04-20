@@ -22,10 +22,14 @@
     },
     "middleName": {
       "type": "string",
-      "required": "true"
+      "required": true
     },
     "position": {
       "type": "string"
+    },
+    "username": {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],

@@ -1,7 +1,5 @@
 if (typeof require.ensure !== 'function') require.ensure = (defn, chunk) => chunk(require);
 
-import { injectAsyncReducers } from './configure-store';
-
 import App from '../client/scripts/containers/App.jsx';
 import BathhouseItemPage from '../client/scripts/containers/BathhouseItemPage.jsx';
 
@@ -10,17 +8,7 @@ export default function createRoutes(store) {
     path: '/',
     getComponents(nextState, callback) {
       require.ensure([], require => {
-        const HomePage = require('../client/scripts/containers/HomePage.jsx');
-
-        const cityReducer = require('./reducers/city');
-        const userReducer = require('./reducers/user');
-
-        injectAsyncReducers(store, {
-          city: cityReducer.reducer,
-          user: userReducer.reducer,
-        });
-
-        callback(null, HomePage)
+        callback(null, require('../client/scripts/containers/HomePage.jsx'))
       });
     },
   };
@@ -29,23 +17,7 @@ export default function createRoutes(store) {
     path: '/bathhouses',
     getComponents(nextState, callback) {
       require.ensure([], require => {
-        const BathhousesListPage = require('../client/scripts/containers/BathhousesListPage.jsx');
-
-        const bathhouseReducer = require('./reducers/bathhouse');
-        const scheduleReducer = require('./reducers/schedule');
-        const cityReducer = require('./reducers/city');
-        const userReducer = require('./reducers/user');
-        const filterReducer = require('./reducers/filter');
-
-        injectAsyncReducers(store, {
-          bathhouse: bathhouseReducer.reducer,
-          schedule: scheduleReducer.reducer,
-          city: cityReducer.reducer,
-          user: userReducer.reducer,
-          filter: filterReducer.reducer,
-        });
-
-        callback(null, BathhousesListPage);
+        callback(null, require('../client/scripts/containers/BathhousesListPage.jsx'));
       });
     },
   };
@@ -55,75 +27,38 @@ export default function createRoutes(store) {
     component: BathhouseItemPage,
   };
 
+  const ManagerRoute = {
+    path: '/manager',
+  };
+
+  const ManagerLoginRoute = {
+    path: '/manager/login',
+    getComponents(nextState, callback) {
+      require.ensure([], require => {
+        callback(null, require('../client/scripts/containers/ManagerLoginPage.jsx'));
+      });
+    },
+  };
+
+  const ManagerDashboardRoute = {
+    path: '/manager/dashboard',
+    getComponents(nextState, callback) {
+      require.ensure([], require => {
+        callback(null, require('../client/scripts/containers/ManagerDashboardPage.jsx'));
+      });
+    },
+  };
+
   return {
     component: App,
     childRoutes: [
       HomeRoute,
       BathhousesRoute,
       BathhouseRoute,
+
+      ManagerRoute,
+      ManagerLoginRoute,
+      ManagerDashboardRoute,
     ],
   };
 }
-/*
-import React from 'react';
-import { Route, IndexRoute } from 'react-router';
-import { injectAsyncReducers } from './configure-store';
-
-import App from '../client/scripts/containers/App.jsx';
-import BathhouseItemPage from '../client/scripts/containers/BathhouseItemPage.jsx';
-import NotFoundPage from '../client/scripts/containers/NotFoundPage.jsx';
-
-export default function getRoutes(store) {
-  return (
-    <Route>
-      <Route path="/" component={App}>
-        <IndexRoute
-          name="home"
-          component={require('react-router-proxy?name=home!../client/scripts/containers/HomePage.jsx')}
-          onEnter={(nextState, replace, callback) => {
-            const cityReducer = require('./reducers/city');
-            const userReducer = require('./reducers/user');
-
-            injectAsyncReducers(store, {
-              city: cityReducer.reducer,
-              user: userReducer.reducer,
-            });
-
-            callback(null);
-          }}
-        />
-        <Route
-          path="bathhouses"
-          name="bathhouses"
-          component={require('react-router-proxy?name=bathhouses!../client/scripts/containers/BathhousesListPage.jsx')}
-          onEnter={(nextState, replace, callback) => {
-            const bathhouseReducer = require('./reducers/bathhouse');
-            const scheduleReducer = require('./reducers/schedule');
-            const cityReducer = require('./reducers/city');
-            const userReducer = require('./reducers/user');
-            const filterReducer = require('./reducers/filter');
-
-            injectAsyncReducers(store, {
-              bathhouse: bathhouseReducer.reducer,
-              schedule: scheduleReducer.reducer,
-              city: cityReducer.reducer,
-              user: userReducer.reducer,
-              filter: filterReducer.reducer,
-            });
-
-            callback(null);
-          }}
-        >
-          <Route path=":id" component={BathhouseItemPage} name="bathhouse" />
-        </Route>
-        <Route path="manager" name="manager">
-          <Route path="login" name="login" />
-          <Route path="bathhouse" name="manager-bathhouse" />
-          <Route path="carwash" name="manager-carwash" />
-        </Route>
-        <Route path="*" component={NotFoundPage} status={404} name="nothing" />
-      </Route>
-    </Route>
-  );
-}
-*/

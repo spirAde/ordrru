@@ -1,4 +1,5 @@
 export default {
+  // Users part
   'organizationType.bathhouse': 'Бани и сауны',
   'organizationType.carwash': 'Автомойки',
 
@@ -79,4 +80,18 @@ export default {
 
   'selectTime': 'Выберите время',
   'loading': 'Загрузка',
+
+  // Manager part
+  'entrance': 'Войти',
+  'username': 'Логин',
+  'password': 'Пароль',
+  'welcome': 'Добро пожаловать!',
+
+  // errors
+  'usernameIsAlphanumeric': 'Логин должен содержать только цифры и буквы',
+  'usernameIsLength': 'Логин должен содержать больше 3 символов',
+  'passwordIsLength': 'Пароль должен содержать больше 3 символов',
+
+  // server-side errors - code : transcription
+  'LOGIN_FAILED': 'Неверный логин или пароль',
 }

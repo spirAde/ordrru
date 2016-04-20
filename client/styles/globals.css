@@ -7,6 +7,11 @@
 	height: 0;
 }
 
+.g-boxing::before, .g-boxing::after {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
 .g-icons::before, .g-icons::after,
 .g-buttons a:before, .g-buttons a:after,
 .g-field-checkbox input + label:after, .g-field-checkbox label:before,

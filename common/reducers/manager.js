@@ -1,19 +1,34 @@
-import { fromJS } from 'immutable';
+import { fromJS, Map } from 'immutable';
 
 import createReducer from '../utils/create-reducer';
 
-import configs from '../../common/data/configs.json';
-
-import { CHANGE_ACTIVE_CITY } from '../../client/scripts/actions/city-actions';
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE,
+	LOGOUT_REQUEST, LOGOUT_SUCCESS, LOGOUT_FAILURE } from '../../client/scripts/actions/manager-actions';
 
 export const initialState = fromJS({
 	isFetching: false,
-	activeCityId: null,
-	cities: configs.cities,
+	loginError: {},
+	logoutError: {},
+	token: null,
+	auth: {
+		isAuthenticated: false,
+	},
 });
 
 export const reducer = createReducer({
-	[CHANGE_ACTIVE_CITY](state, action) {
-		return state.set('activeCityId', action.payload.id);
+	[LOGIN_REQUEST](state) {
+		return state.set('isFetching', true);
+	},
+	[LOGIN_SUCCESS](state, action) {
+		return state
+			.set('isFetching', false)
+			.set('token', fromJS(action.payload.token))
+			.set('loginError', Map())
+			.setIn(['auth', 'isAuthenticated'], true);
+	},
+	[LOGIN_FAILURE](state, action) {
+		return state
+			.set('isFetching', false)
+			.set('loginError', fromJS(action.payload));
 	},
 }, initialState);

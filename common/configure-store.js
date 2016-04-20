@@ -12,7 +12,6 @@ import configureReducers from './reducers/index';
 import createSocketMiddleware from './middlewares/socket-middleware';
 
 export function configureStore(history, initialState = {}) {
-
   const middleware = [thunk, routerMiddleware(history)];
 
   let finalCreateStore;
@@ -48,8 +47,6 @@ export function configureStore(history, initialState = {}) {
   const reducers = configureReducers();
   const store = finalCreateStore(reducers, initialState);
 
-  store.asyncReducers = {};
-
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./reducers/index', () => {
       store.replaceReducer(require('./reducers/index'));
@@ -57,20 +54,4 @@ export function configureStore(history, initialState = {}) {
   }
 
   return store;
-}
-
-export function injectAsyncReducers(store, asyncReducers) {
-  console.log('injectAsyncReducers', __SERVER__);
-
-  const state = store.getState();
-
-  forEach(
-    filter(keys(asyncReducers), name => !has(state, name)),
-    name => {
-      store.asyncReducers[name] = asyncReducers[name];
-    }
-  );
-
-  // TODO: add module hot accept
-  store.replaceReducer(configureReducers(store.asyncReducers));
 }
