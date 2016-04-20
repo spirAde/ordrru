@@ -105,3 +105,4 @@ envs
 build
 rethinkdb_data
 trash
+tasks.txt
