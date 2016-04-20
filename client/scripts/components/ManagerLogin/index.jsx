@@ -8,7 +8,6 @@ import partialRight from 'lodash/partialRight';
 
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { FormattedMessage } from 'react-intl';
 import KeyHandler, { KEYUP } from 'react-key-handler';
@@ -16,17 +15,10 @@ import KeyHandler, { KEYUP } from 'react-key-handler';
 import classNames from 'classnames';
 
 import './style.css';
-import '../../../styles/notie.css';
 
 import logoImg from '../../../images/logo.png';
 
 const ENTER_KEY = 13;
-
-let notie;
-
-if (__CLIENT__) {
-  notie = require('notie');
-}
 
 function validate(value, rules) {
   const errors = {
@@ -102,15 +94,6 @@ class ManagerLoginComponent extends Component {
 	 * */
   componentDidMount() {
     ReactDOM.findDOMNode(this.refs.username).focus();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.loginError.has('code')) {
-      const errorMessage = this.context.intl.messages[nextProps.loginError.get('code')];
-      notie.alert(3, errorMessage, 5);
-    } else if (nextProps.loginError.has('error') && !nextProps.loginError.has('code')) {
-      notie.alert(3, nextProps.loginError.get('error'), 5);
-    }
   }
 
   checkFormIsValid() {
@@ -343,18 +326,10 @@ class ManagerLoginComponent extends Component {
 }
 
 /**
- * contextTypes
- * @property {Object} router
- */
-ManagerLoginComponent.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
-/**
  * propTypes
+ * @property {Function} onSubmit - send user credentials
  */
 ManagerLoginComponent.propTypes = {
-  loginError: ImmutablePropTypes.map.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 

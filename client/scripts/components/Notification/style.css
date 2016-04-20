@@ -1,0 +1,51 @@
+.Notie {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  height: auto;
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+
+  &--active {
+    -moz-transition: all 1s ease;
+    -webkit-transition: all 1s ease;
+    transition: all 1s ease;
+  }
+
+  &-inner {
+    padding: 20px;
+    display: inline-block;
+  }
+
+  &-content {
+    max-width: 900px;
+    margin: 0 auto;
+    color: #FFFFFF;
+  }
+
+  &-type-error {
+    background-color: #FF5525;
+  }
+
+  &-type-success {
+    background-color: #57BF57;
+  }
+
+  &-type-info {
+    background-color: #4D82D6;
+  }
+
+  &-type-warning {
+    background-color: #D6A14D;
+  }
+
+  &-close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 15px 20px 0 0;
+    cursor: pointer;
+  }
+}

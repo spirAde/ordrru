@@ -3,6 +3,8 @@ import path from 'path';
 import loopback from 'loopback';
 import boot from 'loopback-boot';
 
+import cookie from 'cookie';
+
 import moment from 'moment';
 
 import { createServer } from 'http';
@@ -40,6 +42,14 @@ app.use('/build', loopback.static(path.join(__dirname, '../build')));
 app.use('/icons', loopback.static(path.join(__dirname, '../client/images/icons')));
 app.use('/api', loopback.rest());
 
+// entrance for managers, they have their own reducer and own configuration
+/*app.use('/manager', (req, res, next) => {
+  const cookies = req.headers.cookie && cookie.parse(req.headers.cookie);
+  const token = cookies && cookies.token;
+
+});*/
+
+// ... for other users
 app.use((req, res, next) => {
 
   if (req.url.split('/')[1] === 'explorer') return next();

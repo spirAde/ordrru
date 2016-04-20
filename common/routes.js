@@ -27,12 +27,8 @@ export default function createRoutes(store) {
     component: BathhouseItemPage,
   };
 
-  const ManagerRoute = {
-    path: '/manager',
-  };
-
   const ManagerLoginRoute = {
-    path: '/manager/login',
+    path: 'login',
     getComponents(nextState, callback) {
       require.ensure([], require => {
         callback(null, require('../client/scripts/containers/ManagerLoginPage.jsx'));
@@ -41,10 +37,23 @@ export default function createRoutes(store) {
   };
 
   const ManagerDashboardRoute = {
-    path: '/manager/dashboard',
+    path: 'dashboard',
     getComponents(nextState, callback) {
       require.ensure([], require => {
         callback(null, require('../client/scripts/containers/ManagerDashboardPage.jsx'));
+      });
+    },
+  };
+
+  const ManagerRoute = {
+    path: 'manager',
+    childRoutes: [
+      ManagerLoginRoute,
+      ManagerDashboardRoute
+    ],
+    getComponents(nextState, callback) {
+      require.ensure([], require => {
+        callback(null, require('../client/scripts/containers/ManagerPage.jsx'));
       });
     },
   };
@@ -57,8 +66,6 @@ export default function createRoutes(store) {
       BathhouseRoute,
 
       ManagerRoute,
-      ManagerLoginRoute,
-      ManagerDashboardRoute,
     ],
   };
 }

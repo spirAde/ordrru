@@ -1,7 +1,9 @@
 import Cookies from 'js-cookie';
 
-import { Manager } from '../API';
 import { push, replace } from 'react-router-redux';
+
+import { Manager } from '../API';
+import { addNotification } from './notification-actions';
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -33,7 +35,6 @@ function loginFailure(error) {
     type: LOGIN_FAILURE,
     payload: {
       error: error.message,
-      code: error.code,
     },
     error,
   };
@@ -48,7 +49,13 @@ export function login(credentials, redirect = '/manager/dashboard') {
         dispatch(loginSuccess(token));
         dispatch(push(redirect));
       })
-      .catch(error => dispatch(loginFailure(error)));
+      .catch(error => {
+        dispatch(loginFailure(error));
+        dispatch(addNotification({
+          message: error.code,
+          level: 'error',
+        }));
+      });
   };
 }
 

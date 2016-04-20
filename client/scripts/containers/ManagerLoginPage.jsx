@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import ManagerLoginComponent from '../components/ManagerLogin/index.jsx';
 
@@ -30,13 +29,10 @@ class ManagerLoginPage extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { loginError } = this.props;
-
     return (
       <div>
         <Helmet title="Login" />
         <ManagerLoginComponent
-          loginError={loginError}
           onSubmit={this.handleSubmitLogin}
         />
       </div>
@@ -46,9 +42,9 @@ class ManagerLoginPage extends Component {
 
 /**
  * propTypes
+ * @property {Function} login - login request
  */
 ManagerLoginPage.propTypes = {
-  loginError: ImmutablePropTypes.map.isRequired,
   login: PropTypes.func.isRequired,
 };
 
