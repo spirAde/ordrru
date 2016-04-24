@@ -3,8 +3,8 @@ import Helmet from 'react-helmet';
 
 import { connect } from 'react-redux';
 
-import { changeUserViewport } from '../actions/user-actions';
-import { initGlobalCurrentDateAndPeriod } from '../actions/application-actions';
+import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice,
+} from '../actions/application-actions';
 
 /**
  * App - smart component, container, root
@@ -17,8 +17,10 @@ class App extends Component {
     this.initServiceWorker();
     this.initGlobalCurrentDateAndPeriod();
 
-    this.props.changeUserViewport(this.getViewPort());
-    window.addEventListener('resize', this.getViewPort);
+    this.props.changeViewport(this.getViewPort());
+    window.addEventListener('resize', () => {
+      this.props.changeViewport(this.getViewPort());
+    });
   }
 
   getViewPort() {
@@ -58,7 +60,8 @@ class App extends Component {
 App.propTypes = {
   children: PropTypes.object.isRequired,
   initGlobalCurrentDateAndPeriod: PropTypes.func.isRequired,
-  changeUserViewport: PropTypes.func.isRequired,
+  changeViewport: PropTypes.func.isRequired,
+  setDevice: PropTypes.func.isRequired,
 };
 
 /**
@@ -70,7 +73,8 @@ function mapDispatchToProps(dispatch) {
   return {
     initGlobalCurrentDateAndPeriod: (datetime) =>
       dispatch(initGlobalCurrentDateAndPeriod(datetime)),
-    changeUserViewport: (viewport) => dispatch(changeUserViewport(viewport)),
+    changeViewport: (viewport) => dispatch(changeViewport(viewport)),
+    setDevice: (device) => dispatch(setDevice(device)),
   };
 }
 

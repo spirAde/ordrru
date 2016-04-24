@@ -191,7 +191,14 @@ function renderMethod(method, modelRoute) {
 		const route = method.routes[0].path;
 		const methodType = method.routes[0].verb;
 
-		if (methodType === 'get') {
+		if (method.name === 'login') {
+			renderedMethod += '\n\t\tconst conditions = include ? `?include=${include}` : \'\';';
+			renderedMethod += '\n\t\treturn _fetch(`${baseUrl}' + `${modelRoute}${route}` + '${conditions}`, {';
+			renderedMethod += `\n\t\t\tmethod: 'post',`;
+			renderedMethod += '\n\t\t\tbody: JSON.stringify(credentials),';
+			renderedMethod += '\n\t\t});';
+			renderedMethod += '\n\t},';
+		} else if (methodType === 'get') {
 			renderedMethod += '\n\t\tconst conditions = isEmpty(filter) ? \'\' : `?filter=${JSON.stringify(filter)}`;\n';
 
 			if (args.indexOf('id') === -1) {

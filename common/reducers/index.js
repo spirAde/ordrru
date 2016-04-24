@@ -13,7 +13,7 @@ import { reducer as manager } from './manager';
 import { reducer as order } from './order';
 import { reducer as notification } from './notification';
 
-export default function configureReducers() {
+export function configureReducers() {
   return combineReducers({
     routing: routerReducer,
     application,
@@ -25,7 +25,7 @@ export default function configureReducers() {
   });
 }
 
-export default function configureManagerReducers() {
+export function configureManagerReducers() {
   return combineReducers({
     routing: routerReducer,
     application,

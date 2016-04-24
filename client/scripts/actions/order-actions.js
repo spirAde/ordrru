@@ -4,38 +4,44 @@ export const FIND_ORDERS_REQUEST = 'FIND_ORDERS_REQUEST';
 export const FIND_ORDERS_SUCCESS = 'FIND_ORDERS_SUCCESS';
 export const FIND_ORDERS_FAILURE = 'FIND_ORDERS_FAILURE';
 
-function fetchOrdersRequest() {
+function findOrdersRequest() {
   return {
     type: FIND_ORDERS_REQUEST,
-    payload: {},
   };
 }
 
-function fetchOrdersSuccess(orders) {
+function findOrdersSuccess(roomId, orders) {
   return {
     type: FIND_ORDERS_SUCCESS,
     payload: {
+      id: roomId,
       orders,
     },
   };
 }
 
-function fetchOrdersFailure(error) {
+function findOrdersFailure(error) {
   return {
     type: FIND_ORDERS_FAILURE,
     payload: {
-      error,
+      error: error.message,
     },
     error,
   };
 }
 
-export function findOrders() {
-  return dispatch => {
-    dispatch(fetchOrdersRequest());
+export function findOrdersIfNeed(roomId) {
+  return (dispatch, getState) => {
+    const state = getState();
 
-    return Order.find()
-      .then(data => dispatch(fetchOrdersSuccess(data)))
-      .catch(error => dispatch(fetchOrdersFailure(error)));
+    if (state.order.get('orders').has(roomId)) {
+      return false;
+    }
+
+    dispatch(findOrdersRequest());
+
+    return Order.find({ where: { roomId } })
+      .then(orders => dispatch(findOrdersSuccess(roomId, orders)))
+      .catch(error => dispatch(findOrdersFailure(error)));
   };
 }

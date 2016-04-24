@@ -71,7 +71,7 @@ export function findRoomScheduleIfNeed(roomId) {
     const currentDate = state.application.get('date');
     const currentPeriod = state.application.get('period');
 
-    if (state.schedule.get('schedules').has(roomId) || state.schedule.get('isFetching')) {
+    if (state.schedule.get('schedules').has(roomId)) {
       return false;
     }
 

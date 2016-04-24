@@ -13,6 +13,7 @@ import moment from 'moment';
 import messages from '../../common/data/messages/index';
 
 import { configureStore } from '../../common/configure-store';
+import { configureReducers, configureManagerReducers } from '../../common/reducers/index';
 import createRoutes from '../../common/routes';
 
 import IntlUtils from './utils/IntlUtils';
@@ -21,11 +22,6 @@ import '../styles/core.css';
 import '../styles/fonts.css';
 import '../styles/globals.css';
 
-const store = configureStore(browserHistory, window.__INITIAL_STATE__);
-const { dispatch, getState } = store;
-
-const history = syncHistoryWithStore(browserHistory, store);
-
 const reactRoot = document.getElementById('root');
 
 const localization = navigator.languages ?
@@ -33,7 +29,17 @@ const localization = navigator.languages ?
 const locale = localization.indexOf('-') ? localization.split('-')[0] : localization;
 
 const location = createLocation(document.location.pathname, document.location.search);
+
+const reducers = location.pathname.indexOf('manager') === -1 ?
+  configureReducers() : configureManagerReducers();
+const store = configureStore(browserHistory, reducers, window.__INITIAL_STATE__);
+const history = syncHistoryWithStore(browserHistory, store);
+
+const { dispatch, getState } = store;
+
 const routes = createRoutes(store);
+
+console.log('client');
 
 function runApp() {
   match({ routes, location }, () => {
@@ -49,10 +55,7 @@ function runApp() {
     );
 
     if (__DEVELOPMENT__) {
-      const Perf = require('react-addons-perf');
-
       window.React = React; // enable debugger
-      window.Perf = Perf; // performance tool
 
       if (!reactRoot || !reactRoot.firstChild || !reactRoot.firstChild.attributes
         || !reactRoot.firstChild.attributes['data-react-checksum']) {

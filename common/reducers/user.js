@@ -3,7 +3,6 @@ import { fromJS } from 'immutable';
 import createReducer from '../utils/create-reducer';
 
 import { CHANGE_CITY, CHANGE_ORGANIZATION_TYPE,
-  SET_USER_DEVICE, CHANGE_USER_VIEWPORT,
   RESET_FULL_ORDER, RESET_DATETIME_ORDER,
   UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END, UPDATE_ORDER_SUM,
   CHECK_ORDER_REQUEST, CHECK_ORDER_SUCCESS, CHECK_ORDER_FAILURE,
@@ -34,13 +33,6 @@ export const initialState = fromJS({
     confirm: { valid: false, loading: false, error: null, active: false, },
     prepayment: { valid: false, loading: false, error: null, active: false, },
   },
-  device: {
-    isMobile: false,
-    viewport: {
-      height: null,
-      width: null
-    },
-  },
   auth: {
     isFetching: false,
     isAuthenticated: false,
@@ -56,13 +48,6 @@ export const reducer = createReducer({
   },
   [CHANGE_ORGANIZATION_TYPE](state, action) {
     return state.set('organizationTypeId', action.payload.organizationTypeId);
-  },
-  [SET_USER_DEVICE](state, action) {
-    return state;
-  },
-  [CHANGE_USER_VIEWPORT](state, action) {
-    return state
-      .setIn(['device', 'viewport'], action.payload.viewport);
   },
   [RESET_FULL_ORDER](state) {
     return state

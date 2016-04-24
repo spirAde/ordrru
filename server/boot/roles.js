@@ -1,6 +1,3 @@
-module.exports = function roles(server) {
+export default (app) => {
 
-	const users = [
-		{}
-	];
-};
+}

@@ -33,7 +33,16 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "tokens": {
+      "type": "hasMany",
+      "model": "Token",
+      "foreignKey": "userId",
+      "options": {
+        "disableInclude": false
+      }
+    }
+  },
   "acls": [],
   "methods": {}
 }
