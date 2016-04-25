@@ -1,4 +1,5 @@
 import map from 'lodash/map';
+import forEach from 'lodash/forEach';
 
 import React, { Component, PropTypes } from 'react';
 import Helmet from 'react-helmet';
@@ -22,13 +23,16 @@ const hooks = {
     const state = getState();
     const bathhouseId = state.manager.getIn(['manager', 'organizationId']);
 
-    promises.push(dispatch(findBathhouseAndRooms(bathhouseId)));
-    /*return Promise.resolve(dispatch(findBathhouseAndRooms(bathhouseId)))
-      .then(data => Promise.all(map(data.payload.rooms, room => {
-        promises.push(dispatch(findRoomScheduleIfNeed(room.id)));
-        promises.push(dispatch(findOrdersIfNeed(room.id)));
-      })));*/
-    return Promise.all(promises);
+    return new Promise(resolve => dispatch(findBathhouseAndRooms(bathhouseId))
+      .then(data => {
+        forEach(data.payload.rooms, room => {
+          promises.push(dispatch(findRoomScheduleIfNeed(room.id)));
+          promises.push(dispatch(findOrdersIfNeed(room.id)));
+        });
+
+        return resolve(Promise.all(promises));
+      })
+    );
   },
 };
 

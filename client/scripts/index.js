@@ -39,8 +39,6 @@ const { dispatch, getState } = store;
 
 const routes = createRoutes(store);
 
-console.log('client');
-
 function runApp() {
   match({ routes, location }, () => {
     moment.locale(locale);

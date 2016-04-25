@@ -6,6 +6,7 @@ import BathhouseItemPage from '../client/scripts/containers/BathhouseItemPage.js
 export default function createRoutes(store) {
   const HomeRoute = {
     path: '/',
+    //component: HomePage,
     getComponents(nextState, callback) {
       require.ensure([], require => {
         callback(null, require('../client/scripts/containers/HomePage.jsx'))
@@ -15,6 +16,7 @@ export default function createRoutes(store) {
 
   const BathhousesRoute = {
     path: '/bathhouses',
+    //component: BathhousesListPage,
     getComponents(nextState, callback) {
       require.ensure([], require => {
         callback(null, require('../client/scripts/containers/BathhousesListPage.jsx'));
@@ -29,6 +31,7 @@ export default function createRoutes(store) {
 
   const ManagerLoginRoute = {
     path: 'login',
+    //component: ManagerLoginPage,
     getComponents(nextState, callback) {
       require.ensure([], require => {
         callback(null, require('../client/scripts/containers/ManagerLoginPage.jsx'));
@@ -38,15 +41,26 @@ export default function createRoutes(store) {
 
   const ManagerDashboardRoute = {
     path: 'dashboard',
+    //component: ManagerDashboardPage,
     getComponents(nextState, callback) {
       require.ensure([], require => {
         callback(null, require('../client/scripts/containers/ManagerDashboardPage.jsx'));
       });
     },
+    onEnter(nextState, replace, callback) {
+      // the setTimeout is necessary because of this bug:
+      // https://github.com/rackt/redux-router/pull/62
+      // this will result in a bunch of warnings, but it doesn't seem to be a serious problem
+      const state = store.getState();
+      if (!state.manager.get('isAuthenticated')) replace({ pathname: '/manager/login' });
+
+      callback();
+    },
   };
 
   const ManagerRoute = {
     path: 'manager',
+    //component: ManagerPage,
     childRoutes: [
       ManagerLoginRoute,
       ManagerDashboardRoute

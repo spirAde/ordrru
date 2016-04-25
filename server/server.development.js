@@ -1,5 +1,7 @@
 import path from 'path';
 
+import pick from 'lodash/pick';
+
 import loopback from 'loopback';
 import boot from 'loopback-boot';
 
@@ -51,6 +53,7 @@ app.use('/manager', (req, res, next) => {
   }
 
   const referenceDatetime = moment().toDate();
+  const locale = req.acceptsLanguages(app.get('locales')) || 'ru';
 
   const reducers = configureManagerReducers();
   const memoryHistory = createMemoryHistory(req.originalUrl);
@@ -65,6 +68,7 @@ app.use('/manager', (req, res, next) => {
         <Root
           assets={isomorphicTools.assets()}
           store={store}
+          locale={locale}
           referenceDatetime={referenceDatetime}
         />
       )
@@ -75,8 +79,6 @@ app.use('/manager', (req, res, next) => {
     hydrateOnClient();
     return;
   }
-
-  const locale = req.acceptsLanguages(app.get('locales')) || 'ru';
 
   const AccessToken = app.models.AccessToken;
   const Manager = app.models.Manager;
@@ -93,10 +95,14 @@ app.use('/manager', (req, res, next) => {
         hydrateOnClient();
       }
 
-      Manager.findById(token.userId, (error, manager) => {
-        if (error || !manager) {
+      Manager.findById(token.userId, (error, data) => {
+        if (error || !data) {
           hydrateOnClient();
         }
+
+        const manager = pick(
+          data, ['firstName', 'secondName', 'middleName', 'position', 'organizationId']
+        );
 
         store.dispatch(setIsAuthenticated(true));
         store.dispatch(setManager(manager));
@@ -145,11 +151,7 @@ app.use('/manager', (req, res, next) => {
                     />
                   );
 
-                  console.log(RootComponent);
-        
-                  console.log(ReactDOMServer.renderToString(RootComponent));
-
-                  console.log(2);
+                  //console.log('SERVER', ReactDOMServer.renderToString(RootComponent));
                   res.status(200);
                   res.send('<!doctype html>\n' +
                     ReactDOMServer.renderToString(RootComponent)

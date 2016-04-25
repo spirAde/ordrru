@@ -4,8 +4,7 @@ import createReducer from '../utils/create-reducer';
 
 import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE,
 	LOGOUT_REQUEST, LOGOUT_SUCCESS, LOGOUT_FAILURE,
-	SET_IS_AUTHENTICATED, SET_MANAGER,
-} from '../../client/scripts/actions/manager-actions';
+	SET_IS_AUTHENTICATED, SET_MANAGER } from '../../client/scripts/actions/manager-actions';
 
 export const initialState = fromJS({
 	isFetching: false,
@@ -21,7 +20,7 @@ export const reducer = createReducer({
 		return state.set('isAuthenticated', action.payload.status);
 	},
 	[SET_MANAGER](state, action) {
-		return state.set('manager', action.payload.manager);
+		return state.set('manager', Map(action.payload.manager));
 	},
 	[LOGIN_REQUEST](state) {
 		return state.set('isFetching', true);
