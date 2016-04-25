@@ -1,4 +1,7 @@
+import cookie from 'cookie';
 import Cookies from 'js-cookie';
+
+import omit from 'lodash/omit';
 
 import { push, replace } from 'react-router-redux';
 
@@ -12,6 +15,27 @@ export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT_REQUEST = 'LOGOUT_REQUEST';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
+
+export const SET_IS_AUTHENTICATED = 'SET_IS_AUTHENTICATED';
+export const SET_MANAGER = 'SET_MANAGER';
+
+export function setIsAuthenticated(status) {
+  return {
+    type: SET_IS_AUTHENTICATED,
+    payload: {
+      status,
+    },
+  };
+}
+
+export function setManager(manager) {
+  return {
+    type: SET_MANAGER,
+    payload: {
+      manager,
+    },
+  };
+}
 
 function loginRequest() {
   return {
@@ -44,9 +68,11 @@ export function login(credentials, redirect = '/manager/dashboard') {
   return dispatch => {
     dispatch(loginRequest());
 
-    return Manager.login(credentials)
-      .then((token) => {
-        dispatch(loginSuccess(token));
+    return Manager.login(credentials, 'user')
+      .then((data) => {
+        dispatch(loginSuccess(omit(data, 'user')));
+        dispatch(setIsAuthenticated(true));
+        dispatch(setManager(data.user));
         dispatch(push(redirect));
       })
       .catch(error => {
@@ -91,8 +117,20 @@ export function logout(token, redirect = '/manager/login') {
     return Manager.logout(token)
       .then(() => {
         dispatch(logoutSuccess());
+        dispatch(setIsAuthenticated(false));
         dispatch(replace(redirect));
       })
       .catch(error => dispatch(logoutFailure(error)));
+  };
+}
+
+export function configureAuth(isServer, cookies, currentLocation) {
+  return dispatch => {
+    if (isServer) {
+      const rawCookies = cookie.parse(cookies || '{}');
+      const token = rawCookies.token && JSON.parse(rawCookies.token);
+    } else {
+
+    }
   };
 }

@@ -31,27 +31,6 @@
       "foreignKey": "cityId"
     }
   },
-  "acls": [
-    {
-      "accessType": "*",
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "DENY"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "find"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "findOne"
-    }
-  ],
+  "acls": [],
   "methods": {}
 }

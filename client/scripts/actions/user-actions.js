@@ -9,9 +9,6 @@ import { calculateDatetimeOrderSum } from '../../../common/utils/schedule-helper
 export const CHANGE_ORGANIZATION_TYPE = 'CHANGE_ORGANIZATION_TYPE';
 export const CHANGE_CITY = 'CHANGE_CITY';
 
-export const SET_USER_DEVICE = 'SET_USER_DEVICE';
-export const CHANGE_USER_VIEWPORT = 'CHANGE_USER_VIEWPORT';
-
 export const UPDATE_ORDER_DATETIME_START = 'UPDATE_ORDER_DATETIME_START';
 export const UPDATE_ORDER_DATETIME_END = 'UPDATE_ORDER_DATETIME_END';
 export const UPDATE_ORDER_SUM = 'UPDATE_ORDER_SUM';
@@ -122,34 +119,6 @@ export function changeOrganizationType(id) {
     type: CHANGE_ORGANIZATION_TYPE,
     payload: {
       id,
-    },
-  };
-}
-
-/**
- * set user device
- * @param {String} device - device
- * @return {{type: string, payload: {id: string}}} - action
- * */
-export function setUserDevice(device) {
-  return {
-    type: SET_USER_DEVICE,
-    payload: {
-      device,
-    },
-  };
-}
-
-/**
- * set user device viewport
- * @param {Object} viewport - height, width
- * @return {{type: string, payload: {id: string}}} - action
- * */
-export function changeUserViewport(viewport) {
-  return {
-    type: CHANGE_USER_VIEWPORT,
-    payload: {
-      viewport,
     },
   };
 }

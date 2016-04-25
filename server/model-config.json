@@ -25,6 +25,10 @@
     "dataSource": "ordrDB",
     "public": false
   },
+  "Token": {
+    "dataSource": "ordrDB",
+    "public": false
+  },
   "ACL": {
     "dataSource": "ordrDB",
     "public": false

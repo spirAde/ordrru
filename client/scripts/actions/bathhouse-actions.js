@@ -1,6 +1,11 @@
 import { List, fromJS } from 'immutable';
 
-import { flatten, isNull, trim, map, assign } from 'lodash';
+import flatten from 'lodash/flatten';
+import isNull from 'lodash/isNull';
+import trim from 'lodash/trim';
+import map from 'lodash/map';
+import assign from 'lodash/assign';
+import omit from 'lodash/omit';
 
 import { Bathhouse } from '../API';
 
@@ -14,6 +19,10 @@ import { findRoomScheduleIfNeed } from './schedule-actions';
 export const FIND_BATHHOUSES_REQUEST = 'FIND_BATHHOUSES_REQUEST';
 export const FIND_BATHHOUSES_SUCCESS = 'FIND_BATHHOUSES_SUCCESS';
 export const FIND_BATHHOUSES_FAILURE = 'FIND_BATHHOUSES_FAILURE';
+
+export const FIND_BATHHOUSE_REQUEST = 'FIND_BATHHOUSE_REQUEST';
+export const FIND_BATHHOUSE_SUCCESS = 'FIND_BATHHOUSE_SUCCESS';
+export const FIND_BATHHOUSE_FAILURE = 'FIND_BATHHOUSE_FAILURE';
 
 export const CHANGE_ACTIVE_ROOM = 'CHANGE_ACTIVE_ROOM';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
@@ -72,7 +81,7 @@ export function changeActiveRoom(id) {
  * Request fetching bathhouses
  * @return {{type: string, payload: {}}}
  * */
-function fetchBathhousesRequest() {
+function findBathhousesRequest() {
   return {
     type: FIND_BATHHOUSES_REQUEST,
     payload: {},
@@ -85,7 +94,7 @@ function fetchBathhousesRequest() {
  * @param {Array.<Object>} rooms - list of rooms
  * @return {{type: string, payload: {bathhouses: Array.<Object>, rooms: Array.<Object>}}}
  * */
-function fetchBathhousesSuccess(bathhouses, rooms) {
+function findBathhousesSuccess(bathhouses, rooms) {
   return {
     type: FIND_BATHHOUSES_SUCCESS,
     payload: {
@@ -100,11 +109,11 @@ function fetchBathhousesSuccess(bathhouses, rooms) {
  * @param {Object} error
  * @return {{type: string, payload: {error: Object}}}
  * */
-function fetchBathhousesFailure(error) {
+function findBathhousesFailure(error) {
   return {
     type: FIND_BATHHOUSES_FAILURE,
     payload: {
-      error,
+      error: error.message,
     },
     error,
   };
@@ -119,7 +128,7 @@ export function findBathhousesAndRooms(cityId) {
   return (dispatch, getState) => {
     const state = getState();
 
-    dispatch(fetchBathhousesRequest());
+    dispatch(findBathhousesRequest());
 
     return Bathhouse.find({ include: 'rooms', where: { cityId, isActive: true } })
       .then(data => {
@@ -138,9 +147,45 @@ export function findBathhousesAndRooms(cityId) {
           bathhouses, rooms, sorting.get('name'), sorting.get('isDesc')
         );
 
-        dispatch(fetchBathhousesSuccess(bathhouses, sortedRooms));
+        dispatch(findBathhousesSuccess(bathhouses, sortedRooms));
       })
-      .catch(error => dispatch(fetchBathhousesFailure(error)));
+      .catch(error => dispatch(findBathhousesFailure(error)));
+  };
+}
+
+function findBathhouseRequest() {
+  return {
+    type: FIND_BATHHOUSE_REQUEST,
+  };
+}
+
+function findBathhouseSuccess(bathhouse, rooms) {
+  return {
+    type: FIND_BATHHOUSE_SUCCESS,
+    payload: {
+      bathhouse,
+      rooms,
+    },
+  };
+}
+
+function findBathhouseFailure(error) {
+  return {
+    type: FIND_BATHHOUSE_FAILURE,
+    payload: {
+      error: error.message,
+    },
+    error,
+  };
+}
+
+export function findBathhouseAndRooms(id) {
+  return dispatch => {
+    dispatch(findBathhouseRequest());
+
+    return Bathhouse.findById(id, { include: 'rooms' })
+      .then(bathhouse => dispatch(findBathhouseSuccess(omit(bathhouse, 'rooms'), bathhouse.rooms)))
+      .catch(error => dispatch(findBathhouseFailure(error)));
   };
 }
 
@@ -151,11 +196,7 @@ export function findBathhousesAndRooms(cityId) {
  * */
 export function shouldFetchBathhousesForCity(state) {
   const bathhouses = state.bathhouse.get('bathhouses');
-  if (bathhouses.isEmpty()) {
-    return true;
-  } else if (state.bathhouse.get('isFetching') || !bathhouses.isEmpty()) {
-    return false;
-  }
+  return !state.bathhouse.get('isFetching') || !bathhouses;
 }
 
 /**

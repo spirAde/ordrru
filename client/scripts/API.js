@@ -167,7 +167,8 @@ Depending on the value of `include` parameter, the body may contain additional p
 
 	 */
 	login: async (credentials, include) => {
-		return _fetch(`${baseUrl}/managers/login`, {
+		const conditions = include ? `?include=${include}` : '';
+		return _fetch(`${baseUrl}/managers/login${conditions}`, {
 			method: 'post',
 			body: JSON.stringify(credentials),
 		});
@@ -207,6 +208,18 @@ Depending on the value of `include` parameter, the body may contain additional p
 		return _fetch(`${baseUrl}/managers/reset`, {
 			method: 'post',
 			body: JSON.stringify(data),
+		});
+	},
+	
+	/**
+	 * verify manager access token and role
+	 * @param {string} token - access token
+	 * @return {Boolean} - status of validation
+	 */
+	verify: async (token) => {
+		return _fetch(`${baseUrl}/managers/verify`, {
+			method: 'post',
+			body: JSON.stringify(token),
 		});
 	},
 };
