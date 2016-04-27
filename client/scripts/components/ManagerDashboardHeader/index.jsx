@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-
-import classNames from 'classnames';
+import { FormattedMessage } from 'react-intl';
 
 import './style.css';
+
+import IconComponent from '../Icon/index.jsx';
 
 import logoImg from '../../../images/logo.png';
 
@@ -19,6 +20,14 @@ class ManagerDashboardHeaderComponent extends Component {
    */
   constructor(props) {
     super(props);
+
+    this.handleClickLogout = this.handleClickLogout.bind(this);
+  }
+
+  handleClickLogout(event) {
+    event.preventDefault();
+
+    this.props.onSubmit();
   }
 
   /**
@@ -37,17 +46,22 @@ class ManagerDashboardHeaderComponent extends Component {
           </div>
           <div className="ManagerDashboardHeader-links">
             <a className="ManagerDashboardHeader-link ManagerDashboardHeader-link-history">
-							История
-						</a>
+              <FormattedMessage id="history" />
+            </a>
             <a className="ManagerDashboardHeader-link ManagerDashboardHeader-link-message">
-							Сообщения
-						</a>
+              <FormattedMessage id="messages" />
+            </a>
           </div>
           <div className="ManagerDashboardHeader-user">
             <a className="ManagerDashboardHeader-username">
               {fullName}
             </a>
-            <a className="ManagerDashboardHeader-logout icons" />
+            <a className="ManagerDashboardHeader-logout icons" onClick={this.handleClickLogout}>
+              <IconComponent
+                name="icon-exit"
+                rate={1.5}
+              />
+            </a>
           </div>
         </div>
       </div>

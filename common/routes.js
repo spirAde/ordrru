@@ -48,9 +48,6 @@ export default function createRoutes(store) {
       });
     },
     onEnter(nextState, replace, callback) {
-      // the setTimeout is necessary because of this bug:
-      // https://github.com/rackt/redux-router/pull/62
-      // this will result in a bunch of warnings, but it doesn't seem to be a serious problem
       const state = store.getState();
       if (!state.manager.get('isAuthenticated')) replace({ pathname: '/manager/login' });
 

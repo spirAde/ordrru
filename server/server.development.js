@@ -42,6 +42,8 @@ const bootOptions = {
   bootScripts: ['./boot/preload.js'],
 };
 
+app.use(loopback.token());
+
 app.use('/build', loopback.static(path.join(__dirname, '../build')));
 app.use('/icons', loopback.static(path.join(__dirname, '../client/images/icons')));
 app.use('/api', loopback.rest());

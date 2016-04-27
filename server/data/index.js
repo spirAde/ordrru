@@ -36,7 +36,7 @@ const questions = [
 			{ name: 'room' },
 			{ name: 'order' },
 			{ name: 'schedule' },
-			{ name: 'review' },
+			{ name: 'comment' },
 			{ name: 'all' },
 		],
 		when: (answers) => answers.type === 'data',

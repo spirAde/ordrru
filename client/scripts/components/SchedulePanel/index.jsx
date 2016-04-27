@@ -19,7 +19,7 @@ import './style.css';
 let Ps;
 
 if (__CLIENT__) {
-  Ps = require('perfect-scrollbar');
+  Ps = require('perfect-scrollbar'); // eslint-disable-line global-require
 }
 
 /**

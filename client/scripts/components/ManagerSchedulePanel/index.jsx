@@ -1,6 +1,4 @@
-import map from 'lodash/map';
-
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import ManagerScheduleRow from '../ManagerScheduleRow/index.jsx';
@@ -24,7 +22,7 @@ class ManagerSchedulePanel extends Component {
     const rows = this.renderRows();
 
     return (
-      <div className="ManagerSchedulePanel">
+      <div className="schedule-panel schedule-carousel schedule-loaded">
         {rows}
       </div>
     );

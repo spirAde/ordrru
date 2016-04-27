@@ -2,7 +2,8 @@ import moment from 'moment-timezone';
 
 import { setDisablePeriod, removeAllFirstSchedules } from './schedule-actions';
 
-import { periodToTime, MOMENT_FORMAT } from '../../../common/utils/date-helper';
+import { periodToTime, getCityDateAndPeriod,
+  MOMENT_FORMAT } from '../../../common/utils/date-helper';
 import { LAST_PERIOD } from '../../../common/utils/schedule-helper';
 
 export const SET_CURRENT_DATE = 'SET_CURRENT_DATE';

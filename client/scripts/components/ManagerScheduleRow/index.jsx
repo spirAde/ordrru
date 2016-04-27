@@ -1,7 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import './style.css';
+
+import { FIRST_PERIOD, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
 class ManagerScheduleRow extends Component {
   render() {

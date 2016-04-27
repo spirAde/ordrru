@@ -1,9 +1,8 @@
-import cookie from 'cookie';
 import Cookies from 'js-cookie';
 
 import omit from 'lodash/omit';
 
-import { push, replace } from 'react-router-redux';
+import { push } from 'react-router-redux';
 
 import { Manager } from '../API';
 import { addNotification } from './notification-actions';
@@ -110,27 +109,16 @@ function logoutFailure(error) {
   };
 }
 
-export function logout(token, redirect = '/manager/login') {
+export function logout(redirect = '/manager/login') {
   return dispatch => {
     dispatch(logoutRequest());
 
-    return Manager.logout(token)
+    return Manager.logout()
       .then(() => {
         dispatch(logoutSuccess());
         dispatch(setIsAuthenticated(false));
-        dispatch(replace(redirect));
+        dispatch(push(redirect));
       })
       .catch(error => dispatch(logoutFailure(error)));
-  };
-}
-
-export function configureAuth(isServer, cookies, currentLocation) {
-  return dispatch => {
-    if (isServer) {
-      const rawCookies = cookie.parse(cookies || '{}');
-      const token = rawCookies.token && JSON.parse(rawCookies.token);
-    } else {
-
-    }
   };
 }

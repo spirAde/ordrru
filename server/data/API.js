@@ -119,7 +119,9 @@ function renderAPI(models, callback) {
 	let API = '';
 
 	API += `
+require('es6-promise').polyfill();
 import fetch from 'isomorphic-fetch';
+import Cookies from 'js-cookie';
 import { isEmpty, assign, has } from 'lodash';
 
 const baseUrl = '${process.env.API_PROTOCOL}://${process.env.API_HOST}:${process.env.API_PORT}/api';
@@ -129,25 +131,59 @@ const headers = {
 	'Content-Type': 'application/json',
 };
 
+function setAuthorization(headers) {
+	const rawToken = Cookies.get('token');
+
+	if (!rawToken || !__CLIENT__) return headers;
+
+	const token = JSON.parse(rawToken);
+
+	if (isEmpty(token) || !token.id) return headers;
+
+	return assign({}, headers, { Authorization: token.id });
+}
+function checkStatus(response) {
+	if (response.status >= 200 && response.status < 300) {
+		return response;
+	} else {
+		var error = new Error(response.statusText);
+		error.response = response;
+		throw error;
+	}
+}
+
+function parseText(response) {
+	return response.text();
+}
+
 function _fetch(url, options) {
 	if (!url) {
 		throw new Error('There is no URL provided for the request.');
 	}
 
-	options = assign({}, options, { headers });
+	const headers = {
+		Accept: 'application/json',
+		'Content-Type': 'application/json; charset=utf-8',
+	};
 
-	return fetch(url, options)
-		.then(response => response.json())
+	const newOptions = assign({}, options, { headers: setAuthorization(headers) });
+
+	const fetch_ = fetch.bind(undefined);
+
+	return fetch_(url, newOptions)
+		.then(checkStatus)
+		.then(parseText)
 		.then(response => {
-			if (has(response, 'error')) {
-				throw response.error;
+			// catch if status === 204
+			if (!response) return false;
+
+			const data = JSON.parse(response);
+
+			if (has(data, 'error')) {
+				throw data.error;
 			}
 
-			if (response.status >= 200 && response.status < 300) {
-				throw new Error('Something wrong, response has error status code, but hasn\\'t error object');
-			}
-
-			return response;
+			return data;
 		}).catch(error => { throw error; });
 }\n`;
 
@@ -196,6 +232,11 @@ function renderMethod(method, modelRoute) {
 			renderedMethod += '\n\t\treturn _fetch(`${baseUrl}' + `${modelRoute}${route}` + '${conditions}`, {';
 			renderedMethod += `\n\t\t\tmethod: 'post',`;
 			renderedMethod += '\n\t\t\tbody: JSON.stringify(credentials),';
+			renderedMethod += '\n\t\t});';
+			renderedMethod += '\n\t},';
+		} else if (method.name === 'logout') {
+			renderedMethod += '\n\t\treturn _fetch(`${baseUrl}' + `${modelRoute}${route}` + '`, {';
+			renderedMethod += `\n\t\t\tmethod: 'post',`;
 			renderedMethod += '\n\t\t});';
 			renderedMethod += '\n\t},';
 		} else if (methodType === 'get') {

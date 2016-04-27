@@ -30,6 +30,8 @@
     position: relative;
     padding-left: 30px;
     margin: 0 20px;
+    color: #FFFFFF;
+    cursor: pointer;
 
     &::before {
       position: absolute;
@@ -47,9 +49,18 @@
     position: absolute;
     right: 20px;
     top: 20px;
+    width: 150px;
   }
 
-  &-username {}
+  &-username {
+    color: #FFFFFF;
+    top: -7px;
+    position: relative;
+    margin-right: 25px;
+  }
 
-  &-logout {}
+  &-logout {
+    color: #FFFFFF;
+    cursor: pointer;
+  }
 }

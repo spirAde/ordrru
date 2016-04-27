@@ -31,10 +31,10 @@ import './style.css';
 
 let Ps;
 
-let defaultBoxOffset = 0;
+const DEFAULT_BOX_OFFSET = 444; // TODO: remove this magic value, calculate in componentDidMount
 
 if (__CLIENT__) {
-  Ps = require('perfect-scrollbar');
+  Ps = require('perfect-scrollbar'); // eslint-disable-line global-require
 }
 
 /**
@@ -92,7 +92,6 @@ class FiltersListComponent extends Component {
    * */
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll, false);
-    defaultBoxOffset = this.refs.box.offsetTop;
     this.handleScroll();
   }
 
@@ -119,7 +118,13 @@ class FiltersListComponent extends Component {
    * @return {void}
    * */
   handleScroll() {
-    const isSticked = defaultBoxOffset < window.pageYOffset;
+    const { data } = this.state;
+
+    const isSticked = DEFAULT_BOX_OFFSET < window.pageYOffset;
+
+    if (data.get('isSticked') !== isSticked) {
+      this.props.onChangeFiltersStick(isSticked);
+    }
 
     this.setState(({ data }) => ({
       data: data.set('isSticked', isSticked),
@@ -401,6 +406,7 @@ class FiltersListComponent extends Component {
  * @property {Function} updateRoomsByPrice - filter rooms by price
  * @property {Function} updateRoomsBySorting - filter sorting rooms
  * @property {Function} resetRoomsByTag - clear rooms in invalid, and cancel tag
+ * @property {Function} onChangeFiltersStick - check if filters box change isSticked value
  */
 FiltersListComponent.propTypes = {
   offersCount: PropTypes.number.isRequired,
@@ -424,6 +430,7 @@ FiltersListComponent.propTypes = {
   updateRoomsByPrice: PropTypes.func.isRequired,
   updateRoomsBySorting: PropTypes.func.isRequired,
   resetRoomsByTag: PropTypes.func.isRequired,
+  onChangeFiltersStick: PropTypes.func.isRequired,
 };
 
 /**

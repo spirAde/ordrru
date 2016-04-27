@@ -10,6 +10,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { findBathhouseAndRooms } from '../actions/bathhouse-actions';
 import { findRoomScheduleIfNeed } from '../actions/schedule-actions';
 import { findOrdersIfNeed } from '../actions/order-actions';
+import { logout } from '../actions/manager-actions';
 
 import ManagerDashboardHeaderComponent from '../components/ManagerDashboardHeader/index.jsx';
 import DatepaginatorComponent from '../components/DatePaginator/index.jsx';
@@ -44,6 +45,12 @@ const hooks = {
 class ManagerDashboardPage extends Component {
   constructor(props) {
     super(props);
+
+    this.handleLogout = this.handleLogout.bind(this);
+  }
+
+  handleLogout() {
+    this.props.logout();
   }
 
   /**
@@ -51,13 +58,14 @@ class ManagerDashboardPage extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { manager, viewport, date, rooms, orders, schedules } = this.props;
+    const { manager, viewport, date, bathhouse, rooms, orders, schedules } = this.props;
 
     return (
       <div>
         <Helmet title="Dashboard" />
         <ManagerDashboardHeaderComponent
           manager={manager}
+          onSubmit={this.handleLogout}
         />
         <DatepaginatorComponent
           width={viewport.get('width')}
@@ -84,8 +92,20 @@ ManagerDashboardPage.propTypes = {
   schedules: ImmutablePropTypes.map.isRequired,
   viewport: ImmutablePropTypes.map.isRequired,
   date: PropTypes.string.isRequired,
+  logout: PropTypes.func.isRequired,
 };
 
+/**
+ * pass method to props
+ * @param {Function} dispatch
+ * @return {Object} props - list of methods
+ * */
+function mapDispatchToProps(dispatch) {
+  return {
+    logout: () => dispatch(logout()),
+  };
+}
+
 export default provideHooks(hooks)(connect(
-  ManagerDashboardSelectors
+  ManagerDashboardSelectors, mapDispatchToProps
 )(ManagerDashboardPage));
