@@ -1,0 +1,3 @@
+O1: Split logic between main part of application and manager. Added authentication for manager on server, if cookie is valid
+O2: Datepaginator component.
+O3: Schedule Panel. Schedule Row components.
