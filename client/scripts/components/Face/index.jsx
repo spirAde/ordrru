@@ -40,7 +40,10 @@ class FaceComponent extends Component {
               to={{ pathname: '/bathhouses', query: { city: 'mgn', mode: 'list' } }}
             >
               <span>Подобрать</span>
-              <IconComponent name="icon-chevron-right" style={{ margin: '0 -14px -4px 5px' }} />
+              <IconComponent
+                name="icon-chevron-right"
+                className="Face-icon-chevron-right"
+              />
             </Link>
           </div>
           <div className="Face-select-city">

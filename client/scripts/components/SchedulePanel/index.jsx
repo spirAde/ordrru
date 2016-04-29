@@ -11,6 +11,7 @@ import moment from 'moment';
 import { STEP, FIRST_PERIOD, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import ScheduleRowComponent from '../ScheduleRow/index.jsx';
 
@@ -37,6 +38,8 @@ class SchedulePanelComponent extends Component {
         orderedPeriods: {},
       }),
     };
+
+    this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
     this.handleMouseOverCell = this.handleMouseOverCell.bind(this);
@@ -67,6 +70,12 @@ class SchedulePanelComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
+    /*console.log('===========================================================');
+    console.log('order', this.props.order && this.props.order.toJS(), nextProps.order && nextProps.order.toJS());
+    console.log('schedule', this.props.schedule && this.props.schedule.toJS(), nextProps.schedule && nextProps.schedule.toJS());
+    console.log('shouldComponentUpdate', !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState));
+    console.log('===========================================================');*/
     return !shallowEqualImmutable(this.props, nextProps) ||
       !shallowEqualImmutable(this.state, nextState);
   }
@@ -211,7 +220,9 @@ class SchedulePanelComponent extends Component {
 
     const orderIsStarted = !isNull(order.getIn(['datetime', 'startDate'])) &&
       !isNull(order.getIn(['datetime', 'startPeriod']));
-    const rows = schedule ? this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
+
+    const rows = schedule && schedule.size ?
+      this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
 
     const classes = classNames({
       SchedulePanel: true,

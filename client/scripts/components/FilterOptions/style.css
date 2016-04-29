@@ -46,4 +46,12 @@
 	 	font-family: var(--font-family-bold);
 		color: #18B2AE
 	}
+
+ 	&-icon-checkbox-checked {
+		margin: 5px 10px 0 0;
+ 	}
+
+	&-icon-checkbox-unchecked {
+		margin: 5px 10px 0 0;
+	}
 }

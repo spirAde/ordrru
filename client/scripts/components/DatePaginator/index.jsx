@@ -23,9 +23,7 @@ class DatePaginatorComponent extends Component {
     super(props);
 
     this.state = {
-      data: Map({
-        selectedDate: moment(props.date).format(props.selectedDateFormat),
-      }),
+      selectedDate: moment(props.date).format(props.selectedDateFormat),
     };
   }
   renderItems(dates) {
@@ -53,9 +51,6 @@ class DatePaginatorComponent extends Component {
     });
   }
   render() {
-    const { data } = this.state;
-    const { width } = this.props;
-
     return (
       <div className="DatePaginator" ref="datepaginator">
         <div className="DatePaginator-wrapper">

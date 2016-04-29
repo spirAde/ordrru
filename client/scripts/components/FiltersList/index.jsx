@@ -267,9 +267,9 @@ class FiltersListComponent extends Component {
       >
         <FormattedMessage id={`tags.${tag}`} />
         <IconComponent
+          className="FiltersList-icon-cancel"
           name="icon-cancel"
           rate={2}
-          style={{ margin: '-5px -30px', float: 'right' }}
         />
       </a>
     ));

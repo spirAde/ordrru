@@ -1,7 +1,5 @@
-import Immutable from 'immutable';
-
-export default function shallowEqualImmutable(objA, objB) {
-  if (objA === objB || Immutable.is(objA, objB)) {
+export default function shallowEqual(objA, objB) {
+  if (objA === objB) {
     return true;
   }
 
@@ -18,8 +16,8 @@ export default function shallowEqualImmutable(objA, objB) {
   }
 
   const bHasOwnProperty = Object.prototype.hasOwnProperty.bind(objB);
-  for (let index = 0, len = keysA.length; index < len; index++) {
-    if (!bHasOwnProperty(keysA[index]) || !Immutable.is(objA[keysA[index]], objB[keysA[index]])) {
+  for (let index = 0; index < keysA.length; index++) {
+    if (!bHasOwnProperty(keysA[index]) || objA[keysA[index]] !== objB[keysA[index]]) {
       return false;
     }
   }

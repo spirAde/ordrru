@@ -137,9 +137,10 @@ class BathhouseListPage extends Component {
         <FiltersListComponent
           onChangeFiltersStick={this.handleChangeFilterStick}
         />
+        <CommentsListComponent isActive={commentsIsActive} />
         <RoomsListComponent
           style={{
-            marginTop: data.get('isSticked') ? '69px' : 0,
+            marginTop: data.get('isSticked') ? 69 : 0,
           }}
           isActive={isListMode}
         />

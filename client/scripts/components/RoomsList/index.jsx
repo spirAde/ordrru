@@ -1,3 +1,5 @@
+import { Map } from 'immutable';
+
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -130,6 +132,7 @@ class RoomsListComponent extends Component {
         bathhouse => bathhouse.get('id') === room.get('bathhouseId')
       );
       const schedule = schedules.get(room.get('id'));
+      const activeRoomOrder = order.get('roomId') === room.get('id') ? order : Map();
 
       return (
         <RoomItemComponent
@@ -138,7 +141,7 @@ class RoomsListComponent extends Component {
           room={room}
           bathhouse={bathhouse}
           schedule={schedule}
-          order={order}
+          order={activeRoomOrder}
           steps={steps}
           isClosable={false}
           onChangeActiveRoom={this.handleChangeActiveRoom}
