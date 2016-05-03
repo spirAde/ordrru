@@ -91,6 +91,10 @@ export default {
   'history': 'История',
   'message': 'Сообщение',
   'messages': 'Сообщения',
+  'availableTime': 'Доступное время',
+  'disabledTime': 'Недоступное время',
+  'createdManagerTime': 'Создано администратором',
+  'createdUserTime': 'Создано пользователем',
 
   // errors
   'usernameIsAlphanumeric': 'Логин должен содержать только цифры и буквы',

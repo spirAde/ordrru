@@ -1,5 +1,3 @@
-import { Map } from 'immutable';
-
 import { isNull, indexOf } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';

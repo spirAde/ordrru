@@ -7,9 +7,20 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import IconComponent from '../Icon/index.jsx';
 
+import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+
 import './style.css';
 
 class CommentComponent extends Component {
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
+  }
+
   renderStars(rating) {
     const fullStarsCount = floor(rating / 2);
     const halfStarsCount = floor(rating - fullStarsCount * 2);

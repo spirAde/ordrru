@@ -1,5 +1,5 @@
-import map from 'lodash/map';
 import forEach from 'lodash/forEach';
+import moment from 'moment';
 
 import React, { Component, PropTypes } from 'react';
 import Helmet from 'react-helmet';
@@ -12,9 +12,13 @@ import { findRoomScheduleIfNeed } from '../actions/schedule-actions';
 import { findOrdersIfNeed } from '../actions/order-actions';
 import { logout } from '../actions/manager-actions';
 
+import shallowEqualImmutable from '../utils/shallowEqualImmutable';
+
 import ManagerDashboardHeaderComponent from '../components/ManagerDashboardHeader/index.jsx';
 import DatepaginatorComponent from '../components/DatePaginator/index.jsx';
-import ManagerSchedulePanel from '../components/ManagerSchedulePanel/index.jsx';
+import ManagerRoomListComponent from '../components/ManagerRoomList/index.jsx';
+
+import { MOMENT_FORMAT } from '../../../common/utils/date-helper';
 
 import { ManagerDashboardSelectors } from '../selectors/ManagerDashboardSelectors';
 
@@ -46,11 +50,31 @@ class ManagerDashboardPage extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      currentDate: moment(props.date).format(MOMENT_FORMAT),
+    };
+
     this.handleLogout = this.handleLogout.bind(this);
+    this.handleSelectDate = this.handleSelectDate.bind(this);
+  }
+
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   handleLogout() {
     this.props.logout();
+  }
+
+  handleSelectDate(date) {
+    this.setState({
+      currentDate: date,
+    });
   }
 
   /**
@@ -58,7 +82,8 @@ class ManagerDashboardPage extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { manager, viewport, date, bathhouse, rooms, orders, schedules } = this.props;
+    const { manager, viewport, rooms, orders, schedules } = this.props;
+    const { currentDate } = this.state;
 
     return (
       <div>
@@ -67,14 +92,19 @@ class ManagerDashboardPage extends Component {
           manager={manager}
           onSubmit={this.handleLogout}
         />
-        <DatepaginatorComponent
-          width={viewport.get('width')}
-          date={date}
-        />
-        <ManagerSchedulePanel
+        {
+          viewport ?
+            <DatepaginatorComponent
+              width={viewport.get('width')}
+              date={currentDate}
+              onSelectDate={this.handleSelectDate}
+            /> : null
+        }
+        <ManagerRoomListComponent
           rooms={rooms}
           orders={orders}
           schedules={schedules}
+          date={currentDate}
         />
       </div>
     );

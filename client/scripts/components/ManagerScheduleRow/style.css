@@ -1,1 +1,13 @@
-.ManagerScheduleRow {}
+.ManagerScheduleRow {
+  &-cell {
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid #7F8C9D;
+    margin: 0 10px 0 0;
+    padding: 20px 0;
+    cursor: pointer;
+    transition: background 0.3s ease 0s;
+    position: relative;
+    float: left;
+  }
+}

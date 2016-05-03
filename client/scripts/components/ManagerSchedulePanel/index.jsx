@@ -1,38 +1,65 @@
+import moment from 'moment';
+
 import React, { Component } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import ManagerScheduleRow from '../ManagerScheduleRow/index.jsx';
+import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+
+import ManagerScheduleRowComponent from '../ManagerScheduleRow/index.jsx';
 
 import './style.css';
 
-class ManagerSchedulePanel extends Component {
-  renderRows() {
-    const { rooms, orders, schedules } = this.props;
+class ManagerSchedulePanelComponent extends Component {
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
+  }
 
-    return rooms.map(room => (
-      <ManagerScheduleRow
-        key={room.get('id')}
-        room={room}
-        orders={orders.get(room.get('id'))}
-        schedule={schedules.get(room.get('id'))}
-      />
-    ));
+  renderRows() {
+    const { orders, schedules } = this.props;
+
+    return schedules.map(schedule => {
+      const dateOrders = orders.find(
+        order => moment(order.get('date')).isSame(schedule.get('date'))
+      );
+
+      return (
+        <ManagerScheduleRowComponent
+          key={schedule.get('id')}
+          orders={dateOrders}
+          cells={schedule.get('periods')}
+        />
+      );
+    });
   }
   render() {
-    const rows = this.renderRows();
+    const { schedules } = this.props;
 
-    return (
-      <div className="schedule-panel schedule-carousel schedule-loaded">
-        {rows}
-      </div>
-    );
+    if (schedules && schedules.size) {
+      const rows = this.renderRows();
+
+      return (
+        <div className="ManagerSchedulePanel">
+          <div className="ManagerSchedulePanel-stage-outer">
+            <div className="ManagerSchedulePanel-stage" style={{ width: 108355 }}>
+              {rows}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   }
 }
 
-ManagerSchedulePanel.propTypes = {
-  rooms: ImmutablePropTypes.list.isRequired,
-  orders: ImmutablePropTypes.map.isRequired,
-  schedules: ImmutablePropTypes.map.isRequired,
+ManagerSchedulePanelComponent.propTypes = {
+  orders: ImmutablePropTypes.list.isRequired,
+  schedules: ImmutablePropTypes.list.isRequired,
 };
 
-export default ManagerSchedulePanel;
+export default ManagerSchedulePanelComponent;

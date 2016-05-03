@@ -1,5 +1,15 @@
 .ManagerSchedulePanel {
   position: relative;
 
+  &-stage {
+    position: relative;
+    height: 62px;
+    /*margin-left: 25px;
+    margin-right: 25px;*/
+  }
 
+  &-stage-outer {
+    position: relative;
+    overflow: hidden;
+  }
 }

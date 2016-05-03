@@ -14,6 +14,8 @@ import KeyHandler, { KEYUP } from 'react-key-handler';
 
 import classNames from 'classnames';
 
+import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+
 import './style.css';
 
 import logoImg from '../../../images/logo.png';

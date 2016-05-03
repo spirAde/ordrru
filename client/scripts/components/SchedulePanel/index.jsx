@@ -70,12 +70,6 @@ class SchedulePanelComponent extends Component {
    * @return {boolean}
    * */
   shouldComponentUpdate(nextProps, nextState) {
-    /*console.log('===========================================================');
-    console.log('order', this.props.order && this.props.order.toJS(), nextProps.order && nextProps.order.toJS());
-    console.log('schedule', this.props.schedule && this.props.schedule.toJS(), nextProps.schedule && nextProps.schedule.toJS());
-    console.log('shouldComponentUpdate', !shallowEqualImmutable(this.props, nextProps) ||
-      !shallowEqualImmutable(this.state, nextState));
-    console.log('===========================================================');*/
     return !shallowEqualImmutable(this.props, nextProps) ||
       !shallowEqualImmutable(this.state, nextState);
   }

@@ -20,6 +20,7 @@ class CommentsListComponent extends Component {
     return !shallowEqualImmutable(this.props, nextProps) ||
       !shallowEqualImmutable(this.state, nextState);
   }
+
   renderComments() {
     const { comments } = this.props;
 

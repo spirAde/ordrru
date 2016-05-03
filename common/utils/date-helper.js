@@ -71,20 +71,12 @@ export function periodToTime(period) {
  * @return {Number} result.period
  * */
 export function getCityDateAndPeriod(serverTime, timezone) {
-	const currentMoment = moment(serverTime);
-	const currentDate = currentMoment.format(MOMENT_FORMAT);
-	const currentHour = currentMoment.format('HH');
-	const currentMinutes = currentMoment.format('mm');
+	const cityDatetime = moment(serverTime).tz(timezone);
+
+	const currentDate = cityDatetime.format(MOMENT_FORMAT);
+	const currentHour = cityDatetime.format('HH');
+	const currentMinutes = cityDatetime.format('mm');
 	const currentPeriod = (currentHour * 2 + (currentMinutes >= 30 ? 1 : 0)) * 3;
 
-	const currentTime = periodToTime(currentPeriod);
-	const currentDatetime = new Date(`${currentDate} ${currentTime}:00`);
-	const currentMomentDatetimeOffset = moment(currentDatetime).tz(timezone);
-
-	const newDate = currentMomentDatetimeOffset.format(MOMENT_FORMAT);
-	const newHour = currentMomentDatetimeOffset.format('HH');
-	const newMinutes = currentMomentDatetimeOffset.format('mm');
-	const newPeriod = (newHour * 2 + (newMinutes >= 30 ? 1 : 0)) * 3;
-
-	return { date: newDate, period: newPeriod };
+	return { date: currentDate, period: currentPeriod };
 }

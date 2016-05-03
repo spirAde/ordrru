@@ -6,6 +6,8 @@ import './style.css';
 
 import IconComponent from '../Icon/index.jsx';
 
+import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+
 import logoImg from '../../../images/logo.png';
 
 /**
@@ -22,6 +24,15 @@ class ManagerDashboardHeaderComponent extends Component {
     super(props);
 
     this.handleClickLogout = this.handleClickLogout.bind(this);
+  }
+  
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   handleClickLogout(event) {
