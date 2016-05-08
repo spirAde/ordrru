@@ -89,6 +89,27 @@ export function findRoomScheduleIfNeed(roomId) {
   };
 }
 
+export function findRoomScheduleForDateIfNeed(roomId, date) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const schedules = state.schedule.getIn(['schedules', roomId]);
+    const dateSchedule = schedules.find(schedule => moment(schedule.get('date')).isSame(date));
+
+    if (dateSchedule.size) return false;
+
+    dispatch(fetchRoomScheduleRequest());
+
+    return Schedule.find({
+      where: { roomId, date },
+      order: 'date ASC',
+    })
+      .then(schedule => {
+        dispatch(fetchRoomScheduleSuccess(roomId, schedule));
+      })
+      .catch(error => dispatch(fetchRoomScheduleFailure(error)));
+  };
+}
+
 /**
  * update schedule for room
  * @param {String} roomId - room id
@@ -191,8 +212,8 @@ export function redefineRoomSchedule(id, date, period, isStartOrder) {
     }
 
     const recoverSchedule = map(schedule, date => assign({}, date, {
-      periods: map(date.periods, period => (
-        assign({}, period, { status: omit(period.status, ['isForceDisable']) })
+      periods: map(date.periods, period => assign(
+        {}, period, { status: omit(period.status, ['isForceDisable']) }
       )),
     }));
 

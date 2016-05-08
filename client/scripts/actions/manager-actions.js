@@ -58,6 +58,7 @@ function loginFailure(error) {
     type: LOGIN_FAILURE,
     payload: {
       error: error.message,
+      code: error.code,
     },
     error,
   };
@@ -75,6 +76,7 @@ export function login(credentials, redirect = '/manager/dashboard') {
         dispatch(push(redirect));
       })
       .catch(error => {
+        console.log(error);
         dispatch(loginFailure(error));
         dispatch(addNotification({
           message: error.code,

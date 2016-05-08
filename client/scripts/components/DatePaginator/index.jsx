@@ -37,7 +37,7 @@ class DatePaginatorComponent extends Component {
       offDaysFormat, startOfWeekFormat } = this.props;
 
     const itemsCount = floor((width - selectedItemWidth - 2 * navItemWidth) / itemWidth);
-    const sideRangeDateValue = floor((itemsCount / 2));
+    const sideRangeDateValue = floor(itemsCount / 2);
 
     const start = moment(date).subtract(sideRangeDateValue, 'days');
     const end = moment(date).add(sideRangeDateValue, 'days');
@@ -51,11 +51,10 @@ class DatePaginatorComponent extends Component {
         m: momentMark.clone().format(selectedDateFormat),
         isSelected: momentMark.isSame(date),
         isToday: momentMark.isSame(today),
-        isOffDay: (offDays.split(',').indexOf(momentMark.format(offDaysFormat)) !== -1),
-        isStartOfWeek: (
-          startOfWeek.split(',').indexOf(momentMark.format(startOfWeekFormat)) !== -1
-        ),
-        text: (momentMark.isSame(date)) ?
+        isOffDay: offDays.split(',').indexOf(momentMark.format(offDaysFormat)) !== -1,
+        isStartOfWeek:
+          startOfWeek.split(',').indexOf(momentMark.format(startOfWeekFormat)) !== -1,
+        text: momentMark.isSame(date) ?
           momentMark.format(selectedItemText) : momentMark.format(itemText),
         formatted: momentMark.format(MOMENT_FORMAT),
       };
@@ -145,6 +144,8 @@ class DatePaginatorComponent extends Component {
 }
 
 DatePaginatorComponent.defaultProps = {
+  width: 0,
+
   format: 'Do MMM',
 
   selectedDate: moment().clone().startOf('day'),
@@ -170,7 +171,7 @@ DatePaginatorComponent.defaultProps = {
  */
 DatePaginatorComponent.propTypes = {
   date: PropTypes.string.isRequired,
-  width: PropTypes.number.isRequired,
+  width: PropTypes.number,
   onSelectDate: PropTypes.func.isRequired,
 
   format: PropTypes.string,

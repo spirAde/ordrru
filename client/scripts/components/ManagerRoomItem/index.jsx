@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,7 +19,7 @@ class ManagerRoomItemComponent extends Component {
       !shallowEqualImmutable(this.state, nextState);
   }
   render() {
-    const { room, orders, schedules } = this.props;
+    const { room, orders, schedules, date } = this.props;
 
     return (
       <div className="ManagerRoom">
@@ -44,6 +44,7 @@ class ManagerRoomItemComponent extends Component {
           key={`schedule-${room.get('id')}`}
           orders={orders}
           schedules={schedules}
+          date={date}
         />
       </div>
     );
@@ -54,6 +55,7 @@ ManagerRoomItemComponent.propTypes = {
   room: ImmutablePropTypes.map.isRequired,
   orders: ImmutablePropTypes.list.isRequired,
   schedules: ImmutablePropTypes.list.isRequired,
+  date: PropTypes.string.isRequired,
 };
 
 export default ManagerRoomItemComponent;

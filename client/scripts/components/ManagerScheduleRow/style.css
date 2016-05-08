@@ -9,5 +9,28 @@
     transition: background 0.3s ease 0s;
     position: relative;
     float: left;
+
+    &--available {
+      &:hover {
+        background-color: #E5E9EC;
+      }
+    }
+
+    &--disabled {
+      background-color: #7F8C9D;
+      color: #FFFFFF ;
+    }
+
+    &--manager {
+      background-color: #18B2AD;
+      border-color: #18B2AD ;
+      color: #FFFFFF ;
+    }
+
+    &--user {
+      background-color: #F4740C;
+      border-color: #F4740C;
+      color: #FFFFFF;
+    }
   }
 }

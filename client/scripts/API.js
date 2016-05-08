@@ -51,7 +51,7 @@ function _fetch(url, options) {
 	const fetch_ = fetch.bind(undefined);
 
 	return fetch_(url, newOptions)
-		.then(checkStatus)
+		//.then(checkStatus)
 		.then(parseText)
 		.then(response => {
 			// catch if status === 204

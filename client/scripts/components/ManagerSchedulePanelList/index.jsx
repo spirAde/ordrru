@@ -5,11 +5,11 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
-import ManagerRoomItemComponent from '../ManagerRoomItem/index.jsx';
+import ManagerSchedulePanelComponent from '../ManagerSchedulePanel/index.jsx';
 
 import './style.css';
 
-class ManagerRoomListComponent extends Component {
+class ManagerSchedulePanelListComponent extends Component {
   /**
    * shouldComponentUpdate
    * @return {boolean}
@@ -19,19 +19,19 @@ class ManagerRoomListComponent extends Component {
       !shallowEqualImmutable(this.state, nextState);
   }
 
-  renderRooms() {
-    const { rooms, orders, schedules, date } = this.props;
+  renderSchedulePanels() {
+    const { rooms, orders, schedules, dx } = this.props;
 
     return rooms.map(room => {
       const roomSchedules = schedules.get(room.get('id'));
       const roomOrders = orders.get(room.get('id'));
 
       return (
-        <ManagerRoomItemComponent
+        <ManagerSchedulePanelComponent
           room={room}
           orders={roomOrders}
           schedules={roomSchedules}
-					date={date}
+          dx={dx}
           key={room.get('id')}
         />
       );
@@ -40,21 +40,21 @@ class ManagerRoomListComponent extends Component {
   render() {
     const { rooms } = this.props;
 
-    const renderedRooms = rooms && rooms.size ? this.renderRooms() : List();
+    const renderedSchedulePanels = rooms && rooms.size ? this.renderSchedulePanels() : List();
 
     return (
-      <div className="ManagerRoomList">
-        {renderedRooms}
+      <div className="ManagerSchedulePanelList">
+        {renderedSchedulePanels}
       </div>
     );
   }
 }
 
-ManagerRoomListComponent.propTypes = {
+ManagerSchedulePanelListComponent.propTypes = {
   rooms: ImmutablePropTypes.list.isRequired,
-  orders: ImmutablePropTypes.list.isRequired,
-  schedules: ImmutablePropTypes.list.isRequired,
-  date: PropTypes.string.isRequired,
+  orders: ImmutablePropTypes.map.isRequired,
+  schedules: ImmutablePropTypes.map.isRequired,
+  dx: PropTypes.number.isRequired,
 };
 
-export default ManagerRoomListComponent;
+export default ManagerSchedulePanelListComponent;

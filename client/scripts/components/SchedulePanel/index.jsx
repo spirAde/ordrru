@@ -11,7 +11,7 @@ import moment from 'moment';
 import { STEP, FIRST_PERIOD, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
-import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
+//import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import ScheduleRowComponent from '../ScheduleRow/index.jsx';
 
@@ -39,7 +39,7 @@ class SchedulePanelComponent extends Component {
       }),
     };
 
-    this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
+    //this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
     this.handleMouseOverCell = this.handleMouseOverCell.bind(this);
