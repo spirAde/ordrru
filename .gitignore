@@ -106,3 +106,4 @@ build
 rethinkdb_data
 trash
 tasks.txt
+common/data/configs.json

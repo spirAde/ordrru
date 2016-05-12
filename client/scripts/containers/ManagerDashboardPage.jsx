@@ -80,6 +80,11 @@ class ManagerDashboardPage extends Component {
       !shallowEqualImmutable(this.state, nextState);
   }
 
+  componentWillUnmount() {
+    const panelElement = ReactDOM.findDOMNode(this.refs.panel);
+    panelElement.removeEventListener('mousewheel', this.handleMouseWheelEvent, false);
+  }
+
   handleMouseWheelEvent(event) {
     event.preventDefault();
 

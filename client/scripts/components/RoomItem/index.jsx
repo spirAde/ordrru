@@ -11,7 +11,6 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
-//import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import SchedulePanelComponent from '../SchedulePanel/index.jsx';
 import IconComponent from '../Icon/index.jsx';
@@ -46,6 +45,7 @@ class RoomItemComponent extends Component {
      * @property {Object} data
      * @property {boolean} data.scheduleIsOpen - opened or not schedule for room
      */
+    // TODO: remove immutable, set just plain
     this.state = {
       data: Map({
         scheduleIsOpen: false,
@@ -53,8 +53,6 @@ class RoomItemComponent extends Component {
         tooltipIsActive: false,
       }),
     };
-
-    //this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
     this.handleOpenDescription = this.handleOpenDescription.bind(this);
@@ -268,7 +266,6 @@ class RoomItemComponent extends Component {
   render() {
     const { isOpen, room, bathhouse, schedule, isClosable, order, steps } = this.props;
 
-    //console.log(order && order.toJS());
     const { data } = this.state;
 
     const bathhouseUrl = `/bathhouse/${bathhouse.get('id')}`;

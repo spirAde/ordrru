@@ -2,11 +2,21 @@
   position: relative;
   margin-bottom: 40px;
 
+  &-time-stage-outer {
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &-time-stage {
+    margin: 25px 20px 0 20px;
+  }
+
   &-stage {
     position: relative;
     height: 62px;
-    /*margin-left: 25px;
-    margin-right: 25px;*/
+    margin-left: 25px;
+    margin-right: 25px;
   }
 
   &-stage-outer {
@@ -71,5 +81,9 @@
         color: #FFFFFF;
       }
     }
+  }
+
+  &-icon-devtool-question {
+    margin: -4px 0 0 5px;
   }
 }
