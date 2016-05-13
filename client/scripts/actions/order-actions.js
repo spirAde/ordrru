@@ -40,7 +40,17 @@ export function findOrdersIfNeed(roomId) {
 
     dispatch(findOrdersRequest());
 
-    return Order.find({ where: { roomId } })
+    return Order.find({ where: { roomId }, data: { splitByDates: true } })
+      .then(orders => dispatch(findOrdersSuccess(roomId, orders)))
+      .catch(error => dispatch(findOrdersFailure(error)));
+  };
+}
+
+export function findOrdersForDate(roomId, date) {
+  return dispatch => {
+    dispatch(findOrdersRequest());
+
+    return Order.find({ where: { roomId, date } })
       .then(orders => dispatch(findOrdersSuccess(roomId, orders)))
       .catch(error => dispatch(findOrdersFailure(error)));
   };

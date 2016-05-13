@@ -200,6 +200,10 @@
 		position: relative;
  	}
 
+ 	&-option {
+		margin: 0 10px -5px 0;
+ 	}
+
 	&-booking {
 	 	background-color: rgba(75,95,106,.9);
 	 	color: #fff;
@@ -220,6 +224,27 @@
 
 	 	margin-bottom: 13px;
 	 	position: relative;
+ 	}
+
+ 	&-icon-devtool-question {
+		margin: 4px 5px 0 -5px;
+ 	}
+
+ 	&-icon-location-point-mapbox {
+		margin: 0 5px -2px 0;
+ 	}
+
+ 	&-datetime-icon-cancel {
+		 position: absolute;
+		 top: 22%;
+		 right: 10px;
+		 cursor: pointer;
+ 	}
+
+ 	&-icon-cancel {
+		fill-opacity: .5;
+		float: right;
+		cursor: pointer;
  	}
 
 	&-field-date-time-input {

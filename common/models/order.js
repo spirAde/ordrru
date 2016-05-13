@@ -1,11 +1,12 @@
 import moment from 'moment';
 import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber,
-  take, takeRight, assign } from 'lodash';
+  take, takeRight, assign, flatten } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
   recalculateSchedule, fixNeighboringSchedules,
   clog, calculateDatetimeOrderSum, mergeSchedules, fixOrderEndpoints } from '../utils/schedule-helper';
 import { datesRange, isSameDate } from '../utils/date-helper';
+import { FIRST_PERIOD, LAST_PERIOD } from '../utils/schedule-helper';
 import mkLogger from '../../server/utils/logger';
 
 const logger = mkLogger('model:Order');
@@ -35,6 +36,69 @@ export default (Order) => {
       next(null, status);
     });
   }
+
+  Order.afterRemote('find', (ctx, orders, next) => {
+    const questParams = JSON.parse(ctx.args.filter);
+    const needSplitOrders = questParams && questParams.data && questParams.data.splitByDates;
+
+    //console.log(needSplitOrders, orders);
+
+    if (needSplitOrders && orders.length) {
+      const newOrders = map(orders, order => {
+        const orderData = order.__data;
+
+        const startDate = orderData.datetime.startDate;
+        const endDate = orderData.datetime.endDate;
+
+        const isOneDayOrder = moment(startDate).isSame(endDate);
+
+        if (isOneDayOrder) return assign({}, orderData, { isOneDayOrder: true });
+
+        const dates = datesRange(startDate, endDate);
+        const datesLength = dates.length;
+
+        return dates.map((date, index) => {
+          const dateISO = date + 'T00:00:00.000Z';
+
+          if (index === 0) {
+            return assign({}, orderData, {
+              datetime: {
+                startDate: dateISO,
+                startPeriod: orderData.datetime.startPeriod,
+                endDate: dateISO,
+                endPeriod: LAST_PERIOD
+              },
+              isOneDayOrder: false,
+            });
+          } else if (index === datesLength - 1) {
+            return assign({}, orderData, {
+              datetime: {
+                startDate: dateISO,
+                startPeriod: FIRST_PERIOD,
+                endDate: dateISO,
+                endPeriod: orderData.datetime.endPeriod
+              },
+              isOneDayOrder: false,
+            });
+          }
+
+          return assign({}, orderData, {
+            datetime: {
+              startDate: dateISO,
+              startPeriod: FIRST_PERIOD,
+              endDate: dateISO,
+              endPeriod: LAST_PERIOD,
+            },
+            isOneDayOrder: false,
+          });
+        });
+      });
+
+      ctx.result = flatten(newOrders);
+    }
+
+    next();
+  });
 
   // Check that new order has valid interval, and doesn't conflict with other orders
   Order.observe('before save', (ctx, next) => {

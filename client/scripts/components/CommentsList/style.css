@@ -1,0 +1,28 @@
+.CommentsList {
+  transition: all 0.3s ease 0s;
+  position: fixed;
+  left: 1025px;
+  width: 330px;
+  padding: 90px 0px 20px 0px;
+  box-sizing: border-box;
+  z-index: 17;
+  top: -20px;
+  background-color: #FFFFFF;
+
+  &-header {
+    padding: 23.5px 0px;
+    border-top: 1px solid #DCE0E0;
+    border-bottom: 1px solid #DCE0E0;
+    z-index: 12;
+    background-color: #FFFFFF;
+    position: relative;
+    text-align: center;
+  }
+
+  &-list {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(255,255,255,.9);
+  }
+}

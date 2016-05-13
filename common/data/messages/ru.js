@@ -80,12 +80,21 @@ export default {
 
   'selectTime': 'Выберите время',
   'loading': 'Загрузка',
+  'comment': 'Комментарий',
+  'comments': 'Комментарии',
 
   // Manager part
   'entrance': 'Войти',
   'username': 'Логин',
   'password': 'Пароль',
   'welcome': 'Добро пожаловать!',
+  'history': 'История',
+  'message': 'Сообщение',
+  'messages': 'Сообщения',
+  'availableTime': 'Доступное время',
+  'disabledTime': 'Недоступное время',
+  'createdManagerTime': 'Создано администратором',
+  'createdUserTime': 'Создано пользователем',
 
   // errors
   'usernameIsAlphanumeric': 'Логин должен содержать только цифры и буквы',

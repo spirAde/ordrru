@@ -149,4 +149,9 @@
 		text-transform: uppercase;
 		border: 1px solid #18B2AE;
 	}
+
+ 	&-icon-cancel {
+		margin: -5px -30px;
+	 	float: right;
+ 	}
 }

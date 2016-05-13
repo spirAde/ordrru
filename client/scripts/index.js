@@ -22,15 +22,16 @@ import '../styles/core.css';
 import '../styles/fonts.css';
 import '../styles/globals.css';
 
+const location = createLocation(document.location.pathname, document.location.search);
+const isMainApplication = location.pathname.indexOf('manager') === -1;
+
 const reactRoot = document.getElementById('root');
 
 const localization = navigator.languages ?
   navigator.languages[0] : (navigator.language || navigator.userLanguage);
 const locale = localization.indexOf('-') ? localization.split('-')[0] : localization;
 
-const location = createLocation(document.location.pathname, document.location.search);
-
-const reducers = location.pathname.indexOf('manager') === -1 ?
+const reducers = isMainApplication ?
   configureReducers() : configureManagerReducers();
 const store = configureStore(browserHistory, reducers, window.__INITIAL_STATE__);
 const history = syncHistoryWithStore(browserHistory, store);
@@ -38,6 +39,10 @@ const history = syncHistoryWithStore(browserHistory, store);
 const { dispatch, getState } = store;
 
 const routes = createRoutes(store);
+
+if (!isMainApplication) {
+  require('../styles/manager.css'); // eslint-disable-line global-require
+}
 
 function runApp() {
   match({ routes, location }, () => {
@@ -54,6 +59,7 @@ function runApp() {
 
     if (__DEVELOPMENT__) {
       window.React = React; // enable debugger
+      window.Perf = require('react-addons-perf'); // eslint-disable-line global-require
 
       if (!reactRoot || !reactRoot.firstChild || !reactRoot.firstChild.attributes
         || !reactRoot.firstChild.attributes['data-react-checksum']) {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 
 /**
@@ -15,7 +16,10 @@ class BathhouseItemPage extends Component {
   render() {
     return (
       <div>
-        Bathhouse item page
+        <Helmet title="Bathhouse" />
+        <div>
+          Bathhouse item page
+        </div>
       </div>
     );
   }

@@ -1,3 +1,5 @@
+import { Map } from 'immutable';
+
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -12,6 +14,7 @@ import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import { changeActiveRoom } from '../../actions/bathhouse-actions';
 import { findRoomScheduleIfNeed, resetOrderSchedule } from '../../actions/schedule-actions';
+import { findCommentsIfNeed } from '../../actions/comment-actions';
 import { selectOrder, resetFullOrder, resetDatetimeOrder, checkOrder,
   sendOrder } from '../../actions/user-actions';
 
@@ -80,7 +83,10 @@ class RoomsListComponent extends Component {
   handleChangeActiveRoom(id) {
     this.props.changeActiveRoom(id);
 
-    if (id) this.props.findRoomScheduleIfNeed(id);
+    if (id) {
+      this.props.findRoomScheduleIfNeed(id);
+      this.props.findCommentsIfNeed(id);
+    }
 
     if (!id) {
       this.props.resetFullOrder();
@@ -126,6 +132,7 @@ class RoomsListComponent extends Component {
         bathhouse => bathhouse.get('id') === room.get('bathhouseId')
       );
       const schedule = schedules.get(room.get('id'));
+      const activeRoomOrder = order.get('roomId') === room.get('id') ? order : Map();
 
       return (
         <RoomItemComponent
@@ -134,7 +141,7 @@ class RoomsListComponent extends Component {
           room={room}
           bathhouse={bathhouse}
           schedule={schedule}
-          order={order}
+          order={activeRoomOrder}
           steps={steps}
           isClosable={false}
           onChangeActiveRoom={this.handleChangeActiveRoom}
@@ -153,14 +160,14 @@ class RoomsListComponent extends Component {
    * @return {XML} - React element
    * */
   render() {
-    const { bathhouses, rooms, schedules, isActive } = this.props;
+    const { style, bathhouses, rooms, schedules, isActive } = this.props;
     const nothingToShow = !rooms.size;
 
     if (isActive) {
       const roomItems = this.renderRooms(bathhouses, rooms, schedules);
 
       return (
-        <div className="RoomsList">
+        <div className="RoomsList" style={style}>
           {roomItems}
           {
             nothingToShow ?
@@ -178,6 +185,7 @@ class RoomsListComponent extends Component {
 
 /**
  * propTypes
+ * @property {Object} style - parent passed styles
  * @property {string|undefined} activeRoomId - active room id, box with this id will be open
  * @property {Array.<Object>} bathhouses - list of bathhouses
  * @property {Array.<Object>} rooms - list of valid rooms
@@ -189,11 +197,13 @@ class RoomsListComponent extends Component {
  * @property {Function} resetDatetimeOrder - reset datetime user order
  * @property {Function} changeActiveRoom - change active room id, if null then all rooms is closed
  * @property {Function} findRoomScheduleIfNeed - find room schedule if need
+ * @property {Function} findCommentsIfNeed - find room comments if need
  * @property {Function} selectOrder - select order from room item
  * @property {Function} checkOrder - send order to validate
  * @property {Function} resetOrderSchedule - reset order schedule
  */
 RoomsListComponent.propTypes = {
+  style: PropTypes.object.isRequired,
   activeRoomId: PropTypes.string,
   bathhouses: ImmutablePropTypes.list.isRequired,
   rooms: ImmutablePropTypes.list.isRequired,
@@ -205,6 +215,7 @@ RoomsListComponent.propTypes = {
   resetDatetimeOrder: PropTypes.func.isRequired,
   changeActiveRoom: PropTypes.func.isRequired,
   findRoomScheduleIfNeed: PropTypes.func.isRequired,
+  findCommentsIfNeed: PropTypes.func.isRequired,
   selectOrder: PropTypes.func.isRequired,
   checkOrder: PropTypes.func.isRequired,
   sendOrder: PropTypes.func.isRequired,
@@ -222,6 +233,7 @@ function mapDispatchToProps(dispatch) {
     resetDatetimeOrder: () => dispatch(resetDatetimeOrder()),
     changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
     findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
+    findCommentsIfNeed: (id) => dispatch(findCommentsIfNeed(id)),
     selectOrder: (id, date, period) => dispatch(selectOrder(id, date, period)),
     checkOrder: (order) => dispatch(checkOrder(order)),
     sendOrder: () => dispatch(sendOrder()),

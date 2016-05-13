@@ -1,1 +1,89 @@
-.ManagerSchedulePanel {}
+.ManagerSchedulePanel {
+  position: relative;
+  margin-bottom: 40px;
+
+  &-time-stage-outer {
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &-time-stage {
+    margin: 25px 20px 0 20px;
+  }
+
+  &-stage {
+    position: relative;
+    height: 62px;
+    margin-left: 25px;
+    margin-right: 25px;
+  }
+
+  &-stage-outer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &-header {
+    font-size: 16px;
+    font-family: "proxima_bold", Arial, sans-serif;
+    margin-bottom: 25px;
+    float: left;
+  }
+
+  &-help {
+    float: right;
+  }
+
+  &-help-item {
+    display: inline-block;
+    margin-left: 20px;
+    position: relative;
+    padding-left: 15px;
+
+    &:before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      left: -4px;
+      top: 50%;
+      margin-top: -7px;
+      background-color: #7F8C9D;
+      border: 2px solid #FFFFFF;
+    }
+
+    &--available {
+      &::before {
+        background-color: #E5E9EC;
+        color: #E5E9EC;
+      }
+    }
+
+    &--disabled {
+      &::before {
+        background-color: #7F8C9D;
+        color: #FFFFFF ;
+      }
+    }
+
+    &--manager {
+      &::before {
+        background-color: #18B2AD;
+        color: #FFFFFF ;
+      }
+    }
+
+    &--user {
+      &::before {
+        background-color: #F4740C;
+        color: #FFFFFF;
+      }
+    }
+  }
+
+  &-icon-devtool-question {
+    margin: -4px 0 0 5px;
+  }
+}

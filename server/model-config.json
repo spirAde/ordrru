@@ -57,7 +57,7 @@
     "dataSource": "ordrDB",
     "public": true
   },
-  "Review": {
+  "Comment": {
     "dataSource": "ordrDB",
     "public": true
   },

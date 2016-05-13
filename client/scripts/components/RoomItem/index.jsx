@@ -45,6 +45,7 @@ class RoomItemComponent extends Component {
      * @property {Object} data
      * @property {boolean} data.scheduleIsOpen - opened or not schedule for room
      */
+    // TODO: remove immutable, set just plain
     this.state = {
       data: Map({
         scheduleIsOpen: false,
@@ -246,11 +247,12 @@ class RoomItemComponent extends Component {
 
       return (
         <div className={classes} key={index}>
-          <IconComponent
-            name={`icon-${option}`}
-            rate={1.5}
-            style={{ marginRight: '10px', marginBottom: '-5px' }}
-          />
+          <span className="RoomItem-option">
+            <IconComponent
+              name={`icon-${option}`}
+              rate={1.5}
+            />
+          </span>
           <FormattedMessage id={`options.${option}`} />
         </div>
       );
@@ -266,8 +268,11 @@ class RoomItemComponent extends Component {
 
     const { data } = this.state;
 
+    const bathhouseUrl = `/bathhouse/${bathhouse.get('id')}`;
+
     const orderDatetimeValue = this.getDatetimeValue(room.get('id'), order);
-    const orderSum = order.getIn(['sums', 'datetime']) + order.getIn(['sums', 'services']);
+    const orderSum = order && order.size ?
+      order.getIn(['sums', 'datetime']) + order.getIn(['sums', 'services']) : 0;
 
     const options = this.renderOptions(room.get('options').concat(bathhouse.get('options')));
     const stars = this.renderStars(room.get('rating'));
@@ -294,14 +299,10 @@ class RoomItemComponent extends Component {
                 __DEVELOPMENT__ ?
                   <div style={{ float: 'left' }}>
                     <IconComponent
+                      className="RoomItem-icon-devtool-question"
                       id={room.get('id')}
                       name="icon-question"
                       rate={1.5}
-                      style={{
-                        marginTop: '4px',
-                        marginLeft: '-5px',
-                        marginRight: '5px',
-                      }}
                       onMouseOver={this.handleMouseOverTooltip}
                       onMouseLeave={this.handleMouseLeaveTooltip}
                     />
@@ -324,25 +325,22 @@ class RoomItemComponent extends Component {
                 {
                   isClosable ?
                     <IconComponent
+                      className="RoomItem-icon-cancel"
                       name="icon-cancel"
                       rate={2}
-                      style={{
-                        fillOpacity: '.5',
-                        float: 'right',
-                        cursor: 'pointer',
-                      }}
                     /> :
                     null
                 }
               </div>
               <p className="RoomItem-bathhouse-address g-icons">
                 <IconComponent
+                  className="RoomItem-icon-location-point-mapbox"
                   name="icon-location-point-mapbox"
                   color="#F4740C"
-                  style={{ marginBottom: '-2px', marginRight: '5px' }}
                 />
                 <Link
-                  to={{ pathname: `/bathhouse/${bathhouse.get('id')}` }}
+                  target="_blank"
+                  to={{ pathname: bathhouseUrl }}
                   className="RoomItem-bathhouse-address-text"
                 >
                   {bathhouse.get('name')}
@@ -414,15 +412,10 @@ class RoomItemComponent extends Component {
                             order.getIn(['datetime', 'startDate']) ?
                               <span onClick={this.handleResetDatetimeOrder}>
                                 <IconComponent
+                                  className="RoomItem-datetime-icon-cancel"
                                   name="icon-cancel"
                                   rate={1.5}
                                   color="#5A6B74"
-                                  style={{
-                                    position: 'absolute',
-                                    top: '22%',
-                                    right: '10px',
-                                    cursor: 'pointer',
-                                  }}
                                 />
                               </span> : null
                           }
@@ -464,6 +457,7 @@ class RoomItemComponent extends Component {
                     </div>
                   </div>
                   <SchedulePanelComponent
+                    key={`schedule-${room.get('id')}`}
                     schedule={schedule}
                     prices={room.getIn(['price', 'chunks'])}
                     order={order}

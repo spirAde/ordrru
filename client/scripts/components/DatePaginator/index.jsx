@@ -1,13 +1,15 @@
 import map from 'lodash/map';
 import floor from 'lodash/floor';
-import { Map } from 'immutable';
 
 import moment from 'moment';
 
 import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 
 import classNames from 'classnames';
+
+import { MOMENT_FORMAT } from '../../../../common/utils/date-helper';
+
+import shallowEqual from '../../utils/shallowEqual';
 
 import IconComponent from '../Icon/index.jsx';
 
@@ -19,137 +21,64 @@ import './style.css';
  * Dumb components - none
  * */
 class DatePaginatorComponent extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      data: Map({
-        selectedDate: moment(props.date).format(props.selectedDateFormat),
-      }),
-    };
-  }
-  renderItems(dates) {
-    const { selectedItemWidth, itemWidth } = this.props;
-
-    return map(dates, (date, index) => {
-      const classes = classNames({
-        'DatePaginator-item': true,
-        'DatePaginator-item--selected': date.isSelected,
-        'DatePaginator-item--today': date.isToday,
-        'DatePaginator-item--off': date.isOffDay,
-        'DatePaginator-item--divider': date.isStartOfWeek,
-        'DatePaginator-item--no-selected': !date.isValid,
-      });
-
-      const cellWidth = date.isSelected ? selectedItemWidth : itemWidth;
-
-      return (
-        <li className="DatePaginator-item-outer" key={index}>
-          <a className={classes} style={{ width: `${cellWidth}px` }}>
-            <span dangerouslySetInnerHTML={{ __html: date.text }} />
-          </a>
-        </li>
-      );
-    });
-  }
-  render() {
-    const { data } = this.state;
-    const { width } = this.props;
-
-    return (
-      <div className="DatePaginator" ref="datepaginator">
-        <div className="DatePaginator-wrapper">
-          <div className="DatePaginator-datepaginator">
-            <ul className="DatePaginator-pagination">
-              <li className="DatePaginator-item-outer">
-                <IconComponent
-                  className="DatePaginator-nav-item"
-                  name="icon-chevron-left"
-                  rate={2}
-                />
-              </li>
-              <li className="DatePaginator-item-outer">
-                <IconComponent
-                  className="DatePaginator-nav-item"
-                  name="icon-chevron-right"
-                  rate={2}
-                />
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  /*constructor(props) {
-    super(props);
-
-    this.state = {
-      dates: [],
-    };
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqual(this.props, nextProps) ||
+      !shallowEqual(this.state, nextState);
   }
 
-  componentDidMount() {
-    this.initializeDates();
-  }
+  getDates() {
+    const { date } = this.props;
+    const { width, selectedItemWidth, itemWidth, navItemWidth,
+      selectedDateFormat, selectedItemText, itemText, offDays, startOfWeek,
+      offDaysFormat, startOfWeekFormat } = this.props;
 
-  initializeDates() {
-    const {
-      selectedDate, selectedItemWidth, itemWidth, navItemWidth, selectedDateFormat,
-      selectedItemText, itemText, offDays, offDaysFormat, startOfWeek, startOfWeekFormat,
-    } = this.props;
+    const itemsCount = floor((width - selectedItemWidth - 2 * navItemWidth) / itemWidth);
+    const sideRangeDateValue = floor(itemsCount / 2);
 
-    const datepaginatorElement = ReactDOM.findDOMNode(this.refs.datepaginator);
-    const viewWidth = datepaginatorElement.offsetWidth -
-      ((selectedItemWidth - itemWidth) + (navItemWidth * 2));
-    const units = floor(viewWidth / itemWidth);
-    const unitsPerSide = parseInt(units / 2, 10);
+    const start = moment(date).subtract(sideRangeDateValue, 'days');
+    const end = moment(date).add(sideRangeDateValue, 'days');
 
-    const adjustedItemWidth = floor(viewWidth / units);
-    const adjustedSelectedItemWidth = floor(
-      selectedItemWidth + (viewWidth - (units * adjustedItemWidth))
-    );
+    const today = moment();
 
-    const today = moment().startOf('day');
-    const start = moment().clone().startOf('day').subtract(unitsPerSide, 'days');
-    const end = moment().clone().startOf('day').add(units - unitsPerSide, 'days');
-
-    const startDate = moment();
-    const endDate = moment().add(30, 'days');
-
-    const data = {
-      isSelectedStartDate: moment(selectedDate).isSame(startDate),
-      isSelectedEndDate: moment(selectedDate).isSame(endDate),
-      items: [],
-    };
+    const dates = [];
 
     for (let momentMark = start; momentMark.isBefore(end); momentMark.add(1, 'days')) {
-      const valid = ((momentMark.isSame(startDate.format(selectedDateFormat)) ||
-      momentMark.isAfter(startDate)) &&
-      (momentMark.isSame(startDate.format(selectedDateFormat)) || momentMark.isBefore(endDate)));
-
-      data.items[data.items.length] = {
+      dates[dates.length] = {
         m: momentMark.clone().format(selectedDateFormat),
-        isValid: valid,
-        isSelected: momentMark.isSame(selectedDate),
+        isSelected: momentMark.isSame(date),
         isToday: momentMark.isSame(today),
-        isOffDay: (offDays.split(',').indexOf(momentMark.format(offDaysFormat)) !== -1),
-        isStartOfWeek: (
-          startOfWeek.split(',').indexOf(momentMark.format(startOfWeekFormat)) !== -1
-        ),
-        text: (momentMark.isSame(selectedDate)) ?
+        isOffDay: offDays.split(',').indexOf(momentMark.format(offDaysFormat)) !== -1,
+        isStartOfWeek:
+          startOfWeek.split(',').indexOf(momentMark.format(startOfWeekFormat)) !== -1,
+        text: momentMark.isSame(date) ?
           momentMark.format(selectedItemText) : momentMark.format(itemText),
-        itemWidth: (momentMark.isSame(selectedDate)) ?
-          adjustedSelectedItemWidth : adjustedItemWidth,
+        formatted: momentMark.format(MOMENT_FORMAT),
       };
     }
 
-    this.setState({
-      dates: data,
-    });
+    return dates;
   }
+  handleClickDate(date, event) {
+    event.preventDefault();
 
-  renderItems(dates) {
+    this.props.onSelectDate(date);
+  }
+  handleClickNavigation(direction, event) {
+    event.preventDefault();
+
+    const { selectedDate } = this.state;
+
+    const newDate = direction === 'left' ?
+        moment(selectedDate).subtract(1, 'days').format(MOMENT_FORMAT) :
+        moment(selectedDate).add(1, 'days').format(MOMENT_FORMAT);
+
+    this.props.onSelectDate(newDate);
+  }
+  renderDates(dates) {
     const { selectedItemWidth, itemWidth } = this.props;
 
     return map(dates, (date, index) => {
@@ -159,13 +88,16 @@ class DatePaginatorComponent extends Component {
         'DatePaginator-item--today': date.isToday,
         'DatePaginator-item--off': date.isOffDay,
         'DatePaginator-item--divider': date.isStartOfWeek,
-        'DatePaginator-item--no-selected': !date.isValid,
       });
 
       const cellWidth = date.isSelected ? selectedItemWidth : itemWidth;
 
       return (
-        <li className="DatePaginator-item-outer" key={index}>
+        <li
+          className="DatePaginator-item-outer"
+          onClick={this.handleClickDate.bind(this, date.formatted)}
+          key={index}
+        >
           <a className={classes} style={{ width: `${cellWidth}px` }}>
             <span dangerouslySetInnerHTML={{ __html: date.text }} />
           </a>
@@ -173,29 +105,30 @@ class DatePaginatorComponent extends Component {
       );
     });
   }
-
-  /!**
-   * render
-   * @return {XML} - React element
-   * *!/
   render() {
-    const { dates } = this.state;
-    const renderedItems = this.renderItems(dates.items);
+    const dates = this.getDates();
+    const renderedDates = this.renderDates(dates);
 
     return (
       <div className="DatePaginator" ref="datepaginator">
         <div className="DatePaginator-wrapper">
           <div className="DatePaginator-datepaginator">
             <ul className="DatePaginator-pagination">
-              <li className="DatePaginator-item-outer">
+              <li
+                className="DatePaginator-item-outer"
+                onClick={this.handleClickNavigation.bind(this, 'left')}
+              >
                 <IconComponent
                   className="DatePaginator-nav-item"
                   name="icon-chevron-left"
                   rate={2}
                 />
               </li>
-              {renderedItems}
-              <li className="DatePaginator-item-outer">
+              {renderedDates}
+              <li
+                className="DatePaginator-item-outer"
+                onClick={this.handleClickNavigation.bind(this, 'right')}
+              >
                 <IconComponent
                   className="DatePaginator-nav-item"
                   name="icon-chevron-right"
@@ -207,10 +140,12 @@ class DatePaginatorComponent extends Component {
         </div>
       </div>
     );
-  }*/
+  }
 }
 
 DatePaginatorComponent.defaultProps = {
+  width: 0,
+
   format: 'Do MMM',
 
   selectedDate: moment().clone().startOf('day'),
@@ -236,7 +171,8 @@ DatePaginatorComponent.defaultProps = {
  */
 DatePaginatorComponent.propTypes = {
   date: PropTypes.string.isRequired,
-  width: PropTypes.number.isRequired,
+  width: PropTypes.number,
+  onSelectDate: PropTypes.func.isRequired,
 
   format: PropTypes.string,
 

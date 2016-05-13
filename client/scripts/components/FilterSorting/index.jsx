@@ -84,17 +84,17 @@ class FilterSortingComponent extends Component {
       if (type.get('checked') && !type.get('isDesc')) {
         icon = (
           <IconComponent
+            className="FilterSorting-icon-chevron-up"
             name="icon-chevron-up"
             color="#18B2AE"
-            style={{ margin: '0 15px -3px -30px' }}
           />
         );
       } else if (type.get('checked') && type.get('isDesc')) {
         icon = (
           <IconComponent
+            className="FilterSorting-icon-chevron-down"
             name="icon-chevron-down"
             color="#18B2AE"
-            style={{ margin: '0 15px -3px -30px' }}
           />
         );
       }

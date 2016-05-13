@@ -93,17 +93,17 @@ class HeaderComponent extends Component {
           <div className="Header-mode">
             <a className={listButtonClasses} onClick={this.handleChangeMode.bind(this, 'list')}>
               <IconComponent
+                className="Header-icon"
                 name="icon-list"
                 rate={1.5}
-                style={{ margin: '0 10px -5px -15px' }}
               />
               <FormattedMessage id="mode.list" />
             </a>
             <a className={mapButtonClasses} onClick={this.handleChangeMode.bind(this, 'map')}>
               <IconComponent
+                className="Header-icon"
                 name="icon-location-point-mapbox"
                 rate={1.5}
-                style={{ margin: '0 10px -5px -15px' }}
               />
               <FormattedMessage id="mode.map" />
             </a>

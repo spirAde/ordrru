@@ -6,6 +6,7 @@ import { reducer as application } from './application';
 import { reducer as city } from './city';
 import { reducer as filter } from './filter';
 import { reducer as bathhouse } from './bathhouse';
+import { reducer as comment } from './comment';
 import { reducer as schedule } from './schedule';
 import { reducer as user } from './user';
 
@@ -20,6 +21,7 @@ export function configureReducers() {
     city,
     filter,
     bathhouse,
+    comment,
     schedule,
     user,
   });

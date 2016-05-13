@@ -11,6 +11,7 @@ import moment from 'moment';
 import { STEP, FIRST_PERIOD, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+//import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import ScheduleRowComponent from '../ScheduleRow/index.jsx';
 
@@ -19,7 +20,7 @@ import './style.css';
 let Ps;
 
 if (__CLIENT__) {
-  Ps = require('perfect-scrollbar');
+  Ps = require('perfect-scrollbar'); // eslint-disable-line global-require
 }
 
 /**
@@ -37,6 +38,8 @@ class SchedulePanelComponent extends Component {
         orderedPeriods: {},
       }),
     };
+
+    //this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
 
     this.handleSelectOrder = this.handleSelectOrder.bind(this);
     this.handleMouseOverCell = this.handleMouseOverCell.bind(this);
@@ -211,7 +214,9 @@ class SchedulePanelComponent extends Component {
 
     const orderIsStarted = !isNull(order.getIn(['datetime', 'startDate'])) &&
       !isNull(order.getIn(['datetime', 'startPeriod']));
-    const rows = schedule ? this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
+
+    const rows = schedule && schedule.size ?
+      this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
 
     const classes = classNames({
       SchedulePanel: true,

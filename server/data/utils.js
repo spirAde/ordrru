@@ -115,7 +115,7 @@ export function generateOrders(start, end, count) {
 	return take(compact(orders), count);
 }
 
-export function generateReviewDate() {
+export function generateCommentDate() {
 	const end = moment().toDate();
 	const start = moment(end).subtract(random(3), 'months').toDate();
 

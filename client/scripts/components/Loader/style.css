@@ -59,7 +59,7 @@
 
 .loading-container {
   padding-top: 7px;
-  padding-left: 72px;
+  margin: 0 auto;
 }
 
 .loading {

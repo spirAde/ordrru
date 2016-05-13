@@ -83,10 +83,10 @@ const generators = {
 			createdByUser: Math.random() < 0.5
 		}
 	},
-	review: function(room) {
+	comment: function(room) {
 		return {
 			roomId: room.id,
-			date: utils.generateReviewDate(),
+			date: utils.generateCommentDate(),
 			text: casual.sentences(random(5)),
 			evaluation: random(10, true),
 		}
@@ -154,10 +154,10 @@ export default (models) => {
 			});
 		}
 
-		function createReview(room, callback) {
-			const data = generators.review(room);
-			return app.models.Review.create(data, (error, record) => {
-				if (error) console.log('createReview', error);
+		function createComment(room, callback) {
+			const data = generators.comment(room);
+			return app.models.Comment.create(data, (error, record) => {
+				if (error) console.log('createComment', error);
 				return callback(null, record);
 			});
 		}
@@ -170,7 +170,7 @@ export default (models) => {
 			room: [],
 			order: [],
 			schedule: [],
-			review: [],
+			comment: [],
 		};
 
 		const statuses = {
@@ -179,7 +179,7 @@ export default (models) => {
 			room: includes(models, 'room') || includes(models, 'all'),
 			order: includes(models, 'order') || includes(models, 'all'),
 			schedule: includes(models, 'schedule') || includes(models, 'all'),
-			review: includes(models, 'review') || includes(models, 'all'),
+			comment: includes(models, 'comment') || includes(models, 'all'),
 		};
 
 		const counts = {
@@ -187,7 +187,7 @@ export default (models) => {
 			bathhouse: 2,
 			room: 3,
 			order: 5,
-			review: 10,
+			comment: 10,
 		};
 
 		if (error) throw error;
@@ -264,7 +264,7 @@ export default (models) => {
 
 				queue.push(funcs.room);
 			}
-			/*if (statuses.review) {
+			if (statuses.comment) {
 
 				if (!statuses.room) {
 					funcs.room = function(callback) {
@@ -276,21 +276,21 @@ export default (models) => {
 					queue.push(funcs.room);
 				}
 
-				funcs.review = function (rooms, callback) {
+				funcs.comment = function (rooms, callback) {
 					const funcs = map(rooms, room => {
-						return map(range(0, counts.review, 1), index => {
-							return async.apply(createReview, room);
+						return map(range(0, counts.comment, 1), index => {
+							return async.apply(createComment, room);
 						});
 					});
 
-					return async.parallel(flatten(funcs), (error, reviews) => {
-						console.log('reviews', 'x', compact(map(reviews, 'id')).length);
-						callback(null, reviews);
+					return async.parallel(flatten(funcs), (error, comments) => {
+						console.log('comments', 'x', compact(map(comments, 'id')).length);
+						callback(null, comments);
 					});
 				}
 
-				queue.push(funcs.review);
-			}*/
+				queue.push(funcs.comment);
+			}
 			if (statuses.order) {
 
 				if (!statuses.room) {

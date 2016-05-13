@@ -62,4 +62,12 @@
 		color: #18B2AE;
 	 	font-family: var(--font-family-bold);
 	}
+
+ 	&-icon-chevron-up {
+	 	margin: 0 15px -3px -30px;
+ 	}
+
+	&-icon-chevron-down {
+		margin: 0 15px -3px -30px;
+	}
 }
