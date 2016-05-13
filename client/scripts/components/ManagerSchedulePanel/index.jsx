@@ -95,18 +95,18 @@ class ManagerSchedulePanelComponent extends Component {
     const { room, schedules, dx } = this.props;
     const { tooltipIsActive } = this.state;
 
-    const periodsLength = (LAST_PERIOD - FIRST_PERIOD) / STEP;
-    const cellWidth = CELL_WIDTH + CELL_MARGIN;
+    if (schedules && schedules.size) {
+      const periodsLength = (LAST_PERIOD - FIRST_PERIOD) / STEP;
+      const cellWidth = CELL_WIDTH + CELL_MARGIN;
 
-    const translateX = dx * cellWidth;
+      const translateX = dx * cellWidth;
 
-    const styles = ANIMATION_TRANSFORM_ENABLE ?
+      const styles = ANIMATION_TRANSFORM_ENABLE ?
       { transform: `translate3d(${translateX}px, 0px, 0px)`, transition: 'all 0.25s ease 0s' } :
       { transform: `translate(${translateX}px, 0px)` };
 
-    styles.width = cellWidth * schedules.size * periodsLength + 2 * CELL_MARGIN;
+      styles.width = cellWidth * schedules.size * periodsLength + 2 * CELL_MARGIN;
 
-    if (schedules && schedules.size) {
       const rows = this.renderRows();
 
       return (

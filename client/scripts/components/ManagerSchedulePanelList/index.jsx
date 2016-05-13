@@ -6,6 +6,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
 import ManagerSchedulePanelComponent from '../ManagerSchedulePanel/index.jsx';
+import LoaderComponent from '../Loader/index.jsx';
 
 import './style.css';
 
@@ -38,13 +39,15 @@ class ManagerSchedulePanelListComponent extends Component {
     });
   }
   render() {
-    const { rooms } = this.props;
+    const { rooms, isFetching } = this.props;
 
     const renderedSchedulePanels = rooms && rooms.size ? this.renderSchedulePanels() : List();
 
     return (
       <div className="ManagerSchedulePanelList">
-        {renderedSchedulePanels}
+        <LoaderComponent active={isFetching}>
+          {renderedSchedulePanels}
+        </LoaderComponent>
       </div>
     );
   }
@@ -55,6 +58,7 @@ ManagerSchedulePanelListComponent.propTypes = {
   orders: ImmutablePropTypes.map.isRequired,
   schedules: ImmutablePropTypes.map.isRequired,
   dx: PropTypes.number.isRequired,
+  isFetching: PropTypes.bool.isRequired,
 };
 
 export default ManagerSchedulePanelListComponent;

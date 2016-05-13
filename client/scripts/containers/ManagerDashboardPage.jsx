@@ -133,7 +133,7 @@ class ManagerDashboardPage extends Component {
       );
     }
 
-    const { rooms, orders, schedules } = this.props;
+    const { rooms, orders, schedules, ordersIsFetching, schedulesIsFetching } = this.props;
     const { date, dx } = this.state;
 
     return (
@@ -152,6 +152,7 @@ class ManagerDashboardPage extends Component {
           ref="panel"
           rooms={rooms}
           orders={orders}
+          isFetching={ordersIsFetching || schedulesIsFetching}
           schedules={schedules}
           dx={dx}
         />
@@ -171,6 +172,9 @@ ManagerDashboardPage.propTypes = {
   schedules: ImmutablePropTypes.map.isRequired,
   viewport: ImmutablePropTypes.map.isRequired,
   date: PropTypes.string.isRequired,
+
+  ordersIsFetching: PropTypes.bool.isRequired,
+  schedulesIsFetching: PropTypes.bool.isRequired,
 
   logout: PropTypes.func.isRequired,
   findRoomScheduleForDateIfNeed: PropTypes.func.isRequired,

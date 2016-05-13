@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
 
 import shallowCompare from 'react-addons-shallow-compare';
-//import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import './style.css';
 
@@ -13,12 +12,6 @@ import './style.css';
  * Dumb components - none
  * */
 class IconComponent extends Component {
-  constructor(props) {
-    super(props);
-
-    //this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
-  }
-
   /**
    * shouldComponentUpdate
    * @return {boolean}

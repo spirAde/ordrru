@@ -3,10 +3,9 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import classNames from 'classnames';
 
-import { List, Map, fromJS } from 'immutable';
-import range from 'lodash/range';
+import { List, Map } from 'immutable';
 
-import { FIRST_PERIOD, LAST_PERIOD, STEP } from '../../../../common/utils/schedule-helper';
+import { STEP } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -14,36 +13,32 @@ import configs from '../../../../common/data/configs.json';
 
 import './style.css';
 
-function recursiveEnumerationCells(cells, orderPeriods, results) {
+function recursiveEnumerationCells(cells, orders, results) {
   if (!cells.size) return results;
 
-  const firstCell = cells.first();
-
-  const order = orderPeriods.find(order => order.get('startPeriod') === firstCell.get('period'));
+  const currentCell = cells.first();
+  const order = orders.find(
+    order => order.getIn(['datetime', 'startPeriod']) === currentCell.get('period')
+  );
 
   if (order) {
-    const orderLength = order.get('periods').size;
+    const startPeriod = order.getIn(['datetime', 'startPeriod']);
+    const endPeriod = order.getIn(['datetime', 'endPeriod']);
 
-    return recursiveEnumerationCells(
-      cells.skip(orderLength), orderPeriods.skip(1), results.push(Map({
-        length: orderLength,
-        orderId: order.get('orderId'),
-        text: `${order.get('startTime')} — ${order.get('endTime')}`,
-        createdByUser: order.get('createdByUser'),
-        isOneDayOrder: order.get('isOneDayOrder'),
-      }))
-    );
+    const orderLength = (endPeriod - startPeriod) / STEP;
+
+    return recursiveEnumerationCells(cells.skip(orderLength), orders.skip(1), results.push(Map({
+      isOneDayOrder: order.get('isOneDayOrder'),
+      length: orderLength,
+      orderId: order.get('id'),
+      createdByUser: order.get('createdByUser'),
+    })));
   }
 
-  const cellTime = configs.periods[firstCell.get('period')];
-
-  return recursiveEnumerationCells(
-    cells.skip(1), orderPeriods, results.push(Map({
-      length: 1,
-      text: cellTime,
-      enable: firstCell.get('enable'),
-    }))
-  );
+  return recursiveEnumerationCells(cells.skip(1), orders, results.push(Map({
+    length: 1,
+    enable: currentCell.get('enable'),
+  })));
 }
 
 class ManagerScheduleRowComponent extends Component {
@@ -96,8 +91,6 @@ class ManagerScheduleRowComponent extends Component {
     if (!orders.size) {
       // take without last period, because for manager schedule not need period with time 24:00
       return cells.skipLast(1).map((cell, index) => {
-        const cellTime = configs.periods[cell.get('period')];
-
         const classes = classNames({
           'ManagerScheduleRow-cell': true,
           'ManagerScheduleRow-cell--available': cell.has('enable') && cell.get('enable'),
@@ -119,50 +112,45 @@ class ManagerScheduleRowComponent extends Component {
       });
     }
 
-    const orderPeriods = orders.map(order => {
-      const startPeriod = order.getIn(['datetime', 'startPeriod']);
-      const endPeriod = order.getIn(['datetime', 'endPeriod']);
-
-      console.log(startPeriod);
-
-      const fixStartPeriod = startPeriod === FIRST_PERIOD ? FIRST_PERIOD : startPeriod + STEP;
-      const fixEndPeriod = endPeriod === LAST_PERIOD ? LAST_PERIOD : endPeriod - STEP;
-
-      return fromJS({
-        startPeriod: startPeriod,
-        endPeriod: fixEndPeriod,
-        startTime: configs.periods[startPeriod],
-        endTime: configs.periods[endPeriod],
-        orderId: order.get('id'),
-        periods: range(startPeriod, endPeriod, STEP),
-        createdByUser: order.get('createdByUser'),
-        isOneDayOrder: order.get('isOneDayOrder'),
-      });
-    });
-
-    // take without last period, because for manager schedule not need period with time 24:00
-    return recursiveEnumerationCells(cells.skipLast(1), orderPeriods, List()).map((data, index) => {
+    return recursiveEnumerationCells(cells.skipLast(1), orders, List()).map((cell, index) => {
       const classes = classNames({
         'ManagerScheduleRow-cell': true,
-        'ManagerScheduleRow-cell--available': data.has('enable') && data.get('enable'),
-        'ManagerScheduleRow-cell--disabled': data.has('enable') && !data.get('enable'),
-        'ManagerScheduleRow-cell--manager': data.has('createdByUser') && !data.get('createdByUser'),
-        'ManagerScheduleRow-cell--user': data.has('createdByUser') && data.get('createdByUser'),
+        'ManagerScheduleRow-cell--available': cell.has('enable') && cell.get('enable'),
+        'ManagerScheduleRow-cell--disabled': cell.has('enable') && !cell.get('enable'),
+        'ManagerScheduleRow-cell--manager': cell.has('createdByUser') && !cell.get('createdByUser'),
+        'ManagerScheduleRow-cell--user': cell.has('createdByUser') && cell.get('createdByUser'),
       });
 
-      const width = data.get('length') === 1 ?
-          cellWidth : data.get('length') * (cellWidth + cellMargin) - cellMargin;
+      const isOrder = cell.has('orderId');
 
-      if (data.has('orderId')) console.log(data.toJS());
+      let width = 0;
+      let marginRight = 0;
+
+      if (!isOrder) {
+        width = cellWidth;
+        marginRight = cellMargin;
+      } else {
+        const isOneDayOrder = cell.get('isOneDayOrder');
+        const cellLength = cell.get('length');
+
+        if (isOneDayOrder) {
+          width = cellLength * (cellWidth + cellMargin) - cellMargin;
+          marginRight = cellMargin;
+        } else if (!isOneDayOrder) {
+          const isRightOrderPart = index === 0;
+
+          width = isRightOrderPart ?
+            cellLength * (cellWidth + cellMargin) - cellMargin :
+            cellLength * (cellWidth + cellMargin);
+
+          marginRight = isRightOrderPart ? cellMargin : 0;
+        }
+      }
 
       return (
         <div
           className={classes}
-          style={{
-            width: data.get('length') === 1 ?
-              cellWidth : data.get('length') * (cellWidth + cellMargin) - cellMargin,
-            marginRight: cellMargin,
-          }}
+          style={{ width, marginRight }}
           key={index}
         >
           &nbsp;
