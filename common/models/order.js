@@ -4,7 +4,7 @@ import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber,
 
 import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
   recalculateSchedule, fixNeighboringSchedules,
-  clog, calculateDatetimeOrderSum, mergeSchedules, fixOrderEndpoints } from '../utils/schedule-helper';
+  clog, calculateDatetimeOrderSum, mergeSchedules, fixEdgesForDisablePeriods } from '../utils/schedule-helper';
 import { datesRange, isSameDate } from '../utils/date-helper';
 import { FIRST_PERIOD, LAST_PERIOD } from '../utils/schedule-helper';
 import mkLogger from '../../server/utils/logger';
@@ -219,7 +219,7 @@ export default (Order) => {
             payload: {
               roomId: room.id,
               schedule: map(fixedNewSchedules, schedule => assign(
-                {}, schedule, { periods: fixOrderEndpoints(schedule.periods) })
+                {}, schedule, { periods: fixEdgesForDisablePeriods(schedule.periods) })
               ),
             },
             meta: {

@@ -4,8 +4,8 @@ const bathhousesSelector = state => state.bathhouse.get('bathhouses');
 const roomsSelector = state => state.bathhouse.get('rooms');
 const validRoomsSelector = state => state.bathhouse.get('valid');
 const activeRoomIdSelector = state => state.bathhouse.get('activeRoomId');
-const orderSelector = state => state.user.get('order');
-const stepsSelector = state => state.user.get('steps');
+const orderSelector = state => state.order.get('order');
+const stepsSelector = state => state.order.get('steps');
 const schedulesSelector = state => state.schedule.get('schedules');
 
 export const RoomsListSelectors = createSelector(

@@ -1,4 +1,10 @@
 export default {
+  // common
+  'time': 'Время',
+  'date': 'Дата',
+  'close': 'Закрыть',
+  'cancel': 'Отменить',
+
   // Users part
   'organizationType.bathhouse': 'Бани и сауны',
   'organizationType.carwash': 'Автомойки',
@@ -95,6 +101,10 @@ export default {
   'disabledTime': 'Недоступное время',
   'createdManagerTime': 'Создано администратором',
   'createdUserTime': 'Создано пользователем',
+  'dataOrder': 'Данные заказа',
+  'amountOfTime': 'Стоимость за время',
+  'totalAmount': 'Общая сумма',
+  'createOrder': 'Создание заказа',
 
   // errors
   'usernameIsAlphanumeric': 'Логин должен содержать только цифры и буквы',
