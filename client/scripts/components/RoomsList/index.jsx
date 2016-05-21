@@ -16,7 +16,7 @@ import { changeActiveRoom } from '../../actions/bathhouse-actions';
 import { findRoomScheduleIfNeed, resetOrderSchedule } from '../../actions/schedule-actions';
 import { findCommentsIfNeed } from '../../actions/comment-actions';
 import { selectOrder, resetFullOrder, resetDatetimeOrder, checkOrder,
-  sendOrder } from '../../actions/user-actions';
+  sendOrder } from '../../actions/order-actions';
 
 import RoomItemComponent from '../RoomItem/index.jsx';
 

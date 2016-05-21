@@ -15,6 +15,8 @@ import './style.css';
 
 import { FIRST_PERIOD, LAST_PERIOD, STEP } from '../../../../common/utils/schedule-helper';
 
+import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
+
 const ANIMATION_TRANSFORM_ENABLE = false; // TODO: future manager settings
 const CELL_WIDTH = 60;
 const CELL_MARGIN = 10;
@@ -26,6 +28,9 @@ class ManagerSchedulePanelComponent extends Component {
     this.state = {
       tooltipIsActive: false,
     };
+
+    this.handleShowOrder = this.handleShowOrder.bind(this);
+    this.handleCreateOrder = this.handleCreateOrder.bind(this);
 
     this.handleMouseOverTooltip = this.handleMouseOverTooltip.bind(this);
     this.handleMouseLeaveTooltip = this.handleMouseLeaveTooltip.bind(this);
@@ -62,8 +67,20 @@ class ManagerSchedulePanelComponent extends Component {
     });
   }
 
+  handleShowOrder(orderId) {
+    const { room } = this.props;
+
+    this.props.onShowOrder(room.get('id'), orderId);
+  }
+
+  handleCreateOrder(date, period) {
+    const { room } = this.props;
+
+    this.props.onCreateOrder(room.get('id'), date, period);
+  }
+
   renderRows() {
-    const { orders, schedules } = this.props;
+    const { room, orders, schedules } = this.props;
 
     const schedulesLength = schedules.size;
 
@@ -87,6 +104,8 @@ class ManagerSchedulePanelComponent extends Component {
           cellMargin={CELL_MARGIN}
           isFirst={isFirst}
           isLast={isLast}
+          onShowOrder={this.handleShowOrder}
+          onCreateOrder={this.handleCreateOrder}
         />
       );
     });
@@ -179,6 +198,9 @@ ManagerSchedulePanelComponent.propTypes = {
   orders: ImmutablePropTypes.list.isRequired,
   schedules: ImmutablePropTypes.list.isRequired,
   dx: PropTypes.number,
+
+  onShowOrder: PropTypes.func.isRequired,
+  onCreateOrder: PropTypes.func.isRequired,
 };
 
 export default ManagerSchedulePanelComponent;

@@ -1,11 +1,11 @@
+import indexOf from 'lodash/indexOf';
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import classNames from 'classnames';
 
-import { List, Map } from 'immutable';
-
-import { STEP } from '../../../../common/utils/schedule-helper';
+import { STEP, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -13,35 +13,13 @@ import configs from '../../../../common/data/configs.json';
 
 import './style.css';
 
-function recursiveEnumerationCells(cells, orders, results) {
-  if (!cells.size) return results;
+class ManagerScheduleRowComponent extends Component {
+  constructor(props) {
+    super(props);
 
-  const currentCell = cells.first();
-  const order = orders.find(
-    order => order.getIn(['datetime', 'startPeriod']) === currentCell.get('period')
-  );
-
-  if (order) {
-    const startPeriod = order.getIn(['datetime', 'startPeriod']);
-    const endPeriod = order.getIn(['datetime', 'endPeriod']);
-
-    const orderLength = (endPeriod - startPeriod) / STEP;
-
-    return recursiveEnumerationCells(cells.skip(orderLength), orders.skip(1), results.push(Map({
-      isOneDayOrder: order.get('isOneDayOrder'),
-      length: orderLength,
-      orderId: order.get('id'),
-      createdByUser: order.get('createdByUser'),
-    })));
+    this.handleClickCreateOrder = this.handleClickCreateOrder.bind(this);
   }
 
-  return recursiveEnumerationCells(cells.skip(1), orders, results.push(Map({
-    length: 1,
-    enable: currentCell.get('enable'),
-  })));
-}
-
-class ManagerScheduleRowComponent extends Component {
   /**
    * shouldComponentUpdate
    * @return {boolean}
@@ -49,6 +27,26 @@ class ManagerScheduleRowComponent extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return !shallowEqualImmutable(this.props, nextProps) ||
       !shallowEqualImmutable(this.state, nextState);
+  }
+
+  handleClickShowOrder(orderId, event) {
+    event.preventDefault();
+
+    this.props.onShowOrder(orderId);
+  }
+
+  handleClickCreateOrder(event) {
+    event.preventDefault();
+
+    const { date, cells } = this.props;
+
+    const parentNode = event.target.parentNode;
+    const cellIndex = indexOf(parentNode.childNodes, event.target);
+    const cell = cells.get(cellIndex);
+
+    if (!cell.get('enable') || cell.getIn(['status', 'isForceDisable'])) return false;
+
+    return this.props.onCreateOrder(date, cell.get('period'));
   }
 
   renderTimeLineRow() {
@@ -88,69 +86,68 @@ class ManagerScheduleRowComponent extends Component {
   renderRow() {
     const { cells, cellWidth, cellMargin, orders } = this.props;
 
-    if (!orders.size) {
-      // take without last period, because for manager schedule not need period with time 24:00
-      return cells.skipLast(1).map((cell, index) => {
+    return cells.skipLast(1).map((cell, index) => {
+      const order = orders.find(
+        order => order.getIn(['datetime', 'startPeriod']) <= cell.get('period') &&
+          cell.get('period') < order.getIn(['datetime', 'endPeriod'])
+      );
+
+      const cellIsFree = cell.get('enable') && !cell.getIn(['status', 'isForceDisable']);
+      const cellIsBusy = !cell.get('enable') || cell.getIn(['status', 'isForceDisable']);
+
+      if (order) {
+        const isEndOrder = order.getIn(['datetime', 'endPeriod']) === cell.get('period') + STEP;
+        const isOneDayOrder = order.get('isOneDayOrder');
+        const isLastPeriod = cell.get('period') + STEP === LAST_PERIOD;
+
         const classes = classNames({
           'ManagerScheduleRow-cell': true,
-          'ManagerScheduleRow-cell--available': cell.has('enable') && cell.get('enable'),
-          'ManagerScheduleRow-cell--disabled': cell.has('enable') && !cell.get('enable'),
+          'ManagerScheduleRow-cell--available': cellIsFree,
+          'ManagerScheduleRow-cell--disabled': cellIsBusy,
+          'ManagerScheduleRow-cell--manager': !order.get('createdByUser'),
+          'ManagerScheduleRow-cell--user': order.get('createdByUser'),
         });
+
+        let width = cellWidth + cellMargin;
+        let marginRight = 0;
+
+        // TODO: simplify
+        if (isEndOrder && isOneDayOrder) {
+          width -= cellMargin;
+          marginRight = cellMargin;
+        } else if (isEndOrder && !isOneDayOrder && !isLastPeriod) {
+          width -= cellMargin;
+          marginRight = cellMargin;
+        }
 
         return (
           <div
             className={classes}
-            style={{
-              width: cellWidth,
-              marginRight: cellMargin,
-            }}
+            style={{ width, marginRight }}
+            onClick={this.handleClickShowOrder.bind(this, order.get('id'))}
             key={index}
           >
             &nbsp;
           </div>
         );
-      });
-    }
+      }
 
-    return recursiveEnumerationCells(cells.skipLast(1), orders, List()).map((cell, index) => {
       const classes = classNames({
         'ManagerScheduleRow-cell': true,
-        'ManagerScheduleRow-cell--available': cell.has('enable') && cell.get('enable'),
-        'ManagerScheduleRow-cell--disabled': cell.has('enable') && !cell.get('enable'),
+        'ManagerScheduleRow-cell--available': cellIsFree,
+        'ManagerScheduleRow-cell--disabled': cellIsBusy,
         'ManagerScheduleRow-cell--manager': cell.has('createdByUser') && !cell.get('createdByUser'),
         'ManagerScheduleRow-cell--user': cell.has('createdByUser') && cell.get('createdByUser'),
       });
 
-      const isOrder = cell.has('orderId');
-
-      let width = 0;
-      let marginRight = 0;
-
-      if (!isOrder) {
-        width = cellWidth;
-        marginRight = cellMargin;
-      } else {
-        const isOneDayOrder = cell.get('isOneDayOrder');
-        const cellLength = cell.get('length');
-
-        if (isOneDayOrder) {
-          width = cellLength * (cellWidth + cellMargin) - cellMargin;
-          marginRight = cellMargin;
-        } else if (!isOneDayOrder) {
-          const isRightOrderPart = index === 0;
-
-          width = isRightOrderPart ?
-            cellLength * (cellWidth + cellMargin) - cellMargin :
-            cellLength * (cellWidth + cellMargin);
-
-          marginRight = isRightOrderPart ? cellMargin : 0;
-        }
-      }
-
       return (
         <div
           className={classes}
-          style={{ width, marginRight }}
+          style={{
+            width: cellWidth,
+            marginRight: cellMargin,
+          }}
+          onClick={this.handleClickCreateOrder}
           key={index}
         >
           &nbsp;
@@ -208,6 +205,9 @@ ManagerScheduleRowComponent.propTypes = {
 
   isFirst: PropTypes.bool,
   isLast: PropTypes.bool,
+
+  onShowOrder: PropTypes.func.isRequired,
+  onCreateOrder: PropTypes.func.isRequired,
 };
 
 export default ManagerScheduleRowComponent;

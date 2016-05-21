@@ -18,6 +18,7 @@ class ManagerRoomItemComponent extends Component {
     return !shallowEqualImmutable(this.props, nextProps) ||
       !shallowEqualImmutable(this.state, nextState);
   }
+
   render() {
     const { room, orders, schedules, date } = this.props;
 

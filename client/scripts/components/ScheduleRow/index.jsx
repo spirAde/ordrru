@@ -9,7 +9,6 @@ import classNames from 'classnames';
 import { LAST_PERIOD, STEP } from '../../../../common/utils/schedule-helper';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
-//import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import configs from '../../../../common/data/configs.json';
 
@@ -36,8 +35,6 @@ class ScheduleRowComponent extends Component {
     this.state = {
       shownInterval: null,
     };
-
-    //this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
 
     this.handleClickCell = this.handleClickCell.bind(this);
     this.handleMouseLeaveScheduleRow = this.handleMouseLeaveScheduleRow.bind(this);
@@ -152,7 +149,7 @@ class ScheduleRowComponent extends Component {
     const { cells, orderedCells, date, isLast } = this.props;
 
     const { shownInterval } = this.state;
-    const renderCells = this.renderCells(date, cells, orderedCells);
+    const renderedCells = this.renderCells(date, cells, orderedCells);
 
     const classes = classNames({
       ScheduleRow: true,
@@ -199,7 +196,7 @@ class ScheduleRowComponent extends Component {
           className="ScheduleRow-cells g-clear"
           onMouseLeave={this.handleMouseLeaveScheduleRow}
         >
-          {renderCells}
+          {renderedCells}
         </div>
       </div>
     );

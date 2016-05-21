@@ -23,6 +23,7 @@ export function configureReducers() {
     bathhouse,
     comment,
     schedule,
+    order,
     user,
   });
 }

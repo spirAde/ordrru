@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 
+import shallowEqual from '../../utils/shallowEqual';
+
 import './style.css';
 
 /**
@@ -11,6 +13,11 @@ import './style.css';
  * Dumb components - none
  * */
 class LoaderComponent extends Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqual(this.props, nextProps) ||
+      !shallowEqual(this.state, nextState);
+  }
+
   /**
    * render
    * @return {XML} - React element
@@ -98,7 +105,10 @@ class LoaderComponent extends Component {
 LoaderComponent.propTypes = {
   active: PropTypes.bool.isRequired,
   className: PropTypes.string,
-  children: PropTypes.array,
+  children: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object,
+  ]).isRequired,
 };
 
 LoaderComponent.defaultProps = {

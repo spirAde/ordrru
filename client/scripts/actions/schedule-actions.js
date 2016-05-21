@@ -63,9 +63,11 @@ function fetchRoomScheduleFailure(error) {
 /**
  * Fetch schedule for room if need
  * @param {string} roomId - room id
+ * @param {boolean} fixEdges - see common/models/schedule.js -
+ * for user and manager schedules we using same schedules, but disable periods for user need fix
  * @return {Function} - thunk action
  * */
-export function findRoomScheduleIfNeed(roomId) {
+export function findRoomScheduleIfNeed(roomId, fixEdges) {
   return (dispatch, getState) => {
     const state = getState();
     const currentDate = state.application.get('date');
@@ -80,7 +82,7 @@ export function findRoomScheduleIfNeed(roomId) {
     return Schedule.find({
       where: { roomId, date: { gte: currentDate } },
       order: 'date ASC',
-      data: { period: currentPeriod },
+      data: { period: currentPeriod, fixEdges },
     })
       .then(schedule => {
         dispatch(fetchRoomScheduleSuccess(roomId, schedule));
@@ -125,7 +127,7 @@ function updateSchedule(roomId, schedule, reason) {
       schedule,
     },
     meta: {
-      reason, // optional parameter
+      reason: reason || null, // optional parameter
     },
   };
 }
@@ -144,6 +146,16 @@ function updateSchedulesBatch(schedules, reason) {
     meta: {
       reason,
     },
+  };
+}
+
+export function updateScheduleIfNeed(roomId, schedule, reason) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (!state.schedule.hasIn(['schedules', roomId])) return false;
+
+    return updateSchedule(roomId, schedule, reason);
   };
 }
 

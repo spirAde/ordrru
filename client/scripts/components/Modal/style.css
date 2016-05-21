@@ -16,14 +16,9 @@
 
   &-panel {
     position: fixed;
-    background-color: #ffffff;
-    width: 400px;
-    height: 300px;
-    top: 50%;
-    left: 50%;
-    margin-top: -150px;
-    margin-left: -200px;
-    border-radius: 5px;
+    background-color: #CCCCCC;
+    top: 25%;
+    left: 25%;
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     transform: translate3d(0, 0, 0);
