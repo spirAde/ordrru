@@ -61,6 +61,9 @@ function runApp() {
       window.React = React; // enable debugger
       window.Perf = require('react-addons-perf'); // eslint-disable-line global-require
 
+      //const checkUpdate = require('why-did-you-update'); // eslint-disable-line global-require
+      //checkUpdate.whyDidYouUpdate(React);
+
       if (!reactRoot || !reactRoot.firstChild || !reactRoot.firstChild.attributes
         || !reactRoot.firstChild.attributes['data-react-checksum']) {
         console.error(// eslint-disable-line no-console

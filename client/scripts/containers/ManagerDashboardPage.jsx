@@ -10,6 +10,7 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { provideHooks } from 'redial';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import KeyHandler, { KEYUP } from 'react-key-handler';
 
 import { fromJS } from 'immutable';
 
@@ -18,7 +19,7 @@ import { findRoomScheduleIfNeed, findRoomScheduleForDateIfNeed,
   resetOrderSchedule } from '../actions/schedule-actions';
 import { findOrdersIfNeed, findOrdersForDate, selectOrder, resetFullOrder, resetDatetimeOrder,
   checkOrder, sendOrder } from '../actions/order-actions';
-import { logout } from '../actions/manager-actions';
+import { logout, addToSocketRoom } from '../actions/manager-actions';
 
 import shallowEqualImmutable from '../utils/shallowEqualImmutable';
 
@@ -31,6 +32,8 @@ import { MOMENT_FORMAT } from '../../../common/utils/date-helper';
 import { FIRST_PERIOD, LAST_PERIOD, STEP } from '../../../common/utils/schedule-helper';
 
 import { ManagerDashboardSelectors } from '../selectors/ManagerDashboardSelectors';
+
+const ESC_KEY = 27;
 
 const SCROLL_STEP = 6; // TODO: future manager setting, quantity of scroll cells by 1 wheel time
 
@@ -97,10 +100,18 @@ class ManagerDashboardPage extends Component {
     this.handleShowOrder = this.handleShowOrder.bind(this);
     this.handleCreateOrder = this.handleCreateOrder.bind(this);
 
-    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.handleClickCloseButton = this.handleClickCloseButton.bind(this);
+    this.handleClickCreateOrderButton = this.handleClickCreateOrderButton.bind(this);
+
+    this.handleKeyUpEscape = this.handleKeyUpEscape.bind(this);
   }
 
   componentDidMount() {
+    const { manager } = this.props;
+    const bathhouseId = manager.get('organizationId');
+
+    this.props.addToSocketRoom(bathhouseId);
+
     const panelElement = ReactDOM.findDOMNode(this.refs.panel);
     panelElement.addEventListener('mousewheel', this.handleMouseWheelEvent, false);
   }
@@ -127,9 +138,25 @@ class ManagerDashboardPage extends Component {
     panelElement.removeEventListener('mousewheel', this.handleMouseWheelEvent, false);
   }
 
-  handleCloseModal() {
+  handleClickCloseButton() {
+    this.props.resetFullOrder();
+
     this.setState({
       orderModalIsActive: false,
+      shownOrder: null,
+    });
+  }
+
+  handleClickCreateOrderButton() {
+    this.props.sendOrder(true);
+  }
+
+  handleKeyUpEscape() {
+    this.props.resetFullOrder();
+
+    this.setState({
+      orderModalIsActive: false,
+      shownOrder: null,
     });
   }
 
@@ -214,6 +241,11 @@ class ManagerDashboardPage extends Component {
     return (
       <div>
         <Helmet title="Dashboard" />
+        <KeyHandler
+          keyEventName={KEYUP}
+          keyCode={ESC_KEY}
+          onKeyHandle={this.handleKeyUpEscape}
+        />
         <ManagerDashboardHeaderComponent
           manager={manager}
           onSubmit={this.handleLogout}
@@ -240,7 +272,7 @@ class ManagerDashboardPage extends Component {
                 order={shownOrder}
                 active={orderModalIsActive}
                 width="50vw"
-                onClose={this.handleCloseModal}
+                onClickCloseButton={this.handleClickCloseButton}
                 action="show"
               /> : null
           }
@@ -250,7 +282,8 @@ class ManagerDashboardPage extends Component {
                 order={order}
                 active={orderModalIsActive}
                 width="50vw"
-                onClose={this.handleCloseModal}
+                onClickCloseButton={this.handleClickCloseButton}
+                onClickCreateOrderButton={this.handleClickCreateOrderButton}
                 action="create"
               /> : null
           }
@@ -285,6 +318,7 @@ ManagerDashboardPage.propTypes = {
   checkOrder: PropTypes.func.isRequired,
   sendOrder: PropTypes.func.isRequired,
   resetOrderSchedule: PropTypes.func.isRequired,
+  addToSocketRoom: PropTypes.func.isRequired,
 };
 
 /**
@@ -299,12 +333,13 @@ function mapDispatchToProps(dispatch) {
     selectOrder:
       (id, date, period, createdByUser) => dispatch(selectOrder(id, date, period, createdByUser)),
     checkOrder: (order) => dispatch(checkOrder(order)),
-    sendOrder: () => dispatch(sendOrder()),
+    sendOrder: (createdByManager) => dispatch(sendOrder(createdByManager)),
     resetOrderSchedule: () => dispatch(resetOrderSchedule()),
     logout: () => dispatch(logout()),
     findRoomScheduleForDateIfNeed: (roomId, date) =>
       dispatch(findRoomScheduleForDateIfNeed(roomId, date)),
     findOrdersForDate: (roomId, date) => dispatch(findOrdersForDate(roomId, date)),
+    addToSocketRoom: (bathhouseId) => dispatch(addToSocketRoom(bathhouseId)),
   };
 }
 

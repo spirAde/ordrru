@@ -6,7 +6,7 @@ import { FIND_ORDERS_REQUEST, FIND_ORDERS_SUCCESS, FIND_ORDERS_FAILURE,
 	RESET_FULL_ORDER, RESET_DATETIME_ORDER,
 	UPDATE_ORDER_DATETIME_START, UPDATE_ORDER_DATETIME_END, UPDATE_ORDER_SUM,
 	CHECK_ORDER_REQUEST, CHECK_ORDER_SUCCESS, CHECK_ORDER_FAILURE,
-	CHANGE_ORDER_STEP } from '../../client/scripts/actions/order-actions';
+	CHANGE_ORDER_STEP, ADD_ORDER } from '../../client/scripts/actions/order-actions';
 
 export const initialState = fromJS({
 	orders: {},
@@ -63,6 +63,7 @@ export const reducer = createReducer({
 	[UPDATE_ORDER_DATETIME_START](state, action) {
 		return state
 			.setIn(['order', 'roomId'], action.payload.id)
+			.setIn(['order', 'bathhouseId'], action.payload.bathhouseId)
 			.setIn(['order', 'datetime', 'startDate'], action.payload.date)
 			.setIn(['order', 'datetime', 'startPeriod'], action.payload.period)
 			.setIn(['order', 'createdByUser'], action.payload.createdByUser);
@@ -93,5 +94,12 @@ export const reducer = createReducer({
 			.setIn(['steps', 'choice', 'loading'], false)
 			.setIn(['steps', 'choice', 'valid'], false)
 			.setIn(['steps', 'choice', 'error'], action.payload.error);
+	},
+	[ADD_ORDER](state, action) {
+		return state
+			.updateIn(
+				['orders', action.payload.order.roomId],
+				orders => orders.push(fromJS(action.payload.order))
+			);
 	},
 }, initialState);

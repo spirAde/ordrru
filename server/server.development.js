@@ -301,8 +301,10 @@ app.start = () => {
       app.io = io.listen(socketServer);
 
       app.io.on('connection', socket => {
-        socket.on('server/ADD_TO_SOCKET_ROOM', (data) => {
-          socket.join(data.cityId);
+        socket.on('server/ADD_TO_SOCKET_ROOM', data => {
+          console.log('ADD_TO_SOCKET_ROOM', data);
+          const roomId = data.type === 'user' ? data.cityId : data.bathhouseId;
+          socket.join(roomId);
         });
       });
 

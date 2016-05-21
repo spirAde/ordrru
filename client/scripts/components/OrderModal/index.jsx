@@ -13,6 +13,8 @@ import ModalComponent from '../Modal/index.jsx';
 
 import './style.css';
 
+const ORDER_ID_LENGTH = 7;
+
 class OrderModalComponent extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +24,8 @@ class OrderModalComponent extends Component {
     };
 
     this.handleChangeComment = this.handleChangeComment.bind(this);
-    this.handleClickClose = this.handleClickClose.bind(this);
+    this.handleClickCloseButton = this.handleClickCloseButton.bind(this);
+    this.handleClickCreateButton = this.handleClickCreateButton.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -38,10 +41,16 @@ class OrderModalComponent extends Component {
     });
   }
 
-  handleClickClose(event) {
+  handleClickCloseButton(event) {
     event.preventDefault();
 
-    this.props.onClose();
+    this.props.onClickCloseButton();
+  }
+
+  handleClickCreateButton(event) {
+    event.preventDefault();
+
+    this.props.onClickCreateOrderButton();
   }
 
   render() {
@@ -66,7 +75,7 @@ class OrderModalComponent extends Component {
             <div className="OrderModal-header">
               <h2 className="OrderModal-order-id">
                 <FormattedMessage id="dataOrder" />&nbsp;
-                <span>№{order.get('id')}</span>
+                <span>№{order.get('id').slice(-ORDER_ID_LENGTH)}</span>
               </h2>
             </div>
             <div className="OrderModal-body">
@@ -90,8 +99,11 @@ class OrderModalComponent extends Component {
               </div>
             </div>
             <div className="OrderModal-footer">
-              <a className="OrderModal-button" onClick={this.handleClickClose}>
-                <FormattedMessage id="close" />
+              <a
+                className="OrderModal-button OrderModal-button-cancel"
+                onClick={this.handleClickCloseButton}
+              >
+                <FormattedMessage id="cancel" />
               </a>
             </div>
           </ModalComponent>
@@ -141,8 +153,17 @@ class OrderModalComponent extends Component {
             </div>
           </div>
           <div className="OrderModal-footer">
-            <a className="OrderModal-button" onClick={this.handleClickClose}>
+            <a
+              className="OrderModal-button OrderModal-button-cancel"
+              onClick={this.handleClickCloseButton}
+            >
               <FormattedMessage id="cancel" />
+            </a>
+            <a
+              className="OrderModal-button OrderModal-button-create"
+              onClick={this.handleClickCreateButton}
+            >
+              <FormattedMessage id="create" />
             </a>
           </div>
         </ModalComponent>
@@ -169,7 +190,8 @@ OrderModalComponent.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
-  onClose: PropTypes.func.isRequired,
+  onClickCloseButton: PropTypes.func.isRequired,
+  onClickCreateOrderButton: PropTypes.func,
 };
 
 export default OrderModalComponent;

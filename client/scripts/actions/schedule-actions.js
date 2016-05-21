@@ -127,7 +127,7 @@ function updateSchedule(roomId, schedule, reason) {
       schedule,
     },
     meta: {
-      reason, // optional parameter
+      reason: reason || null, // optional parameter
     },
   };
 }
@@ -146,6 +146,16 @@ function updateSchedulesBatch(schedules, reason) {
     meta: {
       reason,
     },
+  };
+}
+
+export function updateScheduleIfNeed(roomId, schedule, reason) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (!state.schedule.hasIn(['schedules', roomId])) return false;
+
+    return updateSchedule(roomId, schedule, reason);
   };
 }
 

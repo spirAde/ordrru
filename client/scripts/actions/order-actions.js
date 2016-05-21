@@ -3,6 +3,7 @@ import isNull from 'lodash/isNull';
 import { Order } from '../API';
 
 import { redefineRoomSchedule } from './schedule-actions';
+import { addNotification } from './notification-actions';
 
 import { calculateDatetimeOrderSum, STEP } from '../../../common/utils/schedule-helper';
 
@@ -26,6 +27,27 @@ export const SEND_ORDER_SUCCESS = 'SEND_ORDER_SUCCESS';
 export const SEND_ORDER_FAILURE = 'SEND_ORDER_FAILURE';
 
 export const CHANGE_ORDER_STEP = 'CHANGE_ORDER_STEP';
+
+export const ADD_ORDER = 'ADD_ORDER';
+
+/**
+ * reset full order
+ * Datetime, services, guests, sums
+ * */
+export function resetFullOrder() {
+  return {
+    type: RESET_FULL_ORDER,
+  };
+}
+
+/**
+ * reset datetime order
+ * */
+export function resetDatetimeOrder() {
+  return {
+    type: RESET_DATETIME_ORDER,
+  };
+}
 
 function findOrdersRequest() {
   return {
@@ -82,16 +104,18 @@ export function findOrdersForDate(roomId, date) {
 /**
  * update start datetime of order
  * @param {string} id - room id
+ * @param {string} bathhouseId - bathhouse id
  * @param {Date} date - start date
  * @param {number} period - start period
  * @param {boolean} createdByUser - created user or manager
  * @return {{type: string, payload: {Object}}} - action
  * */
-function updateOrderDatetimeStart(id, date, period, createdByUser = true) {
+function updateOrderDatetimeStart(id, bathhouseId, date, period, createdByUser = true) {
   return {
     type: UPDATE_ORDER_DATETIME_START,
     payload: {
       id,
+      bathhouseId,
       date,
       period,
       createdByUser,
@@ -142,13 +166,16 @@ function updateOrderSum(type = 'datetime', sum) {
  * @param {boolean} createdByUser - created by user or manager
  * @return {Function} - thunk function
  * */
-export function selectOrder(id, date, period, createdByUser = true) {
+export function selectOrder(roomId, date, period, createdByUser = true) {
   return (dispatch, getState) => {
     const state = getState();
     const order = state.order.get('order');
 
     if (isNull(order.getIn(['datetime', 'startDate']))) {
-      dispatch(updateOrderDatetimeStart(id, date, period, createdByUser));
+      const rooms = state.bathhouse.get('rooms');
+      const bathhouseId = rooms.find(room => room.get('id') === roomId).get('bathhouseId');
+
+      dispatch(updateOrderDatetimeStart(roomId, bathhouseId, date, period, createdByUser));
     } else {
       const endPeriod = createdByUser ? period : period + STEP;
 
@@ -161,7 +188,7 @@ export function selectOrder(id, date, period, createdByUser = true) {
         endPeriod,
       };
 
-      const room = state.bathhouse.get('rooms').find(room => room.get('id') === id);
+      const room = state.bathhouse.get('rooms').find(room => room.get('id') === roomId);
       const prices = room.getIn(['price', 'chunks']);
       const sum = calculateDatetimeOrderSum(datetimeOrder, prices.toJS());
 
@@ -169,7 +196,7 @@ export function selectOrder(id, date, period, createdByUser = true) {
     }
 
     const isStartOrder = isNull(order.getIn(['datetime', 'startDate']));
-    dispatch(redefineRoomSchedule(id, date, period, isStartOrder));
+    dispatch(redefineRoomSchedule(roomId, date, period, isStartOrder));
   };
 }
 
@@ -281,36 +308,33 @@ function sendOrderFailure(error) {
 
 /**
  * create order
+ * @param {Boolean} createdByManager - create notification for manager
  * @return {Function} - thunk action
  * */
-export function sendOrder() {
+export function sendOrder(createdByManager = false) {
   return (dispatch, getState) => {
     const state = getState();
     const order = state.order.get('order');
 
     dispatch(sendOrderRequest());
 
-    Order.create(order.toJS())
-      .then(() => dispatch(sendOrderSuccess()))
-      .catch(error => dispatch(sendOrderFailure(error)));
+    return Order.create(order.toJS())
+      .then(() => {
+        dispatch(sendOrderSuccess());
+        dispatch(resetFullOrder());
+      })
+      .catch(error => {
+        dispatch(sendOrderFailure(error));
+        dispatch(resetFullOrder());
+      });
   };
 }
 
-/**
- * reset full order
- * Datetime, services, guests, sums
- * */
-export function resetFullOrder() {
+export function addOrder(order) {
   return {
-    type: RESET_FULL_ORDER,
-  };
-}
-
-/**
- * reset datetime order
- * */
-export function resetDatetimeOrder() {
-  return {
-    type: RESET_DATETIME_ORDER,
+    type: ADD_ORDER,
+    payload: {
+      order,
+    },
   };
 }

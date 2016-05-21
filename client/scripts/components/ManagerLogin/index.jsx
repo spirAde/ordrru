@@ -98,6 +98,15 @@ class ManagerLoginComponent extends Component {
     ReactDOM.findDOMNode(this.refs.username).focus();
   }
 
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
+  }
+
   checkFormIsValid() {
     const { data } = this.state;
 

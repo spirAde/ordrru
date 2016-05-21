@@ -13,6 +13,7 @@ export const initialState = fromJS({
 	token: null, // TODO: remove after tests, need to store only in cookies
 	manager: {},
 	isAuthenticated: false,
+	socket: null,
 });
 
 export const reducer = createReducer({

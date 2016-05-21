@@ -29,8 +29,6 @@ class ManagerSchedulePanelComponent extends Component {
       tooltipIsActive: false,
     };
 
-    //this.componentDidUpdate = whyDidYouUpdateMixin.componentDidUpdate.bind(this);
-
     this.handleShowOrder = this.handleShowOrder.bind(this);
     this.handleCreateOrder = this.handleCreateOrder.bind(this);
 
@@ -85,10 +83,6 @@ class ManagerSchedulePanelComponent extends Component {
     const { room, orders, schedules } = this.props;
 
     const schedulesLength = schedules.size;
-
-    if (room.get('id') === '52afab01-2597-4c89-a3a0-27c0151e7fd6') {
-      //console.log(orders && orders.toJS());
-    }
 
     return schedules.map((schedule, index) => {
       const dateOrders = orders.filter(order => {

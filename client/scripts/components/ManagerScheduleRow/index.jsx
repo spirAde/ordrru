@@ -3,11 +3,7 @@ import indexOf from 'lodash/indexOf';
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
-
 import classNames from 'classnames';
-
-import { Map } from 'immutable';
 
 import { STEP, LAST_PERIOD } from '../../../../common/utils/schedule-helper';
 
@@ -16,36 +12,6 @@ import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 import configs from '../../../../common/data/configs.json';
 
 import './style.css';
-
-function recursiveEnumerationCells(cells, orders, results) {
-  if (!cells.size) return results;
-
-  const currentCell = cells.first();
-  const order = orders.find(
-    order => order.getIn(['datetime', 'startPeriod']) === currentCell.get('period')
-  );
-
-  if (order) {
-    const startPeriod = order.getIn(['datetime', 'startPeriod']);
-    const endPeriod = order.getIn(['datetime', 'endPeriod']);
-
-    const orderLength = (endPeriod - startPeriod) / STEP;
-
-    return recursiveEnumerationCells(cells.skip(orderLength), orders.skip(1), results.push(Map({
-      isOneDayOrder: order.get('isOneDayOrder'),
-      length: orderLength,
-      orderId: order.get('id'),
-      createdByUser: order.get('createdByUser'),
-    })));
-  }
-
-  return recursiveEnumerationCells(cells.skip(1), orders, results.push(Map({
-    length: 1,
-    period: currentCell.get('period'),
-    enable: currentCell.get('enable'),
-    status: currentCell.get('status'),
-  })));
-}
 
 class ManagerScheduleRowComponent extends Component {
   constructor(props) {
@@ -145,6 +111,7 @@ class ManagerScheduleRowComponent extends Component {
         let width = cellWidth + cellMargin;
         let marginRight = 0;
 
+        // TODO: simplify
         if (isEndOrder && isOneDayOrder) {
           width -= cellMargin;
           marginRight = cellMargin;

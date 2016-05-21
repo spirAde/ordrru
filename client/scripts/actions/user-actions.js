@@ -59,6 +59,7 @@ export function addToSocketRoom(cityId) {
     type: ADD_TO_SOCKET_ROOM,
     payload: {
       cityId,
+      type: 'user',
     },
     meta: {
       remote: true,

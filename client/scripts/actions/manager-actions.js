@@ -18,6 +18,8 @@ export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
 export const SET_IS_AUTHENTICATED = 'SET_IS_AUTHENTICATED';
 export const SET_MANAGER = 'SET_MANAGER';
 
+export const ADD_TO_SOCKET_ROOM = 'ADD_TO_SOCKET_ROOM';
+
 export function setIsAuthenticated(status) {
   return {
     type: SET_IS_AUTHENTICATED,
@@ -76,7 +78,6 @@ export function login(credentials, redirect = '/manager/dashboard') {
         dispatch(push(redirect));
       })
       .catch(error => {
-        console.log(error);
         dispatch(loginFailure(error));
         dispatch(addNotification({
           message: error.code,
@@ -122,5 +123,18 @@ export function logout(redirect = '/manager/login') {
         dispatch(push(redirect));
       })
       .catch(error => dispatch(logoutFailure(error)));
+  };
+}
+
+export function addToSocketRoom(bathhouseId) {
+  return {
+    type: ADD_TO_SOCKET_ROOM,
+    payload: {
+      bathhouseId,
+      type: 'manager',
+    },
+    meta: {
+      remote: true,
+    },
   };
 }

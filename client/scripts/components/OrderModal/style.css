@@ -24,16 +24,29 @@
   }
 
   &-button {
-    border: 1px solid #FFFFFF;
     padding: 10px 15px;
-    margin-right: 5px;
-    color: #FFFFFF;
     display: inline-block;
     font-family: "proxima_bold", Arial, sans-serif;
     cursor: pointer;
+  }
+
+  &-button-cancel {
+    border: 1px solid #FFFFFF;
+    color: #FFFFFF;
 
     &:hover {
       color: #4A5060;
+      background-color: #FFFFFF;
+    }
+  }
+
+  &-button-create {
+    float: right;
+    background-color: #F4740C;
+    color: #FFFFFF;
+
+    &:hover {
+      color: #F4740C;
       background-color: #FFFFFF;
     }
   }
