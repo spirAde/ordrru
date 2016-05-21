@@ -1,4 +1,11 @@
 export default {
+  // common
+  'time': 'Время',
+  'date': 'Дата',
+  'close': 'Закрыть',
+  'cancel': 'Отменить',
+  'create': 'Создать',
+
   // Users part
   'organizationType.bathhouse': 'Бани и сауны',
   'organizationType.carwash': 'Автомойки',
@@ -80,18 +87,46 @@ export default {
 
   'selectTime': 'Выберите время',
   'loading': 'Загрузка',
+  'comment': 'Комментарий',
+  'comments': 'Комментарии',
 
   // Manager part
   'entrance': 'Войти',
   'username': 'Логин',
   'password': 'Пароль',
   'welcome': 'Добро пожаловать!',
+  'history': 'История',
+  'message': 'Сообщение',
+  'messages': 'Сообщения',
+  'availableTime': 'Доступное время',
+  'disabledTime': 'Недоступное время',
+  'createdManagerTime': 'Создано администратором',
+  'createdUserTime': 'Создано пользователем',
+  'dataOrder': 'Данные заказа',
+  'amountOfTime': 'Стоимость за время',
+  'totalAmount': 'Общая сумма',
+  'createOrder': 'Создание заказа',
 
   // errors
   'usernameIsAlphanumeric': 'Логин должен содержать только цифры и буквы',
   'usernameIsLength': 'Логин должен содержать больше 3 символов',
   'passwordIsLength': 'Пароль должен содержать больше 3 символов',
 
+  // codes:
+  'ORDER_CREATED_BY_USER_SUCCESSFULLY': 'Пользователь НОМЕР создал заказ',
+  'ORDER_CREATED_BY_USER_UNSUCCESSFULLY': 'Ошибка создания заказа',
+
+  'ORDER_CREATED_BY_MANAGER_SUCCESSFULLY': 'Заказ успешно создан',
+  'ORDER_CREATED_BY_MANAGER_UNSUCCESSFULLY': 'Ошибка создания заказа',
+
   // server-side errors - code : transcription
   'LOGIN_FAILED': 'Неверный логин или пароль',
+  'ORDER_INCORRECT_DATE_FORMAT': 'Некорректный формат даты заказа',
+  'ORDER_INCORRECT_DURATION': 'Некорректная продолжительность заказа',
+  'ORDER_INCORRECT_PERIOD_FORMAT': 'Некорректный формат времени заказа',
+  'ORDER_INCORRECT_PERIOD_VALUE': 'Некорректное время заказа',
+  'ORDER_INCORRECT_DATES_SEQUENCE': 'Некорректные даты начала и окончания заказа',
+  'ORDER_INCORRECT_PERIODS_SEQUENCE': 'Некорректные время начала и время окончания заказа',
+  'ORDER_INCORRECT_DATETIME_SUM': 'Некорректные данные заказа',
+  'ORDER_INCORRECT_INTERVAL': 'Некорректные данные заказа',
 }

@@ -6,11 +6,12 @@ import createReducer from '../utils/create-reducer';
 
 import {
   FIND_BATHHOUSES_REQUEST, FIND_BATHHOUSES_SUCCESS, FIND_BATHHOUSES_FAILURE,
+  FIND_BATHHOUSE_REQUEST, FIND_BATHHOUSE_SUCCESS, FIND_BATHHOUSE_FAILURE,
   CHANGE_ACTIVE_ROOM, UPDATE_ROOMS, SORT_ROOMS, UPDATE_ROOM_SCHEDULE } from '../../client/scripts/actions/bathhouse-actions';
 
 export const initialState = fromJS({
   isFetching: false,
-  bathhouses: [],
+  bathhouses: null,
   rooms: [],
   valid: [],
   invalid: {
@@ -39,6 +40,19 @@ export const reducer = createReducer({
   },
   [FIND_BATHHOUSES_FAILURE](state) {
     return state.set('isFetching', false);
+  },
+  [FIND_BATHHOUSE_REQUEST](state, action) {
+    return state
+      .set('isFetching', true);
+  },
+  [FIND_BATHHOUSE_SUCCESS](state, action) {
+    return state
+      .set('isFetching', false)
+      .set('bathhouses', fromJS(action.payload.bathhouse))
+      .set('rooms', fromJS(action.payload.rooms))
+  },
+  [FIND_BATHHOUSE_FAILURE](state, action) {
+    return state;
   },
   [CHANGE_ACTIVE_ROOM](state, action) {
     return state

@@ -1,0 +1,72 @@
+@import "../../../styles/variables.css";
+
+.DatePaginator {
+
+  padding: 60px 20px 0 20px;
+  transition: all 0.3s ease 0s;
+
+  &-wrapper {};
+
+  &-datepaginator {
+    font-size: 12px;
+    height: 60px;
+  };
+
+  &-pagination {
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+  }
+
+  &-item-outer {
+    float: left;
+    cursor: pointer;
+  }
+
+  &-item {
+    display: block;
+    box-sizing: border-box;
+    height: 60px;
+    padding: 13px 0;
+    width: 35px;
+    margin: 0;
+    border-left-style: hidden;
+    text-align: center;
+    color: #7F8C9D;
+
+    &--selected {
+      background-color: #FFFFFF !important;
+      color: #F4740C !important;
+      font-family: var(--font-family-bold);
+    }
+
+    &--today {
+      background-color: transparent;
+      color: #4A5060;
+      font-family: var(--font-family-bold);
+    }
+
+    &--divider {
+      border: none;
+    }
+
+    &--off {
+      background-color: rgba(255,255,255,0.5) !important;
+      border-left: 1px solid #E5E9EC !important;
+    }
+
+    &--no-selected {
+      color: #CCCCCC !important;
+      background-color: #F0F0F0 !important;
+
+      &:hover {
+        background-color: #F0F0F0;;
+      }
+    }
+
+  }
+
+  &-nav-item {
+    padding: 17px 0;
+  }
+}

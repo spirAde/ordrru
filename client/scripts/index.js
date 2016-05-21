@@ -13,6 +13,7 @@ import moment from 'moment';
 import messages from '../../common/data/messages/index';
 
 import { configureStore } from '../../common/configure-store';
+import { configureReducers, configureManagerReducers } from '../../common/reducers/index';
 import createRoutes from '../../common/routes';
 
 import IntlUtils from './utils/IntlUtils';
@@ -21,10 +22,8 @@ import '../styles/core.css';
 import '../styles/fonts.css';
 import '../styles/globals.css';
 
-const store = configureStore(browserHistory, window.__INITIAL_STATE__);
-const { dispatch, getState } = store;
-
-const history = syncHistoryWithStore(browserHistory, store);
+const location = createLocation(document.location.pathname, document.location.search);
+const isMainApplication = location.pathname.indexOf('manager') === -1;
 
 const reactRoot = document.getElementById('root');
 
@@ -32,8 +31,18 @@ const localization = navigator.languages ?
   navigator.languages[0] : (navigator.language || navigator.userLanguage);
 const locale = localization.indexOf('-') ? localization.split('-')[0] : localization;
 
-const location = createLocation(document.location.pathname, document.location.search);
+const reducers = isMainApplication ?
+  configureReducers() : configureManagerReducers();
+const store = configureStore(browserHistory, reducers, window.__INITIAL_STATE__);
+const history = syncHistoryWithStore(browserHistory, store);
+
+const { dispatch, getState } = store;
+
 const routes = createRoutes(store);
+
+if (!isMainApplication) {
+  require('../styles/manager.css'); // eslint-disable-line global-require
+}
 
 function runApp() {
   match({ routes, location }, () => {
@@ -49,10 +58,11 @@ function runApp() {
     );
 
     if (__DEVELOPMENT__) {
-      const Perf = require('react-addons-perf');
-
       window.React = React; // enable debugger
-      window.Perf = Perf; // performance tool
+      window.Perf = require('react-addons-perf'); // eslint-disable-line global-require
+
+      //const checkUpdate = require('why-did-you-update'); // eslint-disable-line global-require
+      //checkUpdate.whyDidYouUpdate(React);
 
       if (!reactRoot || !reactRoot.firstChild || !reactRoot.firstChild.attributes
         || !reactRoot.firstChild.attributes['data-react-checksum']) {

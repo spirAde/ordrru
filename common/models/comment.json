@@ -1,6 +1,6 @@
 {
-  "name": "Review",
-  "plural": "reviews",
+  "name": "Comment",
+  "plural": "comments",
   "base": "PersistedModel",
   "strict": false,
   "idInjection": true,
@@ -25,13 +25,6 @@
   },
   "validations": [],
   "relations": {},
-  "acls": [
-    {
-      "accessType": "*",
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "DENY"
-    }
-  ],
+  "acls": [],
   "methods": {}
 }

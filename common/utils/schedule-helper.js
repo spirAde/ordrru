@@ -120,7 +120,6 @@ export function recalculateSchedule(schedule, order, minOrderDuration) {
  * @return {Array.<Object>}
  * */
 export function fixNeighboringSchedules(prev, next, minOrderDuration) {
-
 	if (isEmpty(prev)) throw new Error('previous schedule is empty');
 	if (isEmpty(next)) throw new Error('next schedule is empty');
 
@@ -204,29 +203,36 @@ export function calculateDatetimeOrderSum(order, prices) {
 
 /**
  * Fix endpoints periods for each order in schedule.
- * example: schedule(disable periods) - [12, 15, 18, 21, 33, 36, 39, 42, 45], after use fixOrderEndpoints result
- * will be: [15, 18, 36, 39, 42]
+ * example: schedule(disable periods) - [12, 15, 18, 21, 33, 36, 39, 42, 45], after use fixEdgesForDisablePeriods results:
+ * left and right - [15, 18, 36, 39, 42]
+ * left - [15, 18, 36, 39, 42, 45]
+ * right - [12, 15, 18, 36, 39, 42]
  * @param {Array.<Object>} schedule
+ * @param {Object} fixEdges - left or right fix
  * @return {Array.<Object>} new schedule
  * */
-export function fixOrderEndpoints(schedule) {
-	const busyPeriods = map(
-		filter(schedule, { enable: false }),
-		period => parseInt(period.period, 10)
-	);
+export function fixEdgesForDisablePeriods(schedule, fixEdges) {
+	const edges = [];
 
-	if (!busyPeriods.length) return schedule;
+	reduce(schedule, (prev, curr) => {
+		if (prev.period === FIRST_PERIOD && !prev.enable) edges.push(prev.period);
+		if (!prev.enable && curr.enable) edges.push(prev.period);
+		if (prev.enable && !curr.enable) edges.push(curr.period);
 
-	const fixedPeriods = filter(busyPeriods, (period, index) => {
-		if (period && period !== LAST_PERIOD) {
-			if (index === 0 || index === busyPeriods.length - 1) return period;
-			if (busyPeriods[index + 1] !== period + STEP) return period;
-			if (busyPeriods[index - 1] !== period - STEP) return period;
-		}
+		return curr;
 	});
 
-	return map(schedule, period => {
-		return includes(fixedPeriods, period.period) ? { period: period.period, enable: true } : period;
+	const fixedEdges = filter(edges, (period, index) => {
+		const isLeft = index % 2 === 0;
+		const isRight = index % 2 === 1;
+
+		return (isLeft && fixEdges.left && period !== FIRST_PERIOD) ||
+			(isRight && fixEdges.right && period !== LAST_PERIOD);
+	});
+
+	return map(schedule, (period, index) => {
+		return includes(fixedEdges, period.period) ?
+			assign(period, { enable: true }) : period;
 	});
 }
 

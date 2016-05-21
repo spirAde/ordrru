@@ -1,5 +1,3 @@
-import { Map } from 'immutable';
-
 import { isNull, indexOf } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
@@ -32,11 +30,10 @@ class ScheduleRowComponent extends Component {
 
     /**
      * @type {object}
-     * @property {Object} data
-     * @property {Object|null} data.shownInterval - shown price interval, when user mouse over cell
+     * @property {Object|null} shownInterval - shown price interval, when user mouse over cell
      */
     this.state = {
-      data: Map({ shownInterval: null }),
+      shownInterval: null,
     };
 
     this.handleClickCell = this.handleClickCell.bind(this);
@@ -76,9 +73,10 @@ class ScheduleRowComponent extends Component {
    * */
   handleMouseLeaveScheduleRow(event) {
     event.preventDefault();
-    this.setState(({ data }) => ({
-      data: data.set('shownInterval', null),
-    }));
+
+    this.setState({
+      shownInterval: null,
+    });
   }
 
   /**
@@ -97,13 +95,13 @@ class ScheduleRowComponent extends Component {
       chunk => chunk.get('startPeriod') <= fixedPeriod && fixedPeriod <= chunk.get('endPeriod')
     );
 
-    this.setState(({ data }) => ({
-      data: data.set('shownInterval', Map({
+    this.setState({
+      shownInterval: {
         start: configs.periods[interval.get('startPeriod')],
         end: configs.periods[interval.get('endPeriod')],
         price: interval.get('price'),
-      })),
-    }));
+      },
+    });
 
     this.props.onMouseOverCell(date, period);
   }
@@ -150,8 +148,8 @@ class ScheduleRowComponent extends Component {
   render() {
     const { cells, orderedCells, date, isLast } = this.props;
 
-    const { data } = this.state;
-    const renderCells = this.renderCells(date, cells, orderedCells);
+    const { shownInterval } = this.state;
+    const renderedCells = this.renderCells(date, cells, orderedCells);
 
     const classes = classNames({
       ScheduleRow: true,
@@ -182,13 +180,13 @@ class ScheduleRowComponent extends Component {
           </div>
           <div className="ScheduleRow-price-interval">
             {
-              !isNull(data.get('shownInterval')) ?
+              !isNull(shownInterval) ?
                 <FormattedMessage
                   id="priceOfInterval"
                   values={{
-                    start: data.getIn(['shownInterval', 'start']),
-                    end: data.getIn(['shownInterval', 'end']),
-                    price: data.getIn(['shownInterval', 'price']),
+                    start: shownInterval.start,
+                    end: shownInterval.end,
+                    price: shownInterval.price,
                   }}
                 /> : null
             }
@@ -198,7 +196,7 @@ class ScheduleRowComponent extends Component {
           className="ScheduleRow-cells g-clear"
           onMouseLeave={this.handleMouseLeaveScheduleRow}
         >
-          {renderCells}
+          {renderedCells}
         </div>
       </div>
     );

@@ -8,10 +8,9 @@ import thunk from 'redux-thunk';
 
 import { Iterable } from 'immutable';
 
-import configureReducers from './reducers/index';
 import createSocketMiddleware from './middlewares/socket-middleware';
 
-export function configureStore(history, initialState = {}) {
+export function configureStore(history, reducers, initialState = {}) {
   const middleware = [thunk, routerMiddleware(history)];
 
   let finalCreateStore;
@@ -44,7 +43,6 @@ export function configureStore(history, initialState = {}) {
     finalCreateStore = applyMiddleware(...middleware)(createStore);
   }
 
-  const reducers = configureReducers();
   const store = finalCreateStore(reducers, initialState);
 
   if (__DEVELOPMENT__ && module.hot) {

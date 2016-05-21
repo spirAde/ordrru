@@ -76,4 +76,8 @@
 	&-anchor--active {
 	 	background-color: #18B2AE;
 	}
+
+ 	&-icon {
+	 	margin: 0 10px -5px -15px;
+ 	}
 }

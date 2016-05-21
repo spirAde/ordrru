@@ -80,15 +80,15 @@ class FilterTypeComponent extends Component {
           {
             type.get('checked') ?
               <IconComponent
+                className="FilterType-icon-checkbox-checked"
                 name="icon-checkbox-checked"
                 color="#18B2AE"
-                style={{ marginRight: '10px', marginTop: '5px' }}
                 rate={1.25}
               /> :
               <IconComponent
+                className="FilterType-icon-checkbox-unchecked"
                 name="icon-checkbox-unchecked"
                 color="#BCC1C9"
-                style={{ marginRight: '10px', marginTop: '5px' }}
                 rate={1.25}
               />
           }

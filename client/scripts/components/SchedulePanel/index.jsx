@@ -19,7 +19,7 @@ import './style.css';
 let Ps;
 
 if (__CLIENT__) {
-  Ps = require('perfect-scrollbar');
+  Ps = require('perfect-scrollbar'); // eslint-disable-line global-require
 }
 
 /**
@@ -28,7 +28,6 @@ if (__CLIENT__) {
  * Dumb components - ScheduleRowComponent
  * */
 class SchedulePanelComponent extends Component {
-
   constructor(props) {
     super(props);
 
@@ -211,7 +210,9 @@ class SchedulePanelComponent extends Component {
 
     const orderIsStarted = !isNull(order.getIn(['datetime', 'startDate'])) &&
       !isNull(order.getIn(['datetime', 'startPeriod']));
-    const rows = schedule ? this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
+
+    const rows = schedule && schedule.size ?
+      this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
 
     const classes = classNames({
       SchedulePanel: true,

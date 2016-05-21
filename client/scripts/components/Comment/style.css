@@ -1,0 +1,22 @@
+.Comment {
+  padding: 20px;
+  border-bottom: 1px solid #D7DCDC;
+
+  &-top {
+    margin-bottom: 20px;
+  }
+
+  &-user {
+    float: left;
+    font-family: 'proxima_bold', Arial, sans-serif;
+  }
+
+  &-text {
+    line-height: 1.5;
+  }
+
+  &-evaluation {
+    top:0;
+    float: right;
+  }
+}

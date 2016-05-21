@@ -1,0 +1,66 @@
+.ManagerDashboardHeader {
+
+  &-menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20px;
+    background-color: #4A5060;
+    text-align: center;
+    z-index: 10;
+  }
+
+  &-logo-field {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+  }
+
+  &-logo-image {
+    height: 33px;
+    width: auto;
+    margin-top: -5px;
+  }
+
+  &-links {}
+
+  &-link {
+    position: relative;
+    padding-left: 30px;
+    margin: 0 20px;
+    color: #FFFFFF;
+    cursor: pointer;
+
+    &::before {
+      position: absolute;
+      left: 0;
+      top: -3px;
+      font-size: 24px;
+    }
+  }
+
+  &-link-history {}
+
+  &-link-message {}
+
+  &-user {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 150px;
+  }
+
+  &-username {
+    color: #FFFFFF;
+    top: -7px;
+    position: relative;
+    margin-right: 25px;
+  }
+
+  &-logout {
+    color: #FFFFFF;
+    cursor: pointer;
+  }
+}

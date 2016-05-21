@@ -14,6 +14,8 @@ import KeyHandler, { KEYUP } from 'react-key-handler';
 
 import classNames from 'classnames';
 
+import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+
 import './style.css';
 
 import logoImg from '../../../images/logo.png';
@@ -94,6 +96,15 @@ class ManagerLoginComponent extends Component {
 	 * */
   componentDidMount() {
     ReactDOM.findDOMNode(this.refs.username).focus();
+  }
+
+  /**
+   * shouldComponentUpdate
+   * @return {boolean}
+   * */
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   checkFormIsValid() {

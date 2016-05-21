@@ -74,4 +74,8 @@
 	&-total-offers-count {
 		font-family: var(--font-family-bold);
 	}
+
+ 	&-icon-chevron-right {
+	 	margin: 0 -14px -4px 5px;
+ 	}
 }

@@ -3,7 +3,9 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { provideHooks } from 'redial';
 
-import { trim, escape } from 'lodash';
+import trim from 'lodash/trim';
+import escape from 'lodash/escape';
+import { Map } from 'immutable';
 import moment from 'moment-timezone';
 import later from 'later';
 
@@ -23,6 +25,7 @@ import HeaderComponent from '../components/Header/index.jsx';
 import FiltersListComponent from '../components/FiltersList/index.jsx';
 import RoomsListComponent from '../components/RoomsList/index.jsx';
 import MapComponent from '../components/Map/index.jsx';
+import CommentsListComponent from '../components/CommentsList/index.jsx';
 
 let globalCheckCurrentPeriodInterval = null;
 
@@ -63,6 +66,17 @@ const hooks = {
  * Dumb components - HeaderComponent, FiltersListComponent, RoomsListComponent, MapComponent
  * */
 class BathhouseListPage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: Map({
+        isSticked: false,
+      }),
+    };
+
+    this.handleChangeFilterStick = this.handleChangeFilterStick.bind(this);
+  }
 
   /**
    * componentDidMount
@@ -86,8 +100,9 @@ class BathhouseListPage extends Component {
    * shouldComponentUpdate
    * @return {boolean}
    * */
-  shouldComponentUpdate(nextProps) {
-    return !shallowEqualImmutable(this.props, nextProps);
+  shouldComponentUpdate(nextProps, nextState) {
+    return !shallowEqualImmutable(this.props, nextProps) ||
+      !shallowEqualImmutable(this.state, nextState);
   }
 
   /**
@@ -98,21 +113,37 @@ class BathhouseListPage extends Component {
     window.clearInterval(globalCheckCurrentPeriodInterval);
   }
 
+  handleChangeFilterStick(isSticked) {
+    this.setState(({ data }) => ({
+      data: data.set('isSticked', isSticked),
+    }));
+  }
+
   /**
    * render
    * @return {XML} ReactElement
    * */
   render() {
-    const { mode } = this.props;
+    const { mode, activeRoomId } = this.props;
+    const { data } = this.state;
 
     const isListMode = mode === 'list';
+    const commentsIsActive = !!activeRoomId;
 
     return (
       <div>
         <Helmet title="Bathhouses" />
         <HeaderComponent mode={mode} />
-        <FiltersListComponent />
-        <RoomsListComponent isActive={isListMode} />
+        <FiltersListComponent
+          onChangeFiltersStick={this.handleChangeFilterStick}
+        />
+        <CommentsListComponent isActive={commentsIsActive} />
+        <RoomsListComponent
+          style={{
+            marginTop: data.get('isSticked') ? 69 : 0,
+          }}
+          isActive={isListMode}
+        />
         <MapComponent isActive={!isListMode} />
       </div>
     );
@@ -127,6 +158,7 @@ BathhouseListPage.propTypes = {
   store: PropTypes.object,
   mode: PropTypes.oneOf(['list', 'map']),
   activeCityId: PropTypes.string.isRequired,
+  activeRoomId: PropTypes.string.isRequired,
   addToSocketRoom: PropTypes.func.isRequired,
   changeGlobalCurrentDateAndPeriod: PropTypes.func.isRequired,
 };

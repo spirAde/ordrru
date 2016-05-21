@@ -1,11 +1,12 @@
 import moment from 'moment';
 import { forEach, find, isEmpty, head, last, map, filter, zipWith, isNumber,
-  take, takeRight, assign } from 'lodash';
+  take, takeRight, assign, flatten } from 'lodash';
 
 import { splitOrderByDatesAndPeriods, checkSchedulesIntersection,
   recalculateSchedule, fixNeighboringSchedules,
-  clog, calculateDatetimeOrderSum, mergeSchedules, fixOrderEndpoints } from '../utils/schedule-helper';
+  clog, calculateDatetimeOrderSum, mergeSchedules, fixEdgesForDisablePeriods } from '../utils/schedule-helper';
 import { datesRange, isSameDate } from '../utils/date-helper';
+import { FIRST_PERIOD, LAST_PERIOD } from '../utils/schedule-helper';
 import mkLogger from '../../server/utils/logger';
 
 const logger = mkLogger('model:Order');
@@ -36,6 +37,69 @@ export default (Order) => {
     });
   }
 
+  Order.afterRemote('find', (ctx, orders, next) => {
+    const questParams = JSON.parse(ctx.args.filter);
+    const needSplitOrders = questParams && questParams.data && questParams.data.splitByDates;
+
+    //console.log(needSplitOrders, orders);
+
+    if (needSplitOrders && orders.length) {
+      const newOrders = map(orders, order => {
+        const orderData = order.__data;
+
+        const startDate = orderData.datetime.startDate;
+        const endDate = orderData.datetime.endDate;
+
+        const isOneDayOrder = moment(startDate).isSame(endDate);
+
+        if (isOneDayOrder) return assign({}, orderData, { isOneDayOrder: true });
+
+        const dates = datesRange(startDate, endDate);
+        const datesLength = dates.length;
+
+        return dates.map((date, index) => {
+          const dateISO = date + 'T00:00:00.000Z';
+
+          if (index === 0) {
+            return assign({}, orderData, {
+              datetime: {
+                startDate: dateISO,
+                startPeriod: orderData.datetime.startPeriod,
+                endDate: dateISO,
+                endPeriod: LAST_PERIOD
+              },
+              isOneDayOrder: false,
+            });
+          } else if (index === datesLength - 1) {
+            return assign({}, orderData, {
+              datetime: {
+                startDate: dateISO,
+                startPeriod: FIRST_PERIOD,
+                endDate: dateISO,
+                endPeriod: orderData.datetime.endPeriod
+              },
+              isOneDayOrder: false,
+            });
+          }
+
+          return assign({}, orderData, {
+            datetime: {
+              startDate: dateISO,
+              startPeriod: FIRST_PERIOD,
+              endDate: dateISO,
+              endPeriod: LAST_PERIOD,
+            },
+            isOneDayOrder: false,
+          });
+        });
+      });
+
+      ctx.result = flatten(newOrders);
+    }
+
+    next();
+  });
+
   // Check that new order has valid interval, and doesn't conflict with other orders
   Order.observe('before save', (ctx, next) => {
     checkOrder(ctx.instance, Order.app, (error, status) => {
@@ -48,12 +112,12 @@ export default (Order) => {
 
   // If order is valid, save order and recalculate schedule
   Order.observe('after save', (ctx, next) => {
-
-    const { roomId, datetime: { startDate, endDate, startPeriod, endPeriod } } = ctx.instance;
+    const { roomId, bathhouseId, datetime: { startDate, endDate, startPeriod, endPeriod } } = ctx.instance;
 
     //console.log('startDate', startDate, 'endDate', endDate, 'startPeriod', startPeriod, 'endPeriod', endPeriod);
 
     const app = Order.app;
+    const Bathhouse = app.models.Bathhouse;
     const Room = app.models.Room;
     const Schedule = app.models.Schedule;
 
@@ -92,7 +156,7 @@ export default (Order) => {
     Promise.all([
       Schedule.find({
         where: {
-          roomId: roomId,
+          roomId,
           date: { between: [start, end] },
         },
         order: 'date ASC'
@@ -148,20 +212,38 @@ export default (Order) => {
         return Schedule.update({ id: schedule.id }, schedule);
       });
 
-      return Promise.all(updateSchedulePromises)
-        .then(schedules => {
-          /*app.io.in('01f13c1a-1481-4ea0-869d-901d74bebde4').emit('action', {
+      return Promise.all([Bathhouse.findById(bathhouseId), ...updateSchedulePromises])
+        .then(data => {
+          const [bathhouse, schedules] = data;
+
+          // user sockets
+          app.io.in(bathhouse.cityId).emit('action', {
             type: 'UPDATE_SCHEDULE',
             payload: {
               roomId: room.id,
               schedule: map(fixedNewSchedules, schedule => assign(
-                {}, schedule, { periods: fixOrderEndpoints(schedule.periods) })
+                {}, schedule, { periods: fixEdgesForDisablePeriods(schedule.periods, { left: true, right: true }) })
               ),
             },
-            meta: {
-              reason: 'socket',
-            }
-          });*/
+          });
+
+          // manager sockets
+          app.io.in(bathhouseId).emit('action', {
+            type: 'UPDATE_SCHEDULE',
+            payload: {
+              roomId: room.id,
+              schedule: map(fixedNewSchedules, schedule => assign(
+                {}, schedule, { periods: fixEdgesForDisablePeriods(schedule.periods, { left: false, right: true }) })
+              ),
+            },
+          });
+  
+          app.io.in(bathhouseId).emit('action', {
+            type: 'ADD_ORDER',
+            payload: {
+              order: ctx.instance,
+            },
+          });
 
           logger('afterSave').info({
             roomId: room.id,

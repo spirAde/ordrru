@@ -1,0 +1,85 @@
+.ManagerScheduleRow {
+  height: 120px;
+  float: left;
+
+  &-cell {
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid #7F8C9D;
+    padding: 20px 0;
+    cursor: pointer;
+    transition: background 0.3s ease 0s;
+    position: relative;
+    float: left;
+    display: inline-block;
+
+    &--available {
+      &:hover {
+        background-color: #E5E9EC;
+      }
+    }
+
+    &--disabled {
+      background-color: #7F8C9D;
+      color: #FFFFFF ;
+    }
+
+    &--manager {
+      background-color: #18B2AD;
+      border-color: #18B2AD ;
+      color: #FFFFFF ;
+    }
+
+    &--user {
+      background-color: #F4740C;
+      border-color: #F4740C;
+      color: #FFFFFF;
+    }
+  }
+
+  &-time-item {
+    height: 7px;
+    border-bottom: 1px solid #7F8C9D;
+    position: relative;
+    float: left;
+    display: inline-block;
+
+    &--left {
+      border-left: 1px solid #7F8C9D;
+    }
+  }
+
+  &-time-item-text {
+    margin-top: -20px;
+    margin-left: -20px;
+  }
+
+  &-timeline-row {
+    display: block;
+    margin-top: 20px;
+    height: 20px;
+    margin-left: -5px;
+
+    &--first {
+      margin-left: 0px;
+    }
+
+    &--last {
+      margin-right: 0px;
+    }
+  }
+
+  &-schedule-row {
+    display: block;
+    float: left;
+    height: 80px;
+
+    &--first {
+      margin-left: 5px;
+    }
+
+    &--last {
+      margin-right: 5px;
+    }
+  }
+}

@@ -14,6 +14,7 @@ import RoomItemComponent from '../RoomItem/index.jsx';
 import { changeActiveRoom } from '../../actions/bathhouse-actions';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
+//import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
 
 import configs from '../../../../common/data/configs.json';
 
@@ -23,8 +24,8 @@ let Ps;
 let L;
 
 if (__CLIENT__) {
-  Ps = require('perfect-scrollbar');
-  L = require('mapbox.js');
+  Ps = require('perfect-scrollbar'); // eslint-disable-line global-require
+  L = require('mapbox.js'); // eslint-disable-line global-require
 }
 
 let map = {};
@@ -47,12 +48,13 @@ class MapComponent extends Component {
 
     /**
      * @type {object}
-     * @property {object} data
-     * @property {string} data.selectedRoomId - selected room id
+     * @property {string} selectedRoomId - selected room id
      */
     this.state = {
-      data: Map({ selectedRoomId: null }),
+      selectedRoomId: null,
     };
+
+    //this.componentDidUpdate = __DEVELOPMENT__ && whyDidYouUpdateMixin.componentDidUpdate.bind(this);
 
     this.handleCloseRoom = this.handleCloseRoom.bind(this);
   }
@@ -85,7 +87,7 @@ class MapComponent extends Component {
 
     let roomsContainerElement;
 
-    map.on('popupopen', (event) => {
+    map.on('popupopen', event => {
       Ps.initialize(event.popup._container);
       roomsContainerElement = document.querySelector('.Map-popup-rooms');
       roomsContainerElement.addEventListener(
@@ -94,7 +96,7 @@ class MapComponent extends Component {
       );
     });
 
-    map.on('popupclose', (event) => {
+    map.on('popupclose', event => {
       Ps.destroy(event.popup._container);
       roomsContainerElement.removeEventListener(
         'click',
@@ -216,9 +218,9 @@ class MapComponent extends Component {
 
     this.props.changeActiveRoom(room.get('id'));
 
-    return this.setState(({ data }) => ({
-      data: data.set('selectedRoomId', room.get('id')),
-    }));
+    return this.setState({
+      selectedRoomId: room.get('id'),
+    });
   }
 
   /**
@@ -242,11 +244,11 @@ class MapComponent extends Component {
   handleCloseRoom(event) {
     event.preventDefault();
 
-    this.props.changeActiveRoom(this.state.data.get('selectedRoomId'));
+    this.props.changeActiveRoom(this.state.selectedRoomId);
 
-    this.setState(({ data }) => ({
-      data: data.set('selectedRoomId', null),
-    }));
+    return this.setState({
+      selectedRoomId: null,
+    });
   }
 
   /**
@@ -254,11 +256,13 @@ class MapComponent extends Component {
    * @return {XML} ReactElement
    */
   render() {
+    const { selectedRoomId } = this.state;
+
     let roomItem = null;
 
-    if (this.state.data.get('selectedRoomId') && this.props.isActive) {
+    if (selectedRoomId && this.props.isActive) {
       const { rooms, bathhouses, order, steps } = this.props;
-      const room = rooms.find(room => room.get('id') === this.state.data.get('selectedRoomId'));
+      const room = rooms.find(room => room.get('id') === selectedRoomId);
       const bathhouse = bathhouses.find(
         bathhouse => bathhouse.get('id') === room.get('bathhouseId')
       );

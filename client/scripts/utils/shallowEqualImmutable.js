@@ -17,7 +17,6 @@ export default function shallowEqualImmutable(objA, objB) {
     return false;
   }
 
-  // Test for A's keys different from B.
   const bHasOwnProperty = Object.prototype.hasOwnProperty.bind(objB);
   for (let index = 0, len = keysA.length; index < len; index++) {
     if (!bHasOwnProperty(keysA[index]) || !Immutable.is(objA[keysA[index]], objB[keysA[index]])) {

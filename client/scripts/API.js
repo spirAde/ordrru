@@ -1,5 +1,7 @@
 
+require('es6-promise').polyfill();
 import fetch from 'isomorphic-fetch';
+import Cookies from 'js-cookie';
 import { isEmpty, assign, has } from 'lodash';
 
 const baseUrl = 'http://localhost:3000/api';
@@ -9,25 +11,59 @@ const headers = {
 	'Content-Type': 'application/json',
 };
 
+function setAuthorization(headers) {
+	const rawToken = Cookies.get('token');
+
+	if (!rawToken || !__CLIENT__) return headers;
+
+	const token = JSON.parse(rawToken);
+
+	if (isEmpty(token) || !token.id) return headers;
+
+	return assign({}, headers, { Authorization: token.id });
+}
+function checkStatus(response) {
+	if (response.status >= 200 && response.status < 300) {
+		return response;
+	} else {
+		var error = new Error(response.statusText);
+		error.response = response;
+		throw error;
+	}
+}
+
+function parseText(response) {
+	return response.text();
+}
+
 function _fetch(url, options) {
 	if (!url) {
 		throw new Error('There is no URL provided for the request.');
 	}
 
-	options = assign({}, options, { headers });
+	const headers = {
+		Accept: 'application/json',
+		'Content-Type': 'application/json; charset=utf-8',
+	};
 
-	return fetch(url, options)
-		.then(response => response.json())
+	const newOptions = assign({}, options, { headers: setAuthorization(headers) });
+
+	const fetch_ = fetch.bind(undefined);
+
+	return fetch_(url, newOptions)
+		//.then(checkStatus)
+		.then(parseText)
 		.then(response => {
-			if (has(response, 'error')) {
-				throw response.error;
+			// catch if status === 204
+			if (!response) return false;
+
+			const data = JSON.parse(response);
+
+			if (has(data, 'error')) {
+				throw data.error;
 			}
 
-			if (response.status >= 200 && response.status < 300) {
-				throw new Error('Something wrong, response has error status code, but hasn\'t error object');
-			}
-
-			return response;
+			return data;
 		}).catch(error => { throw error; });
 }
 const API = {};
@@ -167,7 +203,8 @@ Depending on the value of `include` parameter, the body may contain additional p
 
 	 */
 	login: async (credentials, include) => {
-		return _fetch(`${baseUrl}/managers/login`, {
+		const conditions = include ? `?include=${include}` : '';
+		return _fetch(`${baseUrl}/managers/login${conditions}`, {
 			method: 'post',
 			body: JSON.stringify(credentials),
 		});
@@ -180,8 +217,7 @@ Depending on the value of `include` parameter, the body may contain additional p
 	 */
 	logout: async (access_token) => {
 		return _fetch(`${baseUrl}/managers/logout`, {
-			method: 'put',
-			body: JSON.stringify(data),
+			method: 'post',
 		});
 	},
 	
@@ -719,15 +755,15 @@ export const Order = {
 	},
 };
 		
-export const Review = {
+export const Comment = {
 	
 	/**
 	 * Create a new instance of the model and persist it into the data source.
 	 * @param {object} data - Model instance data
-	 * @return {Review}
+	 * @return {Comment}
 	 */
 	create: async (data) => {
-		return _fetch(`${baseUrl}/reviews/`, {
+		return _fetch(`${baseUrl}/comments/`, {
 			method: 'post',
 			body: JSON.stringify(data),
 		});
@@ -736,10 +772,10 @@ export const Review = {
 	/**
 	 * Create a new instance of the model and persist it into the data source.
 	 * @param {object} data - Model instance data
-	 * @return {Review}
+	 * @return {Comment}
 	 */
 	createMany: async (data) => {
-		return _fetch(`${baseUrl}/reviews/`, {
+		return _fetch(`${baseUrl}/comments/`, {
 			method: 'post',
 			body: JSON.stringify(data),
 		});
@@ -748,10 +784,10 @@ export const Review = {
 	/**
 	 * Update an existing model instance or insert a new one into the data source.
 	 * @param {object} data - Model instance data
-	 * @return {Review}
+	 * @return {Comment}
 	 */
 	upsert: async (data) => {
-		return _fetch(`${baseUrl}/reviews/`, {
+		return _fetch(`${baseUrl}/comments/`, {
 			method: 'put',
 			body: JSON.stringify(data),
 		});
@@ -769,33 +805,33 @@ export const Review = {
 	 * Find a model instance by id from the data source.
 	 * @param {any} id - Model id
 	 * @param {object} filter - Filter defining fields and include
-	 * @return {Review}
+	 * @return {Comment}
 	 */
 	findById: async (id, filter) => {
 		const conditions = isEmpty(filter) ? '' : `?filter=${JSON.stringify(filter)}`;
-		return _fetch(`${baseUrl}/reviews/${id}${conditions}`);
+		return _fetch(`${baseUrl}/comments/${id}${conditions}`);
 	},
 
 	
 	/**
 	 * Find all instances of the model matched by filter from the data source.
 	 * @param {object} filter - Filter defining fields, where, include, order, offset, and limit
-	 * @return {Array.<Review>}
+	 * @return {Array.<Comment>}
 	 */
 	find: async (filter) => {
 		const conditions = isEmpty(filter) ? '' : `?filter=${JSON.stringify(filter)}`;
-		return _fetch(`${baseUrl}/reviews/${conditions}`);
+		return _fetch(`${baseUrl}/comments/${conditions}`);
 	},
 
 	
 	/**
 	 * Find first instance of the model matched by filter from the data source.
 	 * @param {object} filter - Filter defining fields, where, include, order, offset, and limit
-	 * @return {Review}
+	 * @return {Comment}
 	 */
 	findOne: async (filter) => {
 		const conditions = isEmpty(filter) ? '' : `?filter=${JSON.stringify(filter)}`;
-		return _fetch(`${baseUrl}/reviews/findOne${conditions}`);
+		return _fetch(`${baseUrl}/comments/findOne${conditions}`);
 	},
 
 	
@@ -806,7 +842,7 @@ export const Review = {
 	 * @return {Object} - The number of instances updated
 	 */
 	updateAll: async (where, data) => {
-		return _fetch(`${baseUrl}/reviews/update`, {
+		return _fetch(`${baseUrl}/comments/update`, {
 			method: 'post',
 			body: JSON.stringify(data),
 		});
@@ -818,7 +854,7 @@ export const Review = {
 	 * @return {Object}
 	 */
 	deleteById: async (id) => {
-		return _fetch(`${baseUrl}/reviews/${id}`, {
+		return _fetch(`${baseUrl}/comments/${id}`, {
 			method: 'delete',
 		});
 	},
@@ -830,7 +866,7 @@ export const Review = {
 	 */
 	count: async (where) => {
 		const conditions = isEmpty(filter) ? '' : `?filter=${JSON.stringify(filter)}`;
-		return _fetch(`${baseUrl}/reviews/count${conditions}`);
+		return _fetch(`${baseUrl}/comments/count${conditions}`);
 	},
 
 	

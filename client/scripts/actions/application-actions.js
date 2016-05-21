@@ -2,12 +2,16 @@ import moment from 'moment-timezone';
 
 import { setDisablePeriod, removeAllFirstSchedules } from './schedule-actions';
 
-import { periodToTime, MOMENT_FORMAT } from '../../../common/utils/date-helper';
+import { periodToTime, getCityDateAndPeriod,
+  MOMENT_FORMAT } from '../../../common/utils/date-helper';
 import { LAST_PERIOD } from '../../../common/utils/schedule-helper';
 
 export const SET_CURRENT_DATE = 'SET_CURRENT_DATE';
 export const SET_CURRENT_PERIOD = 'SET_CURRENT_PERIOD';
 export const SET_SOCKET_ID = 'SET_SOCKET_ID';
+
+export const SET_DEVICE = 'SET_DEVICE';
+export const CHANGE_VIEWPORT = 'CHANGE_VIEWPORT';
 
 /**
  * Set reference date for application
@@ -102,5 +106,35 @@ export function changeGlobalCurrentDateAndPeriod(cityId) {
     dispatch(setCurrentPeriod(newPeriod));
 
     return dispatch(setDisablePeriod(newDate, newPeriod));
+  };
+}
+
+
+/**
+ * set device viewport
+ * @param {Object} viewport - height, width
+ * @return {{type: string, payload: {id: string}}} - action
+ * */
+export function changeViewport(viewport) {
+  return {
+    type: CHANGE_VIEWPORT,
+    payload: {
+      viewport,
+    },
+  };
+}
+
+
+/**
+ * set device
+ * @param {String} device - device
+ * @return {{type: string, payload: {id: string}}} - action
+ * */
+export function setDevice(device) {
+  return {
+    type: SET_DEVICE,
+    payload: {
+      device,
+    },
   };
 }

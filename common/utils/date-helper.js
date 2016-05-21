@@ -1,5 +1,5 @@
 import { isInteger, toInteger } from 'lodash';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export const MOMENT_FORMAT = 'YYYY-MM-DD';
 
@@ -60,4 +60,23 @@ export function periodToTime(period) {
 	const time = fixedRate < 10 ? `0${fixedRate}` : `${fixedRate}`;
 
 	return `${time}:30`;
+}
+
+/**
+ * getCityDateAndPeriod - get current date and period for city timezone excluding browser user time and etc.
+ * @param {String} serverTime - current server time
+ * @param {String} timezone - timezone
+ * @return {Object} result
+ * @return {String} result.date
+ * @return {Number} result.period
+ * */
+export function getCityDateAndPeriod(serverTime, timezone) {
+	const cityDatetime = moment(serverTime).tz(timezone);
+
+	const currentDate = cityDatetime.format(MOMENT_FORMAT);
+	const currentHour = cityDatetime.format('HH');
+	const currentMinutes = cityDatetime.format('mm');
+	const currentPeriod = (currentHour * 2 + (currentMinutes >= 30 ? 1 : 0)) * 3;
+
+	return { date: currentDate, period: currentPeriod };
 }
