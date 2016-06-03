@@ -10,15 +10,7 @@ import LoaderComponent from '../Loader/index.jsx';
 
 import './style.css';
 
-import whyDidYouUpdateMixin from '../../utils/whyDidYouUpdateMixin';
-
 class ManagerSchedulePanelListComponent extends Component {
-  constructor(props) {
-    super(props);
-
-    //this.componentDidUpdate = whyDidYouUpdateMixin.componentDidUpdate.bind(this);
-  }
-
   /**
    * shouldComponentUpdate
    * @return {boolean}

@@ -183,9 +183,9 @@ export default (models) => {
 		};
 
 		const counts = {
-			city: 5,
-			bathhouse: 2,
-			room: 3,
+			city: 2,
+			bathhouse: 5,
+			room: 5,
 			order: 5,
 			comment: 10,
 		};

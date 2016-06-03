@@ -223,6 +223,12 @@
       "type": "belongsTo",
       "model": "Room",
       "foreignKey": "roomId"
+    },
+    "bathhouses": {
+      "type": "belongsTo",
+      "model": "Bathhouse",
+      "foreignKey": "bathhouseId",
+      "through": "Room"
     }
   },
   "acls": [],

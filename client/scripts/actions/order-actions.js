@@ -3,7 +3,6 @@ import isNull from 'lodash/isNull';
 import { Order } from '../API';
 
 import { redefineRoomSchedule } from './schedule-actions';
-import { addNotification } from './notification-actions';
 
 import { calculateDatetimeOrderSum, STEP } from '../../../common/utils/schedule-helper';
 
@@ -91,11 +90,11 @@ export function findOrdersIfNeed(roomId) {
   };
 }
 
-export function findOrdersForDate(roomId, date) {
+export function findOrdersForDatesIfNeed(roomId, dates) {
   return dispatch => {
     dispatch(findOrdersRequest());
 
-    return Order.find({ where: { roomId, date } })
+    return Order.find({ where: { roomId, dates } })
       .then(orders => dispatch(findOrdersSuccess(roomId, orders)))
       .catch(error => dispatch(findOrdersFailure(error)));
   };
@@ -308,10 +307,9 @@ function sendOrderFailure(error) {
 
 /**
  * create order
- * @param {Boolean} createdByManager - create notification for manager
  * @return {Function} - thunk action
  * */
-export function sendOrder(createdByManager = false) {
+export function sendOrder() {
   return (dispatch, getState) => {
     const state = getState();
     const order = state.order.get('order');

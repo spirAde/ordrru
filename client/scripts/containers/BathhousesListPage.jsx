@@ -168,16 +168,9 @@ BathhouseListPage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    addToSocketRoom: (cityId) => dispatch(addToSocketRoom(cityId)),
-    changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
-    findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
-    changeGlobalCurrentDateAndPeriod:
-      (cityId) => dispatch(changeGlobalCurrentDateAndPeriod(cityId)),
-  };
-}
-
-export default provideHooks(hooks)(connect(
-  BathhousesListSelectors, mapDispatchToProps
-)(BathhouseListPage));
+export default provideHooks(hooks)(connect(BathhousesListSelectors, {
+  addToSocketRoom,
+  changeActiveRoom,
+  findRoomScheduleIfNeed,
+  changeGlobalCurrentDateAndPeriod,
+})(BathhouseListPage));

@@ -8,6 +8,10 @@ import { FIND_ROOM_SCHEDULE_REQUEST, FIND_ROOM_SCHEDULE_SUCCESS,
 
 export const initialState = fromJS({
   schedules: {},
+  interval: {
+    start: null, // start date of schedules
+    end: null, // end date of schedules, i.e. the schedules is in the range between [start, end] dates
+  },
   isFetching: false,
 });
 

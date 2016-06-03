@@ -9,13 +9,15 @@ var plugins = [
   'transform-react-display-name'
 ];
 
+var presets = [
+  'es2015',
+  'stage-0',
+  'react'
+];
+
 require('babel-core/register')({
-  plugins: environment === 'development' ? plugins : plugins.concat([
-    'transform-react-remove-prop-types',
-    'transform-react-constant-elements',
-    'transform-react-inline-elements'
-  ]),
-  presets: ['es2015', 'stage-0', 'react']
+  plugins: plugins,
+  presets: environment === 'development' ? presets : presets.concat(['react-optimize'])
 });
 /*require('css-modules-require-hook')({
   devMode: environment === 'development'

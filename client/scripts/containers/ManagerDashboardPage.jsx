@@ -15,10 +15,10 @@ import KeyHandler, { KEYUP } from 'react-key-handler';
 import { fromJS } from 'immutable';
 
 import { findBathhouseAndRooms } from '../actions/bathhouse-actions';
-import { findRoomScheduleIfNeed, findRoomScheduleForDateIfNeed,
+import { findRoomScheduleIfNeed, findRoomScheduleForDatesIfNeed,
   resetOrderSchedule } from '../actions/schedule-actions';
-import { findOrdersIfNeed, findOrdersForDate, selectOrder, resetFullOrder, resetDatetimeOrder,
-  checkOrder, sendOrder } from '../actions/order-actions';
+import { findOrdersIfNeed, findOrdersForDatesIfNeed, selectOrder, resetFullOrder,
+  resetDatetimeOrder, checkOrder, sendOrder } from '../actions/order-actions';
 import { logout, addToSocketRoom } from '../actions/manager-actions';
 
 import shallowEqualImmutable from '../utils/shallowEqualImmutable';
@@ -295,6 +295,17 @@ class ManagerDashboardPage extends Component {
 
 /**
  * propTypes
+ * @property {Object} manager - data about manager
+ * @property {Object} bathhouse - bathhouse data
+ * @property {Array.<Object>} rooms - bathhouse rooms data
+ * @property {Object} order - current created manager order
+ * @property {Object.<Object>} orders - orders for each room
+ * @property {Object.<Object>} schedules - schedules for each room
+ * @property {Object} interval - start and end of schedules date
+ * @property {Object} viewport - viewport of device
+ * @property {String} date - current application date(taken from server)
+ * @property {Boolean} ordersIsFetching - if find orders is fetching
+ * @property {Boolean} schedulesIsFetching - if find schedules is fetching
  */
 ManagerDashboardPage.propTypes = {
   manager: ImmutablePropTypes.map.isRequired,
@@ -303,15 +314,15 @@ ManagerDashboardPage.propTypes = {
   order: ImmutablePropTypes.map.isRequired,
   orders: ImmutablePropTypes.map.isRequired,
   schedules: ImmutablePropTypes.map.isRequired,
+  interval: ImmutablePropTypes.map.isRequired,
   viewport: ImmutablePropTypes.map.isRequired,
   date: PropTypes.string.isRequired,
-
   ordersIsFetching: PropTypes.bool.isRequired,
   schedulesIsFetching: PropTypes.bool.isRequired,
 
   logout: PropTypes.func.isRequired,
-  findRoomScheduleForDateIfNeed: PropTypes.func.isRequired,
-  findOrdersForDate: PropTypes.func.isRequired,
+  findRoomScheduleForDatesIfNeed: PropTypes.func.isRequired,
+  findOrdersForDatesIfNeed: PropTypes.func.isRequired,
   resetFullOrder: PropTypes.func.isRequired,
   resetDatetimeOrder: PropTypes.func.isRequired,
   selectOrder: PropTypes.func.isRequired,
@@ -326,23 +337,15 @@ ManagerDashboardPage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    resetFullOrder: () => dispatch(resetFullOrder()),
-    resetDatetimeOrder: () => dispatch(resetDatetimeOrder()),
-    selectOrder:
-      (id, date, period, createdByUser) => dispatch(selectOrder(id, date, period, createdByUser)),
-    checkOrder: (order) => dispatch(checkOrder(order)),
-    sendOrder: (createdByManager) => dispatch(sendOrder(createdByManager)),
-    resetOrderSchedule: () => dispatch(resetOrderSchedule()),
-    logout: () => dispatch(logout()),
-    findRoomScheduleForDateIfNeed: (roomId, date) =>
-      dispatch(findRoomScheduleForDateIfNeed(roomId, date)),
-    findOrdersForDate: (roomId, date) => dispatch(findOrdersForDate(roomId, date)),
-    addToSocketRoom: (bathhouseId) => dispatch(addToSocketRoom(bathhouseId)),
-  };
-}
-
-export default provideHooks(hooks)(connect(
-  ManagerDashboardSelectors, mapDispatchToProps
-)(ManagerDashboardPage));
+export default provideHooks(hooks)(connect(ManagerDashboardSelectors, {
+  resetFullOrder,
+  resetDatetimeOrder,
+  selectOrder,
+  checkOrder,
+  sendOrder,
+  resetOrderSchedule,
+  logout,
+  findRoomScheduleForDatesIfNeed,
+  findOrdersForDatesIfNeed,
+  addToSocketRoom,
+})(ManagerDashboardPage));

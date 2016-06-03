@@ -69,10 +69,6 @@ ManagerPage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    removeNotification: (uuid) => dispatch(removeNotification(uuid)),
-  };
-}
-
-export default connect(ManagerSelectors, mapDispatchToProps)(ManagerPage);
+export default connect(ManagerSelectors, {
+  removeNotification,
+})(ManagerPage);

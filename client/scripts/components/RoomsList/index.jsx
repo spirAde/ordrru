@@ -241,4 +241,14 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(RoomsListSelectors, mapDispatchToProps)(RoomsListComponent);
+export default connect(RoomsListSelectors, {
+  resetFullOrder,
+  resetDatetimeOrder,
+  changeActiveRoom,
+  findRoomScheduleIfNeed,
+  findCommentsIfNeed,
+  selectOrder,
+  checkOrder,
+  sendOrder,
+  resetOrderSchedule,
+})(RoomsListComponent);

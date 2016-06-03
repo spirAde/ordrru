@@ -53,10 +53,6 @@ ManagerLoginPage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    login: (credentials) => dispatch(login(credentials)),
-  };
-}
-
-export default connect(ManagerLoginSelectors, mapDispatchToProps)(ManagerLoginPage);
+export default connect(ManagerLoginSelectors, {
+  login,
+})(ManagerLoginPage);

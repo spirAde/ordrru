@@ -438,19 +438,15 @@ FiltersListComponent.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    updateRoomsByDateTime: (values) => dispatch(updateRoomsByDateTime(values)),
-    updateRoomsByDistance: (value) => dispatch(updateRoomsByDistance(value)),
-    updateRoomsByGuest: (value) => dispatch(updateRoomsByGuest(value)),
-    updateRoomsByTypes: (value) => dispatch(updateRoomsByTypes(value)),
-    updateRoomsBySearchName: (value) => dispatch(updateRoomsBySearchName(value)),
-    updateRoomsByOptions: (value) => dispatch(updateRoomsByOptions(value)),
-    updateRoomsByPrepayment: (value) => dispatch(updateRoomsByPrepayment(value)),
-    updateRoomsByPrice: (values) => dispatch(updateRoomsByPrice(values)),
-    updateRoomsBySorting: (value) => dispatch(updateRoomsBySorting(value)),
-    resetRoomsByTag: (tag) => dispatch(resetRoomsByTag(tag)),
-  };
-}
-
-export default connect(filtersListSelectors, mapDispatchToProps)(FiltersListComponent);
+export default connect(filtersListSelectors, {
+  updateRoomsByDateTime,
+  updateRoomsByDistance,
+  updateRoomsByGuest,
+  updateRoomsByTypes,
+  updateRoomsBySearchName,
+  updateRoomsByOptions,
+  updateRoomsByPrepayment,
+  updateRoomsByPrice,
+  updateRoomsBySorting,
+  resetRoomsByTag,
+})(FiltersListComponent);

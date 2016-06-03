@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').config({path: 'envs/.env.development'});
+require('dotenv').config({path: 'envs/.env.production'});
 
 var fs = require('fs');
 var path = require('path');
@@ -20,7 +20,7 @@ var postcss = [
 ];
 
 module.exports = {
-  devtool: 'inline-source-map',
+  devtool: 'cheap-module-source-map',
   context: path.resolve(__dirname, '..'),
   entry: [
     './client/scripts/index.js'
@@ -59,11 +59,7 @@ module.exports = {
         include: [path.join(__dirname, '..', 'client'), path.join(__dirname, '..', 'common')],
         exclude: path.join(__dirname, '..', 'client', 'models'),
       },
-      {
-        test: /\.json/,
-        loader: 'json',
-        exclude: /node_modules/,
-      },
+      { test: /\.json/, loader: 'json' },
       { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },
       { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },
       { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" },
@@ -81,18 +77,30 @@ module.exports = {
     new webpack.IgnorePlugin(/webpack-stats\.json$/),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
+      'process.env':{
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+      },
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: process.env.DEVELOPMENT,
       __DEVTOOLS__: process.env.DEVTOOLS,
-      __SSR__: process.env.SSR
+      __SSR__: process.env.SSR,
+      __PROTOCOL__: JSON.stringify(process.env.PROTOCOL),
+      __HOST__: JSON.stringify(process.env.HOST),
+      __PORT__: process.env.PORT,
+      __API_PROTOCOL__: JSON.stringify(process.env.API_PROTOCOL),
+      __API_HOST__: JSON.stringify(process.env.API_HOST),
+      __API_PORT__: process.env.API_PORT,
+      __SOCKET_PROTOCOL__: JSON.stringify(process.env.SOCKET_PROTOCOL),
+      __SOCKET_HOST__: JSON.stringify(process.env.SOCKET_HOST),
+      __SOCKET_PORT__: process.env.SOCKET_PORT,
     }),
 
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        warnings: false
+        warnings: true,
       }
     }),
 

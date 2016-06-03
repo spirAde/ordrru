@@ -97,11 +97,7 @@ HomePage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    changeCity: (city) => dispatch(changeCity(city)),
-    changeOrganizationType: (type) => dispatch(changeOrganizationType(type)),
-  };
-}
-
-export default connect(HomeSelectors, mapDispatchToProps)(HomePage);
+export default connect(HomeSelectors, {
+  changeCity,
+  changeOrganizationType,
+})(HomePage);

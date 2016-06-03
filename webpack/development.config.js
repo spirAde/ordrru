@@ -82,6 +82,9 @@ module.exports = {
     new webpack.IgnorePlugin(/webpack-assets\.json$/),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
+      'process.env':{
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+      },
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: process.env.DEVELOPMENT,

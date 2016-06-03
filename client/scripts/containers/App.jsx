@@ -69,13 +69,8 @@ App.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    initGlobalCurrentDateAndPeriod: (datetime) =>
-      dispatch(initGlobalCurrentDateAndPeriod(datetime)),
-    changeViewport: (viewport) => dispatch(changeViewport(viewport)),
-    setDevice: (device) => dispatch(setDevice(device)),
-  };
-}
-
-export default connect(state => state, mapDispatchToProps)(App);
+export default connect(state => state, {
+  initGlobalCurrentDateAndPeriod,
+  changeViewport,
+  setDevice,
+})(App);
