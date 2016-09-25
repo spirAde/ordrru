@@ -2,8 +2,7 @@ import moment from 'moment-timezone';
 
 import { setDisablePeriod, removeAllFirstSchedules } from './schedule-actions';
 
-import { periodToTime, getCityDateAndPeriod,
-  MOMENT_FORMAT } from '../../../common/utils/date-helper';
+import { periodToTime, MOMENT_FORMAT } from '../../../common/utils/date-helper';
 import { LAST_PERIOD } from '../../../common/utils/schedule-helper';
 
 export const SET_CURRENT_DATE = 'SET_CURRENT_DATE';
@@ -58,7 +57,7 @@ export function initGlobalCurrentDateAndPeriod(datetime) {
     const currentDate = currentMoment.format(MOMENT_FORMAT);
     const currentHour = currentMoment.format('HH');
     const currentMinutes = currentMoment.format('mm');
-    const currentPeriod = (currentHour * 2 + (currentMinutes >= 30 ? 1 : 0)) * 3;
+    const currentPeriod = ((currentHour * 2) + (currentMinutes >= 30 ? 1 : 0)) * 3;
 
     dispatch(setCurrentDate(currentDate));
     return dispatch(setCurrentPeriod(currentPeriod));
@@ -90,7 +89,7 @@ export function changeGlobalCurrentDateAndPeriod(cityId) {
       const newDate = currentMomentDatetimeOffset.format(MOMENT_FORMAT);
       const newHour = currentMomentDatetimeOffset.format('HH');
       const newMinutes = currentMomentDatetimeOffset.format('mm');
-      const newPeriod = (newHour * 2 + (newMinutes >= 30 ? 1 : 0)) * 3;
+      const newPeriod = ((newHour * 2) + (newMinutes >= 30 ? 1 : 0)) * 3;
 
       dispatch(setCurrentDate(newDate));
       return dispatch(setCurrentPeriod(newPeriod));

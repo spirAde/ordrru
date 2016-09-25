@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
-import { filtersListSelectors } from '../../selectors/FiltersListSelectors';
+import FiltersListSelectors from '../../selectors/FiltersListSelectors';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -288,30 +288,24 @@ class FiltersListComponent extends Component {
 
     const tagsItems = this.renderTags(tags);
 
-    const fullFiltersClasses = classNames({
-      FiltersList: true,
+    const fullFiltersClasses = classNames('FiltersList', {
       'FiltersList--opened': data.get('topIsOpen') && data.get('bottomIsOpen'),
     });
 
-    const topFiltersClasses = classNames({
-      'FiltersList-top': true,
+    const topFiltersClasses = classNames('FiltersList-top', {
       'FiltersList-top--opened': data.get('topIsOpen'),
     });
 
-    const bottomFiltersClasses = classNames({
-      'FiltersList-bottom': true,
+    const bottomFiltersClasses = classNames('FiltersList-bottom', {
       'FiltersList-bottom--opened': data.get('bottomIsOpen'),
     });
 
-    const optionsClasses = classNames({
-      'FiltersList-options': true,
+    const optionsClasses = classNames('FiltersList-options', 'g-clear', {
       'FiltersList-options--opened': !data.get('bottomIsOpen'),
       'FiltersList-options--sticked': data.get('isSticked'),
-      'g-clear': true,
     });
 
-    const showContentClasses = classNames({
-      'FiltersList-show-content': true,
+    const showContentClasses = classNames('FiltersList-show-content', {
       'FiltersList-show-content--opened': data.get('topIsOpen') && data.get('bottomIsOpen'),
     });
 
@@ -438,7 +432,7 @@ FiltersListComponent.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-export default connect(filtersListSelectors, {
+export default connect(FiltersListSelectors, {
   updateRoomsByDateTime,
   updateRoomsByDistance,
   updateRoomsByGuest,

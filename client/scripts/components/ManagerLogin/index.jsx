@@ -239,13 +239,11 @@ class ManagerLoginComponent extends Component {
   render() {
     const { data } = this.state;
 
-    const usernameFieldClasses = classNames({
-      'ManagerLogin-label': true,
+    const usernameFieldClasses = classNames('ManagerLogin-label', {
       'ManagerLogin-label--active': data.get('usernameIsActive') || data.get('username'),
     });
 
-    const passwordFieldClasses = classNames({
-      'ManagerLogin-label': true,
+    const passwordFieldClasses = classNames('ManagerLogin-label', {
       'ManagerLogin-label--active': data.get('passwordIsActive') || data.get('password'),
     });
 
@@ -267,8 +265,7 @@ class ManagerLoginComponent extends Component {
 
     const formIsValid = this.checkFormIsValid();
 
-    const buttonClasses = classNames({
-      'ManagerLogin-submit': true,
+    const buttonClasses = classNames('ManagerLogin-submit', {
       'ManagerLogin-submit--disabled': !formIsValid,
     });
 

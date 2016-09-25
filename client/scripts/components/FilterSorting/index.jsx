@@ -74,8 +74,7 @@ class FilterSortingComponent extends Component {
    * */
   renderSortingType(types) {
     return types.map((type, index) => {
-      const classes = classNames({
-        'FilterSorting-button': true,
+      const classes = classNames('FilterSorting-button', {
         'FilterSorting-button--active': type.get('checked'),
       });
 

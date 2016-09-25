@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import ManagerLoginComponent from '../components/ManagerLogin/index.jsx';
 
-import { ManagerLoginSelectors } from '../selectors/ManagerLoginSelectors';
+import ManagerLoginSelectors from '../selectors/ManagerLoginSelectors';
 
 import { login } from '../actions/manager-actions';
 

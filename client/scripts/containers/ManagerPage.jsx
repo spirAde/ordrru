@@ -6,7 +6,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import NotificationsStackComponent from '../components/NotificationsStack/index.jsx';
 import { removeNotification } from '../actions/notification-actions';
 
-import { ManagerSelectors } from '../selectors/ManagerSelectors';
+import ManagerSelectors from '../selectors/ManagerSelectors';
 
 /**
  * ManagerPage - main manager page

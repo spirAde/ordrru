@@ -31,7 +31,7 @@ import OrderModalComponent from '../components/OrderModal/index.jsx';
 import { MOMENT_FORMAT } from '../../../common/utils/date-helper';
 import { FIRST_PERIOD, LAST_PERIOD, STEP } from '../../../common/utils/schedule-helper';
 
-import { ManagerDashboardSelectors } from '../selectors/ManagerDashboardSelectors';
+import ManagerDashboardSelectors from '../selectors/ManagerDashboardSelectors';
 
 const ESC_KEY = 27;
 

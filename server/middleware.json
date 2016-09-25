@@ -1,6 +1,6 @@
 {
   "initial:before": {
-    "loopback#context": {
+    "loopback-context#per-request": {
       "params": {
         "enableHttpContext": true
       }

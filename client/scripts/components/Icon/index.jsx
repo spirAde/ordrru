@@ -27,9 +27,7 @@ class IconComponent extends Component {
   render() {
     const { rate, name, color, className, ...otherProps } = this.props;
 
-    const classes = classNames(className, {
-      Icon: true,
-    });
+    const classes = classNames(className, 'Icon');
 
     return (
       <svg

@@ -214,8 +214,7 @@ class SchedulePanelComponent extends Component {
     const rows = schedule && schedule.size ?
       this.renderScheduleRows(schedule, prices, orderIsStarted) : null;
 
-    const classes = classNames({
-      SchedulePanel: true,
+    const classes = classNames('SchedulePanel', {
       'SchedulePanel--active': isOpen,
     });
 

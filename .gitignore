@@ -100,10 +100,7 @@ fabric.properties
 
 ### Project ###
 webpack-assets.json
-webpack-stats.json
 envs
 build
 rethinkdb_data
-trash
-tasks.txt
-common/data/configs.json
+*.map

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
-import { HeaderSelectors } from '../../selectors/HeaderSelectors';
+import HeaderSelectors from '../../selectors/HeaderSelectors';
 
 import './style.css';
 
@@ -63,17 +63,11 @@ class HeaderComponent extends Component {
     const { mode } = this.props;
     const isListMode = mode === 'list';
 
-    const listButtonClasses = classNames({
-      'Header-anchor': true,
-      'Header-anchor-mode-list': true,
-      'Header-anchor--first': true,
+    const listButtonClasses = classNames('Header-anchor Header-anchor-mode-list Header-anchor--first', {
       'Header-anchor--active': isListMode,
     });
 
-    const mapButtonClasses = classNames({
-      'Header-anchor': true,
-      'Header-anchor-mode-map': true,
-      'Header-anchor--last': true,
+    const mapButtonClasses = classNames('Header-anchor Header-anchor-mode-map Header-anchor--last', {
       'Header-anchor--active': !isListMode,
     });
 

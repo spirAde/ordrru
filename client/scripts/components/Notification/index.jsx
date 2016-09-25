@@ -55,11 +55,7 @@ class NotificationComponent extends Component {
   render() {
     const { notification, offset } = this.props;
 
-    const notieClasses = classNames({
-      Notie: true,
-      'Notie--active': true,
-      [`Notie-type-${notification.get('level')}`]: true,
-    });
+    const notieClasses = classNames(`Notie Notie--active Notie-type-${notification.get('level')}`);
 
     return (
       <div className={notieClasses} style={{ marginTop: offset }}>

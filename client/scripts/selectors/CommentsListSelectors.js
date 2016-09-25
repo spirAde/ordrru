@@ -4,7 +4,7 @@ const activeRoomIdSelector = state => state.bathhouse.get('activeRoomId');
 const commentsSelector = state => state.comment.get('comments');
 const commentsIsFetchingSelector = state => state.comment.get('isFetching');
 
-export const CommentsListSelectors = createSelector(
+const CommentsListSelectors = createSelector(
   activeRoomIdSelector,
   commentsSelector,
   commentsIsFetchingSelector,
@@ -13,3 +13,5 @@ export const CommentsListSelectors = createSelector(
     comments: comments.get(activeRoomId),
   })
 );
+
+export { CommentsListSelectors as default };

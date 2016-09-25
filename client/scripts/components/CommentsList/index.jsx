@@ -3,7 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 
-import { CommentsListSelectors } from '../../selectors/CommentsListSelectors';
+import CommentsListSelectors from '../../selectors/CommentsListSelectors';
 
 import CommentComponent from '../Comment/index.jsx';
 
@@ -31,6 +31,7 @@ class CommentsListComponent extends Component {
       />
     ));
   }
+
   render() {
     const { isActive, commentsIsFetching } = this.props;
 
@@ -54,7 +55,7 @@ class CommentsListComponent extends Component {
 }
 
 CommentsListComponent.propTypes = {
-  comments: ImmutablePropTypes.list.isRequired,
+  comments: ImmutablePropTypes.list,
   isActive: PropTypes.bool.isRequired,
   commentsIsFetching: PropTypes.bool.isRequired,
 };

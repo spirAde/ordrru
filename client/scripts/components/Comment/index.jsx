@@ -1,6 +1,5 @@
 import fill from 'lodash/fill';
 import floor from 'lodash/floor';
-import round from 'lodash/round';
 
 import React, { Component } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -23,7 +22,7 @@ class CommentComponent extends Component {
 
   renderStars(rating) {
     const fullStarsCount = floor(rating / 2);
-    const halfStarsCount = floor(rating - fullStarsCount * 2);
+    const halfStarsCount = floor(rating - (fullStarsCount * 2));
     const emptyStarsCount = floor(5 - fullStarsCount - halfStarsCount);
 
     const fullStars = fill(Array(fullStarsCount), 'icon-star-full');
@@ -34,6 +33,7 @@ class CommentComponent extends Component {
       <IconComponent name={icon} color="#F4740C" key={index} />
     ));
   }
+
   render() {
     const { comment } = this.props;
     const stars = this.renderStars(comment.get('evaluation'));

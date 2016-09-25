@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import Helmet from 'react-helmet';
-
 import { connect } from 'react-redux';
 
-import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice,
-} from '../actions/application-actions';
+import debounce from 'lodash/debounce';
+
+import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice } from '../actions/application-actions';
 
 /**
  * App - smart component, container, root
@@ -12,15 +12,12 @@ import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice,
  * Dumb components - none
  * */
 class App extends Component {
-
   componentDidMount() {
     this.initServiceWorker();
     this.initGlobalCurrentDateAndPeriod();
 
     this.props.changeViewport(this.getViewPort());
-    window.addEventListener('resize', () => {
-      this.props.changeViewport(this.getViewPort());
-    });
+    window.addEventListener('resize', debounce(this.props.changeViewport.bind(this, this.getViewPort()), 250));
   }
 
   getViewPort() {
@@ -58,7 +55,10 @@ class App extends Component {
 }
 
 App.propTypes = {
-  children: PropTypes.object.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object,
+  ]).isRequired,
   initGlobalCurrentDateAndPeriod: PropTypes.func.isRequired,
   changeViewport: PropTypes.func.isRequired,
   setDevice: PropTypes.func.isRequired,

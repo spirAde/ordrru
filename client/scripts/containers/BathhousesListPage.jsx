@@ -9,7 +9,7 @@ import { Map } from 'immutable';
 import moment from 'moment-timezone';
 import later from 'later';
 
-import { BathhousesListSelectors } from '../selectors/BathhousesListSelectors';
+import BathhousesListSelectors from '../selectors/BathhousesListSelectors';
 
 import shallowEqualImmutable from '../utils/shallowEqualImmutable';
 
@@ -155,10 +155,9 @@ class BathhouseListPage extends Component {
  * @property {string} mode - current mode of page(list or map)
  */
 BathhouseListPage.propTypes = {
-  store: PropTypes.object,
   mode: PropTypes.oneOf(['list', 'map']),
-  activeCityId: PropTypes.string.isRequired,
-  activeRoomId: PropTypes.string.isRequired,
+  activeRoomId: PropTypes.string,
+  activeCityId: PropTypes.string,
   addToSocketRoom: PropTypes.func.isRequired,
   changeGlobalCurrentDateAndPeriod: PropTypes.func.isRequired,
 };

@@ -12,7 +12,7 @@ const intervalSelector = state => state.schedule.get('interval');
 const ordersIsFetchingSelector = state => state.schedule.get('isFetching');
 const schedulesIsFetchingSelector = state => state.schedule.get('isFetching');
 
-export const ManagerDashboardSelectors = createSelector(
+const ManagerDashboardSelectors = createSelector(
   viewportSelector,
   dateSelector,
   managerSelector,
@@ -41,3 +41,5 @@ export const ManagerDashboardSelectors = createSelector(
     schedulesIsFetching,
   })
 );
+
+export { ManagerDashboardSelectors as default };

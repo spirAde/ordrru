@@ -7,7 +7,7 @@ import { Router, browserHistory, match } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { IntlProvider } from 'react-intl';
 
-import createLocation from 'history/lib/createLocation';
+import { createLocation } from 'history';
 
 import moment from 'moment';
 import messages from '../../common/data/messages/index';

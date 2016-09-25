@@ -45,7 +45,6 @@ class FilterOptionsComponent extends Component {
   handleChangeOption(option, event) {
     event.preventDefault();
 
-    console.log(option.toJS());
     this.props.onSelect(option.set('checked', !option.get('checked')));
   }
 
@@ -56,11 +55,12 @@ class FilterOptionsComponent extends Component {
    * */
   renderOptions(options) {
     return options.map((option, index) => {
-      const optionClasses = classNames({
-        'FilterOptions-field-option-name': true,
+      const optionClasses = classNames('FilterOptions-field-option-name', {
         'FilterOptions-field-option-name-checked': option.get('checked'),
       });
+
       const name = option.get('name');
+
       return (
         <div
           className="FilterOptions-field FilterOptions-field-checkbox"
@@ -97,6 +97,7 @@ class FilterOptionsComponent extends Component {
   render() {
     const { values } = this.props;
     const options = this.renderOptions(values);
+
     return (
       <div className="FilterOptions-wrapper g-clear">
         <h3 className="FilterOptions-heading">

@@ -119,13 +119,13 @@ class ScheduleRowComponent extends Component {
       const cellIsBusy = !cell.get('enable') || cell.getIn(['status', 'isForceDisable']);
       const cellIsOrdered = orderedCells.includes(cell.get('period'));
 
-      const classes = classNames({
-        'ScheduleRow-cell': true,
+      const classes = classNames('ScheduleRow-cell', {
         'ScheduleRow-cell--odd': index % 2 === 1,
         'ScheduleRow-cell--free': cellIsFree,
         'ScheduleRow-cell--busy': cellIsBusy,
         'ScheduleRow-cell--ordered': cellIsOrdered,
       });
+
       const cellTime = configs.periods[cell.get('period')];
 
       return (
@@ -151,8 +151,7 @@ class ScheduleRowComponent extends Component {
     const { shownInterval } = this.state;
     const renderedCells = this.renderCells(date, cells, orderedCells);
 
-    const classes = classNames({
-      ScheduleRow: true,
+    const classes = classNames('ScheduleRow', {
       'ScheduleRow--last': isLast,
     });
 

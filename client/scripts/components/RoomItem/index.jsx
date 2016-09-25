@@ -239,11 +239,7 @@ class RoomItemComponent extends Component {
   renderOptions(options) {
     return options.map((option, index) => {
       const optionClass = `RoomItem-service-type-${option}`;
-      const classes = classNames({
-        'RoomItem-service-type': true,
-        'g-icons': true,
-        [optionClass]: true,
-      });
+      const classes = classNames('RoomItem-service-type', 'g-icons', optionClass);
 
       return (
         <div className={classes} key={index}>
@@ -277,8 +273,7 @@ class RoomItemComponent extends Component {
     const options = this.renderOptions(room.get('options').concat(bathhouse.get('options')));
     const stars = this.renderStars(room.get('rating'));
 
-    const infoClasses = classNames({
-      'RoomItem-info': true,
+    const infoClasses = classNames('RoomItem-info', {
       'RoomItem-info--opened': isOpen,
     });
 

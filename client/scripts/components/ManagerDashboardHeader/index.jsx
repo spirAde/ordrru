@@ -25,7 +25,7 @@ class ManagerDashboardHeaderComponent extends Component {
 
     this.handleClickLogout = this.handleClickLogout.bind(this);
   }
-  
+
   /**
    * shouldComponentUpdate
    * @return {boolean}

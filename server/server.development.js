@@ -247,17 +247,19 @@ app.use((req, res, next) => {
             </IntlProvider>
           );
 
+          const assets = isomorphicTools.assets();
+
           global.navigator = { userAgent: req.headers['user-agent'] };
 
           res.status(200);
           res.send('<!doctype html>\n' +
             ReactDOMServer.renderToString(
               <Root
-                assets={ isomorphicTools.assets() }
+                assets={assets}
                 component={component}
                 store={store}
                 locale={locale}
-                referenceDatetime = {referenceDatetime}
+                referenceDatetime={referenceDatetime}
               />
             )
           );

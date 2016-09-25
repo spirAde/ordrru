@@ -70,13 +70,11 @@ class FilterPrepaymentComponent extends Component {
       const id = isNull(type.get('isRequired')) ? 'prepayment.whatever' :
         type.get('isRequired') ? 'prepayment.yes' : 'prepayment.no';
 
-      const labelClasses = classNames({
-        'FilterPrepayment-button-label': true,
+      const labelClasses = classNames('FilterPrepayment-button-label', {
         'FilterPrepayment-button-label--checked': type.get('checked'),
       });
 
-      const checkClasses = classNames({
-        'FilterPrepayment-button-check': true,
+      const checkClasses = classNames('FilterPrepayment-button-check', {
         'FilterPrepayment-button-check--checked': type.get('checked'),
       });
 
