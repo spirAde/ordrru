@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/server';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
-import { MapSelector } from '../../selectors/MapSelector';
+import MapSelector from '../../selectors/MapSelector';
 
 import RoomItemComponent from '../RoomItem/index.jsx';
 
@@ -177,20 +177,18 @@ class MapComponent extends Component {
    * @return {XML} content - popup content
    * */
   getPopupContent(properties) {
-    const roomItems = properties.rooms.map((room, index) =>
-      (
-        <div className="Map-popup-room" key={index}>
-          <h3 className="Map-popup-room-name">{room.get('name')}</h3>
-          <p className="Map-popup-room-info">
-            <span>Цена от р/час</span><br />
-            <span>до человек</span>
-          </p>
-          <a className="Map-popup-room-button">
-            Подробнее
-          </a>
-        </div>
-      )
-    );
+    const roomItems = properties.rooms.map((room, index) => (
+      <div className="Map-popup-room" key={index}>
+        <h3 className="Map-popup-room-name">{room.get('name')}</h3>
+        <p className="Map-popup-room-info">
+          <span>Цена от р/час</span><br />
+          <span>до человек</span>
+        </p>
+        <a className="Map-popup-room-button">
+          Подробнее
+        </a>
+      </div>
+    ));
 
     return (
       <div>
@@ -292,7 +290,7 @@ class MapComponent extends Component {
             width: '100%',
             height: '100%',
           }}
-        ></div>
+        />
         <div style={{ position: 'relative', maxWidth: '1024px', zIndex: 12 }}>
           {roomItem}
         </div>

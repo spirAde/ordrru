@@ -124,7 +124,7 @@
     "schedules": {
       "type": "hasMany",
       "model": "Schedule",
-      "foreignKey": "bathhouseId",
+      "foreignKey": "roomId",
       "through": "Room"
     }
   },

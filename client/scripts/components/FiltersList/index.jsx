@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
-import { filtersListSelectors } from '../../selectors/FiltersListSelectors';
+import FiltersListSelectors from '../../selectors/FiltersListSelectors';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -288,30 +288,24 @@ class FiltersListComponent extends Component {
 
     const tagsItems = this.renderTags(tags);
 
-    const fullFiltersClasses = classNames({
-      FiltersList: true,
+    const fullFiltersClasses = classNames('FiltersList', {
       'FiltersList--opened': data.get('topIsOpen') && data.get('bottomIsOpen'),
     });
 
-    const topFiltersClasses = classNames({
-      'FiltersList-top': true,
+    const topFiltersClasses = classNames('FiltersList-top', {
       'FiltersList-top--opened': data.get('topIsOpen'),
     });
 
-    const bottomFiltersClasses = classNames({
-      'FiltersList-bottom': true,
+    const bottomFiltersClasses = classNames('FiltersList-bottom', {
       'FiltersList-bottom--opened': data.get('bottomIsOpen'),
     });
 
-    const optionsClasses = classNames({
-      'FiltersList-options': true,
+    const optionsClasses = classNames('FiltersList-options', 'g-clear', {
       'FiltersList-options--opened': !data.get('bottomIsOpen'),
       'FiltersList-options--sticked': data.get('isSticked'),
-      'g-clear': true,
     });
 
-    const showContentClasses = classNames({
-      'FiltersList-show-content': true,
+    const showContentClasses = classNames('FiltersList-show-content', {
       'FiltersList-show-content--opened': data.get('topIsOpen') && data.get('bottomIsOpen'),
     });
 
@@ -438,19 +432,15 @@ FiltersListComponent.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    updateRoomsByDateTime: (values) => dispatch(updateRoomsByDateTime(values)),
-    updateRoomsByDistance: (value) => dispatch(updateRoomsByDistance(value)),
-    updateRoomsByGuest: (value) => dispatch(updateRoomsByGuest(value)),
-    updateRoomsByTypes: (value) => dispatch(updateRoomsByTypes(value)),
-    updateRoomsBySearchName: (value) => dispatch(updateRoomsBySearchName(value)),
-    updateRoomsByOptions: (value) => dispatch(updateRoomsByOptions(value)),
-    updateRoomsByPrepayment: (value) => dispatch(updateRoomsByPrepayment(value)),
-    updateRoomsByPrice: (values) => dispatch(updateRoomsByPrice(values)),
-    updateRoomsBySorting: (value) => dispatch(updateRoomsBySorting(value)),
-    resetRoomsByTag: (tag) => dispatch(resetRoomsByTag(tag)),
-  };
-}
-
-export default connect(filtersListSelectors, mapDispatchToProps)(FiltersListComponent);
+export default connect(FiltersListSelectors, {
+  updateRoomsByDateTime,
+  updateRoomsByDistance,
+  updateRoomsByGuest,
+  updateRoomsByTypes,
+  updateRoomsBySearchName,
+  updateRoomsByOptions,
+  updateRoomsByPrepayment,
+  updateRoomsByPrice,
+  updateRoomsBySorting,
+  resetRoomsByTag,
+})(FiltersListComponent);

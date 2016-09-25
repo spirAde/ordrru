@@ -10,7 +10,7 @@ const orderSelector = state => state.user.get('order');
 const stepsSelector = state => state.user.get('steps');
 const schedulesSelector = state => state.schedule.get('schedules');
 
-export const MapSelector = createSelector(
+const MapSelector = createSelector(
   citiesSelector,
   activeCityIdSelector,
   bathhousesSelector,
@@ -20,15 +20,15 @@ export const MapSelector = createSelector(
   orderSelector,
   stepsSelector,
   schedulesSelector,
-  (cities, activeCityId, bathhouses, rooms, validRooms, activeRoomId, order, steps, schedules) => {
-    return {
-      bathhouses,
-      activeRoomId,
-      order,
-      steps,
-      schedules,
-      city: cities.find(city => city.get('id') === activeCityId),
-      rooms: rooms.filter(room => validRooms.includes(room.get('id'))),
-    };
-  }
+  (cities, activeCityId, bathhouses, rooms, validRooms, activeRoomId, order, steps, schedules) => ({
+    bathhouses,
+    activeRoomId,
+    order,
+    steps,
+    schedules,
+    city: cities.find(city => city.get('id') === activeCityId),
+    rooms: rooms.filter(room => validRooms.includes(room.get('id'))),
+  })
 );
+
+export { MapSelector as default };

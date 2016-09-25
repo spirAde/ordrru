@@ -2,11 +2,11 @@ import { createSelector } from 'reselect';
 
 const modeSelector = state => state.routing.locationBeforeTransitions.query.mode;
 
-export const HeaderSelectors = createSelector(
+const HeaderSelectors = createSelector(
   modeSelector,
-  (mode) => {
-    return {
-      mode,
-    };
-  }
+  mode => ({
+    mode,
+  })
 );
+
+export { HeaderSelectors as default };

@@ -11,7 +11,7 @@ import configs from '../../common/data/configs.json';
 
 export const initialState = fromJS({
   filters: {},
-  tags: []
+  tags: [],
 });
 
 export const reducer = createReducer({

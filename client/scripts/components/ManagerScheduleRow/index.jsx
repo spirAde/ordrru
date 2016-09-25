@@ -58,8 +58,7 @@ class ManagerScheduleRowComponent extends Component {
       const isEven = index % 2 === 0;
       const time = isEven ? configs.periods[cell.get('period')] : null;
 
-      const classes = classNames({
-        'ManagerScheduleRow-time-item': true,
+      const classes = classNames('ManagerScheduleRow-time-item', {
         'ManagerScheduleRow-time-item--left': isEven,
         'ManagerScheduleRow-time-item--right': !isEven,
       });
@@ -100,8 +99,7 @@ class ManagerScheduleRowComponent extends Component {
         const isOneDayOrder = order.get('isOneDayOrder');
         const isLastPeriod = cell.get('period') + STEP === LAST_PERIOD;
 
-        const classes = classNames({
-          'ManagerScheduleRow-cell': true,
+        const classes = classNames('ManagerScheduleRow-cell', {
           'ManagerScheduleRow-cell--available': cellIsFree,
           'ManagerScheduleRow-cell--disabled': cellIsBusy,
           'ManagerScheduleRow-cell--manager': !order.get('createdByUser'),
@@ -132,8 +130,7 @@ class ManagerScheduleRowComponent extends Component {
         );
       }
 
-      const classes = classNames({
-        'ManagerScheduleRow-cell': true,
+      const classes = classNames('ManagerScheduleRow-cell', {
         'ManagerScheduleRow-cell--available': cellIsFree,
         'ManagerScheduleRow-cell--disabled': cellIsBusy,
         'ManagerScheduleRow-cell--manager': cell.has('createdByUser') && !cell.get('createdByUser'),
@@ -162,14 +159,12 @@ class ManagerScheduleRowComponent extends Component {
     const renderedRow = this.renderRow();
     const renderedRowTimeline = this.renderTimeLineRow();
 
-    const timelineRowClasses = classNames({
-      'ManagerScheduleRow-timeline-row': true,
+    const timelineRowClasses = classNames('ManagerScheduleRow-timeline-row', {
       'ManagerScheduleRow-timeline-row--first': isFirst,
       'ManagerScheduleRow-timeline-row--last': isLast,
     });
 
-    const scheduleRowClasses = classNames({
-      'ManagerScheduleRow-schedule-row': true,
+    const scheduleRowClasses = classNames('ManagerScheduleRow-schedule-row', {
       'ManagerScheduleRow-schedule-row--first': isFirst,
       'ManagerScheduleRow-schedule-row--last': isLast,
     });

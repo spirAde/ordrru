@@ -4,7 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { connect } from 'react-redux';
 
-import { HomeSelectors } from '../selectors/HomeSelectors';
+import HomeSelectors from '../selectors/HomeSelectors';
 
 import { changeCity, changeOrganizationType } from '../actions/user-actions';
 
@@ -87,7 +87,7 @@ class HomePage extends Component {
  * @property {Function} changeOrganizationType - change selected organization type
  */
 HomePage.propTypes = {
-  cities: ImmutablePropTypes.list.isRequired,
+  cities: ImmutablePropTypes.list,
   changeCity: PropTypes.func.isRequired,
   changeOrganizationType: PropTypes.func.isRequired,
 };
@@ -97,11 +97,7 @@ HomePage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    changeCity: (city) => dispatch(changeCity(city)),
-    changeOrganizationType: (type) => dispatch(changeOrganizationType(type)),
-  };
-}
-
-export default connect(HomeSelectors, mapDispatchToProps)(HomePage);
+export default connect(HomeSelectors, {
+  changeCity,
+  changeOrganizationType,
+})(HomePage);

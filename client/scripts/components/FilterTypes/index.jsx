@@ -66,11 +66,12 @@ class FilterTypeComponent extends Component {
    * */
   renderTypes(types) {
     return types.map((type, index) => {
-      const typeClasses = classNames({
-        'FilterType-field-type-name': true,
+      const typeClasses = classNames('FilterType-field-type-name', {
         'FilterType-field-type-name-checked': type.get('checked'),
       });
+
       const name = type.get('name');
+
       return (
         <div
           className="FilterType-field FilterType-field-checkbox"

@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import Helmet from 'react-helmet';
-
 import { connect } from 'react-redux';
 
-import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice,
-} from '../actions/application-actions';
+import debounce from 'lodash/debounce';
+
+import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice } from '../actions/application-actions';
 
 /**
  * App - smart component, container, root
@@ -12,15 +12,12 @@ import { initGlobalCurrentDateAndPeriod, changeViewport, setDevice,
  * Dumb components - none
  * */
 class App extends Component {
-
   componentDidMount() {
     this.initServiceWorker();
     this.initGlobalCurrentDateAndPeriod();
 
     this.props.changeViewport(this.getViewPort());
-    window.addEventListener('resize', () => {
-      this.props.changeViewport(this.getViewPort());
-    });
+    window.addEventListener('resize', debounce(this.props.changeViewport.bind(this, this.getViewPort()), 250));
   }
 
   getViewPort() {
@@ -58,7 +55,10 @@ class App extends Component {
 }
 
 App.propTypes = {
-  children: PropTypes.object.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object,
+  ]).isRequired,
   initGlobalCurrentDateAndPeriod: PropTypes.func.isRequired,
   changeViewport: PropTypes.func.isRequired,
   setDevice: PropTypes.func.isRequired,
@@ -69,13 +69,8 @@ App.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    initGlobalCurrentDateAndPeriod: (datetime) =>
-      dispatch(initGlobalCurrentDateAndPeriod(datetime)),
-    changeViewport: (viewport) => dispatch(changeViewport(viewport)),
-    setDevice: (device) => dispatch(setDevice(device)),
-  };
-}
-
-export default connect(state => state, mapDispatchToProps)(App);
+export default connect(state => state, {
+  initGlobalCurrentDateAndPeriod,
+  changeViewport,
+  setDevice,
+})(App);

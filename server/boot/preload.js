@@ -3,8 +3,7 @@ import fs from 'fs';
 import moment from 'moment';
 import { flatten, assign, invert, map, floor, ceil, min, max } from 'lodash';
 
-export default (app) => {
-
+export default (app, callback) => {
 	const Bathhouse = app.models.Bathhouse;
 	const City = app.models.City;
 
@@ -33,7 +32,9 @@ export default (app) => {
 		]
 	};
 
-	commonFilters.options = map(app.get('bathhouseOptions').concat(app.get('roomOptions')), 'option').map(option => {
+	const commonOptions = app.get('bathhouseOptions').concat(app.get('roomOptions'));
+
+	commonFilters.options = map(commonOptions, 'option').map(option => {
 		return {
 			name: option,
 			checked: false
@@ -105,11 +106,15 @@ export default (app) => {
 					}
 				};
 
-				outData.filters[city.id] = assign({}, commonFilters, { distance: cityDistance, guest: guest, price: prices });
+				outData.filters[city.id] = assign(
+					{}, commonFilters, { distance: cityDistance, guest: guest, price: prices }
+				);
 			});
 
 			try {
-				fs.writeFileSync(configFile, JSON.stringify(outData, null, 2));	
+				fs.writeFile(configFile, JSON.stringify(outData, null, 2), () => {
+					callback();
+				});
 			} catch (error) {
 				throw error;
 			}

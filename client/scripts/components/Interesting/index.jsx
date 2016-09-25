@@ -12,14 +12,6 @@ import './style.css';
 class InterestingComponent extends Component {
 
   /**
-   * constructor
-   * @param {object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * render
    * @return {XML} - React element
    * */

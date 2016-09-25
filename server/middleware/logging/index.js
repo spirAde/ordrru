@@ -5,6 +5,7 @@ import loopback from 'loopback';
 import { merge } from 'lodash';
 import bunyan from 'bunyan';
 import uuid from 'uuid';
+import LoopBackContext from 'loopback-context';
 
 const APP_ROOT = process.cwd();
 
@@ -55,7 +56,7 @@ export default function(config) {
 
 		req.log = logger.child(logCtx, true);
 
-		const loopbackContext = loopback.getCurrentContext();
+		const loopbackContext = LoopBackContext.getCurrentContext();
 
 		if (loopbackContext) loopbackContext.set('logger', req.log);
 

@@ -4,13 +4,11 @@ import './style.css';
 import classNames from 'classnames';
 
 const ModalComponent = ({ children, active, width, height }) => {
-  const maskClasses = classNames({
-    'Modal-mask': true,
+  const maskClasses = classNames('Modal-mask', {
     'Modal-mask--active': active,
   });
 
-  const panelClasses = classNames({
-    'Modal-panel': true,
+  const panelClasses = classNames('Modal-panel', {
     'Modal-panel--hidden': !active,
   });
 

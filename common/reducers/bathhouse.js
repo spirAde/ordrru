@@ -1,7 +1,5 @@
 import { fromJS } from 'immutable';
 
-import configs from '../../common/data/configs.json';
-
 import createReducer from '../utils/create-reducer';
 
 import {

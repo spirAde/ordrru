@@ -80,7 +80,7 @@ class ManagerSchedulePanelComponent extends Component {
   }
 
   renderRows() {
-    const { room, orders, schedules } = this.props;
+    const { orders, schedules } = this.props;
 
     const schedulesLength = schedules.size;
 

@@ -1,7 +1,6 @@
 import path from 'path';
 
 import pick from 'lodash/pick';
-import get from 'lodash/get';
 
 import loopback from 'loopback';
 import boot from 'loopback-boot';
@@ -54,9 +53,7 @@ app.use('/api', loopback.rest());
 
 // entrance for managers, they have their own reducer and own configuration
 app.use('/manager', (req, res, next) => {
-  if (__DEVELOPMENT__) {
-    isomorphicTools.refresh();
-  }
+  isomorphicTools.refresh();
 
   const referenceDatetime = moment().toDate();
   const locale = req.acceptsLanguages(app.get('locales')) || 'ru';
@@ -190,9 +187,7 @@ app.use((req, res, next) => {
 
   const locale = req.acceptsLanguages(app.get('locales')) || 'ru';
 
-  if (__DEVELOPMENT__) {
-    isomorphicTools.refresh();
-  }
+  isomorphicTools.refresh();
 
   const reducers = configureReducers();
   const memoryHistory = createMemoryHistory(req.originalUrl);
@@ -252,17 +247,19 @@ app.use((req, res, next) => {
             </IntlProvider>
           );
 
+          const assets = isomorphicTools.assets();
+
           global.navigator = { userAgent: req.headers['user-agent'] };
 
           res.status(200);
           res.send('<!doctype html>\n' +
             ReactDOMServer.renderToString(
               <Root
-                assets={ isomorphicTools.assets() }
+                assets={assets}
                 component={component}
                 store={store}
                 locale={locale}
-                referenceDatetime = {referenceDatetime}
+                referenceDatetime={referenceDatetime}
               />
             )
           );
@@ -276,7 +273,6 @@ app.use((req, res, next) => {
 
 app.start = () => {
   boot(app, bootOptions, error => {
-
     if (error) throw error;
 
     app.listen(() => {
@@ -302,7 +298,6 @@ app.start = () => {
 
       app.io.on('connection', socket => {
         socket.on('server/ADD_TO_SOCKET_ROOM', data => {
-          console.log('ADD_TO_SOCKET_ROOM', data);
           const roomId = data.type === 'user' ? data.cityId : data.bathhouseId;
           socket.join(roomId);
         });

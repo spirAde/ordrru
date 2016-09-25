@@ -18,10 +18,10 @@ function deepDiff(prevProps, nextProps, property) {
     console.log('%cbefore', 'font-weight: bold', Iterable.isIterable(prevProps) ? prevProps.toJS() : prevProps);
     console.log('%cafter ', 'font-weight: bold', Iterable.isIterable(nextProps) ? nextProps.toJS() : nextProps);
   };
-  
+
   if (!isEqual(prevProps, nextProps) || !is(prevProps, nextProps)) {
     console.group(property);
-    
+
     if ([prevProps, nextProps].every(isFunction)) {
       notify('avoidable?');
     } else if (![prevProps, nextProps].every(isRequiredUpdateObject)) {
@@ -32,19 +32,19 @@ function deepDiff(prevProps, nextProps, property) {
         deepDiff(prevProps[key], nextProps[key], key);
       }
     }
-    
+
     console.groupEnd();
   } else if (prevProps !== nextProps) {
     console.group(property);
     notify('avoidable!');
-    
+
     if (isObject(prevProps) && isObject(nextProps)) {
       const keysList = union(keys(prevProps), keys(nextProps));
       for (const key of keysList) {
         deepDiff(prevProps[key], nextProps[key], key);
       }
     }
-    
+
     console.groupEnd();
   }
 }

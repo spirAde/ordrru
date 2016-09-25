@@ -82,8 +82,7 @@ class DatePaginatorComponent extends Component {
     const { selectedItemWidth, itemWidth } = this.props;
 
     return map(dates, (date, index) => {
-      const classes = classNames({
-        'DatePaginator-item': true,
+      const classes = classNames('DatePaginator-item', {
         'DatePaginator-item--selected': date.isSelected,
         'DatePaginator-item--today': date.isToday,
         'DatePaginator-item--off': date.isOffDay,

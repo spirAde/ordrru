@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import ManagerLoginComponent from '../components/ManagerLogin/index.jsx';
 
-import { ManagerLoginSelectors } from '../selectors/ManagerLoginSelectors';
+import ManagerLoginSelectors from '../selectors/ManagerLoginSelectors';
 
 import { login } from '../actions/manager-actions';
 
@@ -53,10 +53,6 @@ ManagerLoginPage.propTypes = {
  * @param {Function} dispatch
  * @return {Object} props - list of methods
  * */
-function mapDispatchToProps(dispatch) {
-  return {
-    login: (credentials) => dispatch(login(credentials)),
-  };
-}
-
-export default connect(ManagerLoginSelectors, mapDispatchToProps)(ManagerLoginPage);
+export default connect(ManagerLoginSelectors, {
+  login,
+})(ManagerLoginPage);

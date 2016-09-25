@@ -91,18 +91,18 @@ export function findRoomScheduleIfNeed(roomId, fixEdges) {
   };
 }
 
-export function findRoomScheduleForDateIfNeed(roomId, date) {
+export function findRoomScheduleForDatesIfNeed(roomId, dates) {
   return (dispatch, getState) => {
     const state = getState();
     const schedules = state.schedule.getIn(['schedules', roomId]);
-    const dateSchedule = schedules.find(schedule => moment(schedule.get('date')).isSame(date));
+    const dateSchedule = schedules.find(schedule => moment(schedule.get('date')).isSame(dates));
 
     if (dateSchedule.size) return false;
 
     dispatch(fetchRoomScheduleRequest());
 
     return Schedule.find({
-      where: { roomId, date },
+      where: { roomId, dates },
       order: 'date ASC',
     })
       .then(schedule => {
@@ -155,7 +155,7 @@ export function updateScheduleIfNeed(roomId, schedule, reason) {
 
     if (!state.schedule.hasIn(['schedules', roomId])) return false;
 
-    return updateSchedule(roomId, schedule, reason);
+    return dispatch(updateSchedule(roomId, schedule, reason));
   };
 }
 

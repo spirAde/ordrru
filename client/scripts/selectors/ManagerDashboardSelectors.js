@@ -8,10 +8,11 @@ const roomsSelector = state => state.bathhouse.get('rooms');
 const orderSelector = state => state.order.get('order');
 const ordersSelector = state => state.order.get('orders');
 const schedulesSelector = state => state.schedule.get('schedules');
+const intervalSelector = state => state.schedule.get('interval');
 const ordersIsFetchingSelector = state => state.schedule.get('isFetching');
 const schedulesIsFetchingSelector = state => state.schedule.get('isFetching');
 
-export const ManagerDashboardSelectors = createSelector(
+const ManagerDashboardSelectors = createSelector(
   viewportSelector,
   dateSelector,
   managerSelector,
@@ -20,10 +21,11 @@ export const ManagerDashboardSelectors = createSelector(
   orderSelector,
   ordersSelector,
   schedulesSelector,
+  intervalSelector,
   ordersIsFetchingSelector,
   schedulesIsFetchingSelector,
   (
-    viewport, date, manager, bathhouse, rooms, order, orders, schedules,
+    viewport, date, manager, bathhouse, rooms, order, orders, schedules, interval,
     ordersIsFetching, schedulesIsFetching
   ) => ({
     viewport,
@@ -34,7 +36,10 @@ export const ManagerDashboardSelectors = createSelector(
     order,
     orders,
     schedules,
+    interval,
     ordersIsFetching,
     schedulesIsFetching,
   })
 );
+
+export { ManagerDashboardSelectors as default };

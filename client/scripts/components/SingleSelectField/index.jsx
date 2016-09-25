@@ -33,8 +33,7 @@ class SingleSelectFieldComponent extends Component {
   renderRows() {
     const { options, name } = this.props;
     return options.map((option, index) => {
-      const classes = classNames({
-        'SingleSelectField-option': true,
+      const classes = classNames('SingleSelectField-option', {
         'SingleSelectField-option--selected': this.state.selectedIndex === index,
         'SingleSelectField-option--first': index === 0,
         'SingleSelectField-option--last': index === this.props.options.length

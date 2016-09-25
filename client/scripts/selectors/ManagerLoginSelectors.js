@@ -2,11 +2,11 @@ import { createSelector } from 'reselect';
 
 const notificationsSelector = state => state.notification.get('notifications');
 
-export const ManagerLoginSelectors = createSelector(
+const ManagerLoginSelectors = createSelector(
   notificationsSelector,
-  (notifications) => {
-    return {
-      notifications,
-    };
-  }
+  notifications => ({
+    notifications,
+  })
 );
+
+export { ManagerLoginSelectors as default };

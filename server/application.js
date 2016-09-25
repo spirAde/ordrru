@@ -1,4 +1,3 @@
-import cookie from 'cookie';
 import PrettyError from 'pretty-error';
 import moment from 'moment';
 
@@ -74,6 +73,8 @@ export function initializeApp(locale, location, forUser) {
 								</IntlProvider>
 							);
 
+							console.log(1);
+
 							global.navigator = { userAgent: req.headers['user-agent'] };
 
 							res.status(200);
@@ -84,7 +85,7 @@ export function initializeApp(locale, location, forUser) {
 										component={component}
 										store={store}
 										locale={locale}
-										referenceDatetime = {referenceDatetime}
+										referenceDatetime={referenceDatetime}
 									/>
 								)
 							);

@@ -57,9 +57,7 @@ class LoaderComponent extends Component {
 
     const loaderStyle = { position: 'relative' };
 
-    const classes = classNames({
-      'loading-container': true,
-    }, this.props.className);
+    const classes = classNames('loading-container', this.props.className);
 
     // use like overlay
     if (children) {
@@ -74,7 +72,7 @@ class LoaderComponent extends Component {
                 <div className="Loader__foreground" style={foregroundDefaultStyle}>
                   <div className="Loader__message" style={messageDefaultStyle}>
                     <div className={classes}>
-                      <div className="loading"></div>
+                      <div className="loading" />
                       <div className="loading-text">
                         <FormattedMessage id="loading" />
                       </div>
@@ -89,7 +87,7 @@ class LoaderComponent extends Component {
 
     return (
       <div className={classes}>
-        <div className="loading"></div>
+        <div className="loading" />
         <div className="loading-text">
           <FormattedMessage id="loading" />
         </div>

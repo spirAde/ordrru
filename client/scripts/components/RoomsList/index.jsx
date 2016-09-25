@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 
 import { indexOf } from 'lodash';
 
-import { RoomsListSelectors } from '../../selectors/RoomsListSelectors';
+import RoomsListSelectors from '../../selectors/RoomsListSelectors';
 
 import shallowEqualImmutable from '../../utils/shallowEqualImmutable';
 
@@ -222,23 +222,14 @@ RoomsListComponent.propTypes = {
   resetOrderSchedule: PropTypes.func.isRequired,
 };
 
-/**
- * pass method to props
- * @param {Function} dispatch
- * @return {Object} props - list of methods
- * */
-function mapDispatchToProps(dispatch) {
-  return {
-    resetFullOrder: () => dispatch(resetFullOrder()),
-    resetDatetimeOrder: () => dispatch(resetDatetimeOrder()),
-    changeActiveRoom: (id) => dispatch(changeActiveRoom(id)),
-    findRoomScheduleIfNeed: (id) => dispatch(findRoomScheduleIfNeed(id)),
-    findCommentsIfNeed: (id) => dispatch(findCommentsIfNeed(id)),
-    selectOrder: (id, date, period) => dispatch(selectOrder(id, date, period)),
-    checkOrder: (order) => dispatch(checkOrder(order)),
-    sendOrder: () => dispatch(sendOrder()),
-    resetOrderSchedule: () => dispatch(resetOrderSchedule()),
-  };
-}
-
-export default connect(RoomsListSelectors, mapDispatchToProps)(RoomsListComponent);
+export default connect(RoomsListSelectors, {
+  resetFullOrder,
+  resetDatetimeOrder,
+  changeActiveRoom,
+  findRoomScheduleIfNeed,
+  findCommentsIfNeed,
+  selectOrder,
+  checkOrder,
+  sendOrder,
+  resetOrderSchedule,
+})(RoomsListComponent);
