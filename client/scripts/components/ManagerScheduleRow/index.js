@@ -60,7 +60,7 @@ var ManagerScheduleRowComponent = function (_Component) {
   function ManagerScheduleRowComponent(props) {
     (0, _classCallCheck3.default)(this, ManagerScheduleRowComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(ManagerScheduleRowComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (ManagerScheduleRowComponent.__proto__ || (0, _getPrototypeOf2.default)(ManagerScheduleRowComponent)).call(this, props));
 
     _this.handleClickCreateOrder = _this.handleClickCreateOrder.bind(_this);
     return _this;

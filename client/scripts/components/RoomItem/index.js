@@ -120,7 +120,7 @@ var RoomItemComponent = function (_Component) {
      */
     // TODO: remove immutable, set just plain
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(RoomItemComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (RoomItemComponent.__proto__ || (0, _getPrototypeOf2.default)(RoomItemComponent)).call(this, props));
 
     _this.state = {
       data: (0, _immutable.Map)({

@@ -80,7 +80,7 @@ var SchedulePanelComponent = function (_Component) {
   function SchedulePanelComponent(props) {
     (0, _classCallCheck3.default)(this, SchedulePanelComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(SchedulePanelComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (SchedulePanelComponent.__proto__ || (0, _getPrototypeOf2.default)(SchedulePanelComponent)).call(this, props));
 
     _this.state = {
       data: (0, _immutable.fromJS)({

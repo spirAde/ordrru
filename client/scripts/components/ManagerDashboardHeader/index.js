@@ -67,7 +67,7 @@ var ManagerDashboardHeaderComponent = function (_Component) {
   function ManagerDashboardHeaderComponent(props) {
     (0, _classCallCheck3.default)(this, ManagerDashboardHeaderComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(ManagerDashboardHeaderComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (ManagerDashboardHeaderComponent.__proto__ || (0, _getPrototypeOf2.default)(ManagerDashboardHeaderComponent)).call(this, props));
 
     _this.handleClickLogout = _this.handleClickLogout.bind(_this);
     return _this;

@@ -65,7 +65,7 @@ var FilterPrepaymentComponent = function (_Component) {
   function FilterPrepaymentComponent(props) {
     (0, _classCallCheck3.default)(this, FilterPrepaymentComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(FilterPrepaymentComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (FilterPrepaymentComponent.__proto__ || (0, _getPrototypeOf2.default)(FilterPrepaymentComponent)).call(this, props));
 
     _this.handleClick = _this.handleClick.bind(_this);
     return _this;

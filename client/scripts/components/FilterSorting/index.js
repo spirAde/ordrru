@@ -69,7 +69,7 @@ var FilterSortingComponent = function (_Component) {
   function FilterSortingComponent(props) {
     (0, _classCallCheck3.default)(this, FilterSortingComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(FilterSortingComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (FilterSortingComponent.__proto__ || (0, _getPrototypeOf2.default)(FilterSortingComponent)).call(this, props));
 
     _this.handleClickSortingType = _this.handleClickSortingType.bind(_this);
     return _this;

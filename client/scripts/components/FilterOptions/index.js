@@ -69,7 +69,7 @@ var FilterOptionsComponent = function (_Component) {
   function FilterOptionsComponent(props) {
     (0, _classCallCheck3.default)(this, FilterOptionsComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(FilterOptionsComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (FilterOptionsComponent.__proto__ || (0, _getPrototypeOf2.default)(FilterOptionsComponent)).call(this, props));
 
     _this.handleChangeOption = _this.handleChangeOption.bind(_this);
     return _this;

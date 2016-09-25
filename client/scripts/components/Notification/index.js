@@ -60,7 +60,7 @@ var NotificationComponent = function (_Component) {
   function NotificationComponent(props) {
     (0, _classCallCheck3.default)(this, NotificationComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(NotificationComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (NotificationComponent.__proto__ || (0, _getPrototypeOf2.default)(NotificationComponent)).call(this, props));
 
     _this.handleFinishTimeout = _this.handleFinishTimeout.bind(_this);
     _this.handleClickCloseButton = _this.handleClickCloseButton.bind(_this);

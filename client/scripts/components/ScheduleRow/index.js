@@ -76,7 +76,7 @@ var ScheduleRowComponent = function (_Component) {
      * @property {Object|null} shownInterval - shown price interval, when user mouse over cell
      */
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(ScheduleRowComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (ScheduleRowComponent.__proto__ || (0, _getPrototypeOf2.default)(ScheduleRowComponent)).call(this, props));
 
     _this.state = {
       shownInterval: null

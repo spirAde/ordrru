@@ -42,7 +42,7 @@ var SingleSelectFieldComponent = function (_Component) {
   function SingleSelectFieldComponent(props) {
     (0, _classCallCheck3.default)(this, SingleSelectFieldComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(SingleSelectFieldComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (SingleSelectFieldComponent.__proto__ || (0, _getPrototypeOf2.default)(SingleSelectFieldComponent)).call(this, props));
 
     _this.state = {
       selectedIndex: props.index || 0,

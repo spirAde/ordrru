@@ -69,7 +69,7 @@ var FilterTypeComponent = function (_Component) {
   function FilterTypeComponent(props) {
     (0, _classCallCheck3.default)(this, FilterTypeComponent);
 
-    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(FilterTypeComponent).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (FilterTypeComponent.__proto__ || (0, _getPrototypeOf2.default)(FilterTypeComponent)).call(this, props));
 
     _this.handleChangeType = _this.handleChangeType.bind(_this);
     return _this;
